@@ -190,27 +190,72 @@ class GoogleDriveClient(BaseIngestionClient):
             results = self.service.files().list(
                 q=query,
                 spaces="drive",
-                fields="files(id, name, size, mimeType, createdTime)",
+                fields="files(id, name, size, mimeType, md5Checksum, createdTime)",
                 pageSize=50,
                 orderBy="createdTime",
             ).execute()
 
             files = results.get("files", [])
+            if not files:
+                return []
+
+            # Retrieve checksums of already processed videos to prevent duplicate processing
+            processed_md5s = set()
+            try:
+                proc_query = f"'{self.processed_folder_id}' in parents and trashed = false"
+                proc_results = self.service.files().list(
+                    q=proc_query,
+                    spaces="drive",
+                    fields="files(id, name, md5Checksum)",
+                    pageSize=100,
+                ).execute()
+                for pf in proc_results.get("files", []):
+                    if pf.get("md5Checksum"):
+                        processed_md5s.add(pf["md5Checksum"])
+            except Exception as pe:
+                logger.warning(f"Could not scan processed folder for MD5s: {pe}")
+
             pending_videos = []
+            seen_input_md5s = set()
 
             for f in files:
                 name = f.get("name", "")
+                file_id = f.get("id")
                 suffix = Path(name).suffix.lower()
                 mime = f.get("mimeType", "")
+                md5 = f.get("md5Checksum")
+
                 if suffix in VIDEO_EXTENSIONS or mime.startswith("video/"):
+                    # Check 1: Duplicate of an already processed recording
+                    if md5 and md5 in processed_md5s:
+                        logger.warning(
+                            f"Input video '{name}' (MD5: {md5}) is a duplicate of an already processed file. "
+                            f"Auto-moving directly to Processed folder."
+                        )
+                        self.mark_as_processed(file_id)
+                        continue
+
+                    # Check 2: Duplicate twin inside the same Input folder
+                    if md5 and md5 in seen_input_md5s:
+                        logger.warning(
+                            f"Input video '{name}' is a duplicate of another file in Input. "
+                            f"Archiving duplicate to Processed folder."
+                        )
+                        self.mark_as_processed(file_id)
+                        continue
+
+                    if md5:
+                        seen_input_md5s.add(md5)
+
                     pending_videos.append({
-                        "id": f["id"],
+                        "id": file_id,
                         "name": name,
                         "size": int(f.get("size", 0)),
                         "createdTime": f.get("createdTime"),
+                        "md5Checksum": md5,
                     })
 
-            logger.info(f"Found {len(pending_videos)} pending video(s) in Drive Input folder")
+            logger.info(f"Found {len(pending_videos)} pending video(s) in Drive Input folder (after deduplication)")
             return pending_videos
 
         except Exception as e:
@@ -259,13 +304,24 @@ class GoogleDriveClient(BaseIngestionClient):
         logger.info(f"Moving file {file_id} from Input to Processed folder in Drive")
         try:
             # Move file by updating parent folders
-            self.service.files().update(
+            updated = self.service.files().update(
                 fileId=file_id,
                 addParents=self.processed_folder_id,
                 removeParents=self.input_folder_id,
                 fields="id, parents",
             ).execute()
-            logger.info(f"File {file_id} successfully archived in Processed folder")
+
+            # Strict removal verification: guarantee input_folder_id is no longer a parent
+            parents = updated.get("parents", [])
+            if self.input_folder_id in parents:
+                logger.warning(f"File {file_id} still associated with Input folder. Enforcing removal.")
+                self.service.files().update(
+                    fileId=file_id,
+                    removeParents=self.input_folder_id,
+                    fields="id, parents",
+                ).execute()
+
+            logger.info(f"File {file_id} successfully archived in Processed folder and removed from Input.")
         except Exception as e:
             raise IngestionError(
                 operation="mark_as_processed",
@@ -301,8 +357,27 @@ class GoogleDriveClient(BaseIngestionClient):
         meta_year_id = self._ensure_folder(year_str, parent_id=metadata_root_id)
         meta_month_id = self._ensure_folder(month_str, parent_id=meta_year_id)
 
-        # 3. Filename formats: video_ddmmyyyy.mp4 and metadata_ddmmyyyy.json
+        # Check existing filenames in destination to prevent duplicate collisions
+        existing_vids = set()
+        try:
+            q_vids = f"'{video_month_id}' in parents and trashed = false"
+            res_vids = self.service.files().list(q=q_vids, spaces="drive", fields="files(name)").execute()
+            existing_vids = {f["name"] for f in res_vids.get("files", [])}
+        except Exception as e:
+            logger.warning(f"Could not list existing video files for collision check: {e}")
+
+        # 3. Filename formats: video_ddmmyyyy.mp4 and metadata_ddmmyyyy.json (auto-disambiguated)
         drive_video_name = f"video_{ddmmyyyy}.mp4"
+        meta_name = f"metadata_{ddmmyyyy}.json"
+
+        if drive_video_name in existing_vids:
+            counter = 1
+            while f"video_{ddmmyyyy}_{counter}.mp4" in existing_vids:
+                counter += 1
+            drive_video_name = f"video_{ddmmyyyy}_{counter}.mp4"
+            meta_name = f"metadata_{ddmmyyyy}_{counter}.json"
+            logger.info(f"Resolved Drive output collision: disambiguated filename to {drive_video_name}")
+
         logger.info(
             f"Uploading processed video to Drive Output/videos/{year_str}/{month_str}/{drive_video_name}",
             extra_data={"local_path": str(local_video_path)},
@@ -334,7 +409,6 @@ class GoogleDriveClient(BaseIngestionClient):
             # 4. Upload companion metadata JSON into Output/metadata/year/month/
             uploaded_meta_id = None
             if metadata_path and metadata_path.exists():
-                meta_name = f"metadata_{ddmmyyyy}.json"
                 meta_media = MediaFileUpload(str(metadata_path), mimetype="application/json")
                 meta_request = self.service.files().create(
                     body={"name": meta_name, "parents": [meta_month_id]},
@@ -350,6 +424,7 @@ class GoogleDriveClient(BaseIngestionClient):
                 "video_name": drive_video_name,
                 "video_folder": f"Output/videos/{year_str}/{month_str}",
                 "metadata_id": uploaded_meta_id,
+                "metadata_name": meta_name if uploaded_meta_id else None,
                 "metadata_folder": f"Output/metadata/{year_str}/{month_str}",
             }
         except Exception as e:

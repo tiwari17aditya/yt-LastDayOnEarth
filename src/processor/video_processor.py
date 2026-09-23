@@ -27,7 +27,19 @@ class VideoProcessor:
         return f"{clean_stem}_Processed_{today_date}.mp4"
 
     def get_output_path(self, original_filename: str) -> Path:
-        return self.output_dir / self.generate_output_filename(original_filename)
+        base_filename = self.generate_output_filename(original_filename)
+        candidate = self.output_dir / base_filename
+        if not candidate.exists():
+            return candidate
+
+        stem = Path(base_filename).stem
+        suffix = Path(base_filename).suffix
+        counter = 1
+        while candidate.exists():
+            candidate = self.output_dir / f"{stem}_{counter}{suffix}"
+            counter += 1
+        logger.info(f"Resolved duplicate output name collision: {candidate.name}")
+        return candidate
 
     def get_video_duration(self, video_path: Path) -> float:
         """Determines the duration of the video in seconds using ffprobe."""

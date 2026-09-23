@@ -1,6 +1,7 @@
 """Main entry point and orchestrator for the Last Day on Earth video pipeline."""
 
 import argparse
+import hashlib
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -8,6 +9,14 @@ from datetime import datetime
 from src.config import get_settings
 from src.logging_config import get_logger
 from src.exceptions import PipelineError, IngestionError
+
+def calculate_file_md5(file_path: Path) -> str:
+    """Calculates MD5 hash for a local file to ensure reliable duplicate detection."""
+    hasher = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            hasher.update(chunk)
+    return hasher.hexdigest()
 from src.privacy.detector import PrivacyDetector
 from src.subtitles.event_analyzer import SubtitleGenerator
 from src.audio.selector import AudioMixer
@@ -38,7 +47,7 @@ def get_notifier(settings):
         )
 
 
-def run_pipeline(input_video_path: Path, local_only: bool = True) -> Path:
+def run_pipeline(input_video_path: Path, local_only: bool = True, force: bool = False) -> Path:
     """Executes the complete video processing workflow for a single video file."""
     settings = get_settings()
     logger.info("Initiating video processing workflow", extra_data={"input": str(input_video_path)})
@@ -59,6 +68,16 @@ def run_pipeline(input_video_path: Path, local_only: bool = True) -> Path:
     )
     notifier = get_notifier(settings)
     tracker = HistoryTracker(history_file=settings.processing.history_file)
+
+    # Duplicate input detection
+    file_md5 = calculate_file_md5(input_video_path)
+    if not force and tracker.is_duplicate(input_video_path.name, md5_checksum=file_md5):
+        logger.warning(
+            f"Input video '{input_video_path.name}' (MD5: {file_md5}) was already successfully processed. "
+            f"Skipping duplicate execution. (Use --force to reprocess)"
+        )
+        output_path = processor.get_output_path(input_video_path.name)
+        return output_path
 
     try:
         # Step 1: Privacy Protection (Redacting sensitive popups, preserving username & chat)
@@ -124,6 +143,7 @@ def run_pipeline(input_video_path: Path, local_only: bool = True) -> Path:
             output_filename=output_path.name,
             status="SUCCESS",
             youtube_url=youtube_url,
+            md5_checksum=file_md5,
             details={
                 "video_output": str(output_path),
                 "metadata_output": str(metadata_json_path),
@@ -160,7 +180,7 @@ def run_pipeline(input_video_path: Path, local_only: bool = True) -> Path:
         raise
 
 
-def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True) -> int:
+def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, force: bool = False) -> int:
     """Scheduled task runner: checks Drive Input, downloads, processes, uploads, and archives."""
     settings = get_settings()
     logger.info("=" * 60)
@@ -202,7 +222,7 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True) -
 
             try:
                 # Run full video pipeline
-                rendered_output = run_pipeline(local_download_path, local_only=not upload)
+                rendered_output = run_pipeline(local_download_path, local_only=not upload, force=force)
 
                 # Upload processed video & metadata to Google Drive Output (Year -> Month -> video_ddmmyyyy)
                 meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
@@ -247,21 +267,23 @@ def main() -> None:
     process_parser.add_argument("--input", "-i", type=str, required=True, help="Path to input video file")
     process_parser.add_argument("--local", action="store_true", default=True, help="Run locally without uploading to YouTube")
     process_parser.add_argument("--upload", action="store_true", help="Upload to YouTube after processing")
+    process_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
 
     # Scheduled Google Drive CRON command
     cron_parser = subparsers.add_parser("drive-cron", help="Poll Google Drive for pending recordings and process")
     cron_parser.add_argument("--dry-run", action="store_true", help="Inspect Drive Input folder without processing")
     cron_parser.add_argument("--limit", type=int, default=1, help="Max videos to process in this run (default: 1)")
     cron_parser.add_argument("--no-upload", action="store_true", help="Do not upload to YouTube")
+    cron_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
 
     args = parser.parse_args()
 
     if args.command == "process":
         local_flag = not args.upload
-        run_pipeline(Path(args.input), local_only=local_flag)
+        run_pipeline(Path(args.input), local_only=local_flag, force=args.force)
     elif args.command == "drive-cron":
         upload_flag = not args.no_upload
-        exit_code = run_drive_cron(dry_run=args.dry_run, limit=args.limit, upload=upload_flag)
+        exit_code = run_drive_cron(dry_run=args.dry_run, limit=args.limit, upload=upload_flag, force=args.force)
         sys.exit(exit_code)
     else:
         parser.print_help()

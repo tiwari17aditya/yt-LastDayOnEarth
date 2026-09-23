@@ -31,3 +31,28 @@ def test_ffmpeg_command_generation():
     assert str(output_path) in cmd
     assert "-movflags" in cmd
     assert "+faststart" in cmd
+
+
+def test_output_path_collision_disambiguation(tmp_path):
+    processor = VideoProcessor(output_dir=tmp_path)
+    today_str = datetime.now().strftime("%d%m%Y")
+    expected_base = tmp_path / f"gameplay_Processed_{today_str}.mp4"
+    
+    # 1st call: file does not exist yet
+    path1 = processor.get_output_path("gameplay.mp4")
+    assert path1 == expected_base
+    
+    # Create the file on disk to simulate collision
+    path1.touch()
+    
+    # 2nd call: collision detected -> auto-disambiguates to _1
+    path2 = processor.get_output_path("gameplay.mp4")
+    assert path2 == tmp_path / f"gameplay_Processed_{today_str}_1.mp4"
+    
+    # Create that file too
+    path2.touch()
+    
+    # 3rd call: collision detected -> auto-disambiguates to _2
+    path3 = processor.get_output_path("gameplay.mp4")
+    assert path3 == tmp_path / f"gameplay_Processed_{today_str}_2.mp4"
+

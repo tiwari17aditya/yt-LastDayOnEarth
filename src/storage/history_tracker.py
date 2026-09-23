@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from src.logging_config import get_logger
 
 logger = get_logger(component="HistoryTracker")
@@ -30,6 +30,22 @@ class HistoryTracker:
             logger.error("Failed to read history file", extra_data={"error": str(e)})
             return []
 
+    def is_duplicate(self, input_filename: str, md5_checksum: Optional[str] = None) -> bool:
+        """Checks if a video with the same MD5 checksum or input filename was successfully processed."""
+        records = self.load_records()
+        for r in records:
+            if r.get("status") != "SUCCESS":
+                continue
+            # Match by MD5 checksum (strongest guarantee)
+            if md5_checksum and r.get("details", {}).get("md5_checksum") == md5_checksum:
+                logger.info(f"Duplicate detected by MD5 checksum: {md5_checksum} (Job: {r.get('job_id')})")
+                return True
+            # Match by filename
+            if input_filename and r.get("input_filename") == input_filename:
+                logger.info(f"Duplicate detected by filename: {input_filename} (Job: {r.get('job_id')})")
+                return True
+        return False
+
     def record_job(
         self,
         job_id: str,
@@ -38,8 +54,13 @@ class HistoryTracker:
         status: str,
         youtube_url: str = "",
         details: Dict[str, Any] = None,
+        md5_checksum: Optional[str] = None,
     ) -> None:
         records = self.load_records()
+        details = details or {}
+        if md5_checksum:
+            details["md5_checksum"] = md5_checksum
+
         new_record = {
             "job_id": job_id,
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -47,9 +68,10 @@ class HistoryTracker:
             "output_filename": output_filename,
             "status": status,
             "youtube_url": youtube_url,
-            "details": details or {},
+            "details": details,
         }
         records.append(new_record)
         with open(self.history_file, "w", encoding="utf-8") as f:
             json.dump(records, f, indent=2)
         logger.info("Recorded job execution to history", extra_data={"job_id": job_id, "status": status})
+
