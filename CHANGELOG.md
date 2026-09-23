@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-09-23
+
+### Added
+- **Automated YouTube Playlist Management**: Automatically discovers or creates the dedicated channel playlist (`Last Day on Earth: Survival — Official Gameplay Series`, ID `PLJPzVNVZwaGY`) with rich description and hashtags, and automatically adds all newly published episodes.
+- **Comprehensive Duplicate Prevention**:
+  - **Drive Input Deduplication**: Compares native `md5Checksum` against `Processed` folder to skip previously processed recordings and auto-archive twin duplicate uploads.
+  - **Drive Output Disambiguation**: Resolves same-day filename collisions by auto-incrementing suffixes (`video_{ddmmyyyy}_1.mp4`, `metadata_{ddmmyyyy}_1.json`).
+  - **Local Deduplication**: Computes MD5 file checksums and verifies against `HistoryTracker` with `--force` CLI override.
+  - **Strict Drive Removal**: Verifies `parents` after moving to ensure raw recordings are permanently removed from `Input`.
+- **Streamlined OAuth & Secret Sync**: Integrated one-click credential saving and automatic GitHub repository secret synchronization in `scripts/setup_google_auth.py`.
+- **Test Suite Expansion**: Added `tests/test_duplicates.py` and `tests/test_youtube_client.py` bringing test coverage to 27 unit tests.
+
+### Changed
+- **Default Privacy Status**: Switched default YouTube publishing privacy from `unlisted` to `public` across configurations, workflow runners, and publishing clients.
+
 ## [0.4.0] - 2026-09-23
 
 ### Added

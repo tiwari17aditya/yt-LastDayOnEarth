@@ -72,11 +72,18 @@ LastDayOnEarth/
    - `GCP_REFRESH_TOKEN`
    - `NOTIFICATION_RECIPIENTS`
 
-### Google Drive Safety Boundary
-The pipeline enforces a strict folder containment rule:
-- Path: `MyDrive -> youtube-projects -> LastDayOnEarth`
-- Put new raw gameplay recordings in: `Input/`
-- Processed recordings are automatically moved to: `Processed/`
+### Google Drive Folder Architecture
+The pipeline enforces a strict folder containment rule locked to `MyDrive -> youtube-projects -> LastDayOnEarth`:
+- **Input Recordings**: Place new raw gameplay recordings in `Input/`.
+- **Processed Archive**: Processed recordings are automatically moved to `Processed/` and verified.
+- **Output Storage**: Published videos and companion metadata JSON are uploaded to:
+  - `Output/videos/YYYY/MM/video_ddmmyyyy.mp4`
+  - `Output/metadata/YYYY/MM/metadata_ddmmyyyy.json`
+- **Duplicate Prevention**: Native MD5 checksum scanning automatically filters duplicate uploads and disambiguates output file name collisions.
+
+### Dedicated YouTube Playlist
+All uploaded episodes are published directly as **Public** and automatically organized into the channel's dedicated series playlist:
+- **Playlist**: `Last Day on Earth: Survival — Official Gameplay Series` (ID: `PLJPzVNVZwaGY`)
 
 ### Running the Pipeline
 ```bash
@@ -86,8 +93,11 @@ python -m src.main drive-cron --dry-run
 # Run scheduled Drive ingestion and processing
 python -m src.main drive-cron --limit 1
 
-# Process a specific local video directly
-python -m src.main process --input "sample_gameplay.mp4" --local
+# Process a specific local video directly (with optional --force duplicate override)
+python -m src.main process --input "sample_gameplay.mp4" --local [--force]
+
+# Automatically sync Google Cloud credentials to GitHub Actions repository secrets
+python scripts/sync_github_secrets.py
 ```
 
 ### GitHub Actions Automation

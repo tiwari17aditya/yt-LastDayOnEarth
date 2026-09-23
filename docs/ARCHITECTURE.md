@@ -25,13 +25,16 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
  │ 3. Gameplay AI: 1-sec sleek action cues ("Global Map", "Crafting", etc.)   │
  │ 4. Audio Engine: 20 Soothing non-copyrighted CC-BY 4.0 tracks with ducking   │
  │ 5. Video Processor: FFmpeg composite render (veryfast preset, 60fps)        │
- │ 6. Publisher: YouTube Data API v3 upload & rich SEO metadata with CC-BY attr │
- │ 7. Drive Archiver: Moves video from Input -> Processed in Google Drive      │
- │ 8. Notifier: Google Gmail API v1 rich HTML notification dispatch           │
- │ 9. Storage Tracker: Appends execution record to data/history.json           │
+ │ 6. Publisher: YouTube Data API v3 upload & rich SEO metadata (Public)       │
+ │ 7. Playlist Manager: Dedicated playlist auto-discovery & video assignment   │
+ │ 8. Drive Output: Uploads video & metadata to Output/videos & Output/metadata │
+ │ 9. Drive Archiver: Moves video from Input -> Processed in Google Drive      │
+ │ 10. Notifier: Google Gmail API v1 rich HTML notification dispatch           │
+ │ 11. Storage Tracker: Appends execution record to data/history.json          │
  └───────────┬─────────────────────────────────────────────────────────────────┘
              │
-             ├──► [ YouTube Channel (Published / Unlisted) ]
+             ├──► [ YouTube Channel (Published / Public in Dedicated Playlist) ]
+             ├──► [ Google Drive: Output/videos & Output/metadata ]
              ├──► [ Google Drive: Processed Folder (Archived) ]
              └──► [ Gmail Notification (Direct via Gmail API) ]
 ```
@@ -71,10 +74,12 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 - **Naming Rule**: `<Original_Title>_Processed_<DDMMYYYY>.mp4`
 
 ### 3.6 Publisher (`src/publisher/`)
-- **Responsibility**: Formulate engaging, SEO-optimized title, description with chapter markers, and tags, followed by upload via YouTube Data API v3.
+- **Responsibility**: Formulate engaging, SEO-optimized rotating titles with date format `(DD Mon, YYYY)`, description with chapter markers, 50 trending hashtags, direct Public upload via YouTube Data API v3, and automated dedicated playlist management.
 - **Interface**: `BasePublisher`
-  - `generate_metadata(events: List[GameplayEvent]) -> VideoMetadata`
-  - `upload_video(video_path: Path, metadata: VideoMetadata) -> UploadResult`
+  - `generate_metadata(video_title: str, events: List[GameplayEvent]) -> VideoPublishMetadata`
+  - `upload_video(video_path: Path, metadata: VideoPublishMetadata) -> str`
+  - `get_or_create_playlist(youtube, title: str, description: str, privacy_status: str) -> Optional[str]`
+  - `add_video_to_playlist(youtube, video_id: str, playlist_id: str) -> bool`
 
 ### 3.7 Notifications & Reporting (`src/notifications/`)
 - **Responsibility**: Format and send HTML status emails for each job, and aggregate statistics for weekly and monthly reports.
