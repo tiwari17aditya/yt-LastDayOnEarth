@@ -31,7 +31,9 @@ def run_auth_flow() -> None:
     print(" 3. Gmail API (Sending upload notifications)")
     print("=" * 70)
 
-    client_secrets_path = Path("config/client_secrets.json")
+    # Auto-detect config/client_secrets.json or downloaded Google client_secret_*.json
+    candidate_secrets = list(Path("config").glob("client_secret*.json"))
+    client_secrets_path = candidate_secrets[0] if candidate_secrets else Path("config/client_secrets.json")
     client_id = os.getenv("GCP_CLIENT_ID")
     client_secret = os.getenv("GCP_CLIENT_SECRET")
 
