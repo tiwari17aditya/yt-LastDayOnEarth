@@ -106,7 +106,7 @@ def test_mark_as_processed_moves_file(mock_drive_service):
 
 
 def test_upload_processed_video_year_month_structure(mock_drive_service, tmp_path):
-    """Ensure upload_processed_video organizes by Year -> Month -> video_ddmmyyyy."""
+    """Ensure upload_processed_video organizes Output -> (videos & metadata) -> Year -> Month."""
     client = GoogleDriveClient()
     client.service = mock_drive_service
     client.output_folder_id = "output_root"
@@ -117,16 +117,25 @@ def test_upload_processed_video_year_month_structure(mock_drive_service, tmp_pat
     dummy_meta = tmp_path / "test_video_metadata.json"
     dummy_meta.write_text('{"title": "Test"}')
 
-    # Mock folder listing for year and month
+    # Mock folder listing for videos, year, month, metadata, year, month
     mock_drive_service.files().list().execute.side_effect = [
-        {"files": [{"id": "year_2026_id", "name": "2026"}]},
-        {"files": [{"id": "month_09_id", "name": "09"}]},
+        {"files": [{"id": "videos_root_id", "name": "videos"}]},
+        {"files": [{"id": "vid_year_id", "name": "2026"}]},
+        {"files": [{"id": "vid_month_id", "name": "09"}]},
+        {"files": [{"id": "metadata_root_id", "name": "metadata"}]},
+        {"files": [{"id": "meta_year_id", "name": "2026"}]},
+        {"files": [{"id": "meta_month_id", "name": "09"}]},
     ]
 
-    # Mock chunked upload create request
-    mock_req = MagicMock()
-    mock_req.next_chunk.return_value = (None, {"id": "uploaded_vid_id", "name": "video_23092026.mp4"})
-    mock_drive_service.files().create.return_value = mock_req
+    # Mock chunked upload create request for video
+    mock_video_req = MagicMock()
+    mock_video_req.next_chunk.return_value = (None, {"id": "uploaded_vid_id", "name": "video_23092026.mp4"})
+    
+    # Mock metadata create request
+    mock_meta_req = MagicMock()
+    mock_meta_req.execute.return_value = {"id": "uploaded_meta_id", "name": "metadata_23092026.json"}
+
+    mock_drive_service.files().create.side_effect = [mock_video_req, mock_meta_req]
 
     test_date = datetime(2026, 9, 23, 12, 0, 0)
     result = client.upload_processed_video(
@@ -137,4 +146,7 @@ def test_upload_processed_video_year_month_structure(mock_drive_service, tmp_pat
 
     assert result["video_id"] == "uploaded_vid_id"
     assert result["video_name"] == "video_23092026.mp4"
-    assert result["folder_path"] == "Output/2026/09"
+    assert result["video_folder"] == "Output/videos/2026/09"
+    assert result["metadata_id"] == "uploaded_meta_id"
+    assert result["metadata_folder"] == "Output/metadata/2026/09"
+

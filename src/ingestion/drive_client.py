@@ -291,16 +291,20 @@ class GoogleDriveClient(BaseIngestionClient):
         month_str = date.strftime("%m")
         ddmmyyyy = date.strftime("%d%m%Y")
 
-        # 1. Create or get Year folder under Output
-        year_folder_id = self._ensure_folder(year_str, parent_id=self.output_folder_id)
+        # 1. Structure: Output -> videos -> Year -> Month
+        videos_root_id = self._ensure_folder("videos", parent_id=self.output_folder_id)
+        video_year_id = self._ensure_folder(year_str, parent_id=videos_root_id)
+        video_month_id = self._ensure_folder(month_str, parent_id=video_year_id)
 
-        # 2. Create or get Month folder under Year
-        month_folder_id = self._ensure_folder(month_str, parent_id=year_folder_id)
+        # 2. Structure: Output -> metadata -> Year -> Month
+        metadata_root_id = self._ensure_folder("metadata", parent_id=self.output_folder_id)
+        meta_year_id = self._ensure_folder(year_str, parent_id=metadata_root_id)
+        meta_month_id = self._ensure_folder(month_str, parent_id=meta_year_id)
 
-        # 3. Format filename: video_ddmmyyyy.mp4
-        drive_video_name = f"video_{ddmmyyyy}{local_video_path.suffix}"
+        # 3. Filename formats: video_ddmmyyyy.mp4 and metadata_ddmmyyyy.json
+        drive_video_name = f"video_{ddmmyyyy}.mp4"
         logger.info(
-            f"Uploading processed video to Drive Output/{year_str}/{month_str}/{drive_video_name}",
+            f"Uploading processed video to Drive Output/videos/{year_str}/{month_str}/{drive_video_name}",
             extra_data={"local_path": str(local_video_path)},
         )
 
@@ -314,7 +318,7 @@ class GoogleDriveClient(BaseIngestionClient):
 
             file_metadata = {
                 "name": drive_video_name,
-                "parents": [month_folder_id],
+                "parents": [video_month_id],
             }
 
             request = self.service.files().create(body=file_metadata, media_body=media, fields="id, name, webViewLink")
@@ -322,30 +326,31 @@ class GoogleDriveClient(BaseIngestionClient):
             while response is None:
                 status, response = request.next_chunk()
                 if status:
-                    logger.info(f"Drive output upload progress: {int(status.progress() * 100)}%")
+                    logger.info(f"Drive output video upload progress: {int(status.progress() * 100)}%")
 
             uploaded_video_id = response.get("id")
             logger.info(f"Successfully uploaded video to Drive Output: {drive_video_name} (ID: {uploaded_video_id})")
 
-            # 4. Also upload companion metadata JSON if present
+            # 4. Upload companion metadata JSON into Output/metadata/year/month/
             uploaded_meta_id = None
             if metadata_path and metadata_path.exists():
                 meta_name = f"metadata_{ddmmyyyy}.json"
                 meta_media = MediaFileUpload(str(metadata_path), mimetype="application/json")
                 meta_request = self.service.files().create(
-                    body={"name": meta_name, "parents": [month_folder_id]},
+                    body={"name": meta_name, "parents": [meta_month_id]},
                     media_body=meta_media,
-                    fields="id",
+                    fields="id, name",
                 )
                 meta_resp = meta_request.execute()
                 uploaded_meta_id = meta_resp.get("id")
-                logger.info(f"Uploaded metadata JSON to Drive Output: {meta_name}")
+                logger.info(f"Uploaded metadata JSON to Drive Output/metadata/{year_str}/{month_str}/{meta_name}")
 
             return {
                 "video_id": uploaded_video_id,
                 "video_name": drive_video_name,
+                "video_folder": f"Output/videos/{year_str}/{month_str}",
                 "metadata_id": uploaded_meta_id,
-                "folder_path": f"Output/{year_str}/{month_str}",
+                "metadata_folder": f"Output/metadata/{year_str}/{month_str}",
             }
         except Exception as e:
             logger.error(f"Failed to upload processed video to Google Drive Output: {e}")
