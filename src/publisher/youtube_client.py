@@ -61,8 +61,11 @@ class YouTubeClient(BasePublisher):
         events: List[Any],
         music_track: Optional[Dict[str, Any]] = None,
     ) -> VideoPublishMetadata:
-        # High-engagement gaming title
-        clean_title = "Last Day on Earth: Survival - Home Base Workshop, Woodcrafting & Resource Storage"
+        from datetime import datetime
+
+        # Dynamic date in title to keep YouTube uploads unique and easily manageable
+        date_str = datetime.now().strftime("%d/%m/%Y")
+        clean_title = f"Last Day on Earth: Survival — Home Base & Workshop [{date_str}]"
 
         description_lines = [
             "Surviving and thriving in Last Day on Earth: Survival! In this episode, we organize our Home Base, process pine logs into planks at the woodworking bench, manage base storage chests, inspect the weapon workbench, and fuel up the smelting furnaces.",
@@ -78,43 +81,23 @@ class YouTubeClient(BasePublisher):
             desc = getattr(ev, "description", "")
             description_lines.append(f"{mins:02d}:{secs:02d} - {desc}")
 
-        if isinstance(music_track, list) and music_track:
-            description_lines.extend([
-                "",
-                "🎵 SOUNDTRACK (Royalty-Free Random Loop):",
-            ])
-            for t in music_track:
-                mins = int(t.get("start_time", 0) // 60)
-                secs = int(t.get("start_time", 0) % 60)
-                description_lines.append(f"- {mins:02d}:{secs:02d} | {t.get('title', 'Track')} — {t.get('artist', 'Artist')}")
-
-            attributions = [
-                t["attribution_text"]
-                for t in music_track
-                if t.get("attribution_required") and t.get("attribution_text")
-            ]
-            if attributions:
-                description_lines.extend([
-                    "",
-                    "📜 MUSIC LICENSING & ATTRIBUTION:",
-                ] + list(dict.fromkeys(attributions)))
-        elif isinstance(music_track, dict) and music_track:
-            if music_track.get("attribution_required") and music_track.get("attribution_text"):
-                description_lines.extend([
-                    "",
-                    "🎵 BACKGROUND MUSIC & LICENSING:",
-                    music_track["attribution_text"],
-                ])
-            else:
-                description_lines.extend([
-                    "",
-                    "🎵 BACKGROUND MUSIC:",
-                    f"Track: {music_track.get('title', 'Ambient Survival')} by {music_track.get('artist', 'Artist')} ({music_track.get('license', 'Royalty Free')})",
-                ])
+        # Top 50 curated high-engagement trending hashtags for maximum algorithm reach
+        trending_hashtags = [
+            "#LastDayOnEarth", "#LDoE", "#LastDayOnEarthSurvival", "#LDoEGameplay", "#LDoEGuide",
+            "#LDoETips", "#LDoEBunker", "#LDoEBase", "#LDoERaid", "#LDoEUpdate",
+            "#LDoESurvival", "#LDoESettlement", "#LDoECrafting", "#LDoEWorkshop", "#LDoEAlfa",
+            "#ZombieSurvival", "#SurvivalGame", "#ZombieApocalypse", "#SurvivalGaming", "#ZombieHunter",
+            "#PostApocalyptic", "#SurvivalCraft", "#ZombieGame", "#SurviveTheApocalypse", "#ZombieHorde",
+            "#MobileGaming", "#Gaming", "#Gamer", "#GamingCommunity", "#GameWalkthrough",
+            "#AndroidGaming", "#iOSGaming", "#GamingClips", "#Gameplay", "#LetsPlay",
+            "#YouTubeGaming", "#GamingVideos", "#Trending", "#ViralGaming", "#ExplorePage",
+            "#GamingLife", "#ProGamer", "#SurvivalCrafting", "#MobileGames", "#ZombieSurvivalGame",
+            "#ApocalypseSurvival", "#ZombieAttack", "#BaseBuilding", "#SurvivalRun", "#ZombieSurvivalRun"
+        ]
 
         description_lines.extend([
             "",
-            "#LastDayOnEarth #LDOE #LastDayOnEarthSurvival #MobileGaming #ZombieSurvival #SurvivalGame #LDoEGameplay",
+            " ".join(trending_hashtags),
         ])
 
         tags = [
