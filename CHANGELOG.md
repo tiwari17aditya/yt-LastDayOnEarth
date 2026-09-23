@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-23
+
+### Added
+- **Strict Google Drive API v3 Ingestion**: Direct Drive integration strictly locked to `MyDrive -> youtube-projects -> LastDayOnEarth`. Checks for pending videos in `Input` and automatically moves processed videos to `Processed` without requiring local Drive sync.
+- **Gmail API v1 Notifier**: Replaced SMTP with native Google Gmail API v1 (`https://www.googleapis.com/auth/gmail.send`) dispatching rich HTML notifications on publishing success or pipeline failure.
+- **GitHub Actions Scheduled Pipeline**: Configured `.github/workflows/scheduled_pipeline.yml` running 6 times daily (`0 */4 * * *`) with automatic exit if no files are pending, conserving GitHub minutes.
+- **One-Time Google OAuth Setup Script**: `scripts/setup_google_auth.py` generates unified OAuth credentials for Drive, YouTube, and Gmail and outputs GitHub Secrets format.
+- **Drive-Cron Orchestrator Command**: Added `python -m src.main drive-cron [--dry-run] [--limit N] [--no-upload]`.
+- **Test Suite Expansion**: Added unit tests for Google Drive safety boundaries, Gmail API encoding, and drive-cron flow (17/17 tests passing).
+
+## [0.2.0] - 2026-09-23
+
+### Changed
+- **Privacy Policy**: Removed intrusive bounding boxes on native game HUD (username `adistar656` and lower-left clan chat area preserved 100% unblurred).
+- **Subtitles**: Replaced continuous subtitle bars with snappy 1-second action cues ("Global Map", "Entering Base", "Weapon Bench", etc.) with fade in/out animations.
+- **Music Library**: Downloaded 20 authentic 320 kbps soothing/chill studio tracks (CC-BY 4.0 by Kevin MacLeod) replacing sub-bass sweeps.
+
 ## [0.1.0] - 2026-09-23
 
 ### Added

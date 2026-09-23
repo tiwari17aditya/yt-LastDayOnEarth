@@ -78,18 +78,39 @@ class YouTubeClient(BasePublisher):
             desc = getattr(ev, "description", "")
             description_lines.append(f"{mins:02d}:{secs:02d} - {desc}")
 
-        if music_track and music_track.get("attribution_required") and music_track.get("attribution_text"):
+        if isinstance(music_track, list) and music_track:
             description_lines.extend([
                 "",
-                "🎵 BACKGROUND MUSIC & LICENSING:",
-                music_track["attribution_text"],
+                "🎵 SOUNDTRACK (Royalty-Free Random Loop):",
             ])
-        elif music_track:
-            description_lines.extend([
-                "",
-                "🎵 BACKGROUND MUSIC:",
-                f"Track: {music_track.get('title', 'Ambient Survival')} by {music_track.get('artist', 'Artist')} ({music_track.get('license', 'Royalty Free')})",
-            ])
+            for t in music_track:
+                mins = int(t.get("start_time", 0) // 60)
+                secs = int(t.get("start_time", 0) % 60)
+                description_lines.append(f"- {mins:02d}:{secs:02d} | {t.get('title', 'Track')} — {t.get('artist', 'Artist')}")
+
+            attributions = [
+                t["attribution_text"]
+                for t in music_track
+                if t.get("attribution_required") and t.get("attribution_text")
+            ]
+            if attributions:
+                description_lines.extend([
+                    "",
+                    "📜 MUSIC LICENSING & ATTRIBUTION:",
+                ] + list(dict.fromkeys(attributions)))
+        elif isinstance(music_track, dict) and music_track:
+            if music_track.get("attribution_required") and music_track.get("attribution_text"):
+                description_lines.extend([
+                    "",
+                    "🎵 BACKGROUND MUSIC & LICENSING:",
+                    music_track["attribution_text"],
+                ])
+            else:
+                description_lines.extend([
+                    "",
+                    "🎵 BACKGROUND MUSIC:",
+                    f"Track: {music_track.get('title', 'Ambient Survival')} by {music_track.get('artist', 'Artist')} ({music_track.get('license', 'Royalty Free')})",
+                ])
 
         description_lines.extend([
             "",
@@ -136,6 +157,62 @@ class YouTubeClient(BasePublisher):
                 recovery_action="Ensure the video processor rendered the video successfully.",
                 file_path=str(video_path),
             )
-        # Placeholder upload URL until real OAuth credentials are authenticated
-        mock_id = "mock_ldoe_video"
-        return f"https://youtu.be/{mock_id}"
+
+        try:
+            from googleapiclient.discovery import build
+            from googleapiclient.http import MediaFileUpload
+            from src.google_auth import get_google_credentials
+
+            creds = get_google_credentials(scopes=["https://www.googleapis.com/auth/youtube.upload"])
+            if not creds:
+                logger.warning("No YouTube OAuth credentials configured; simulating upload (mock URL).")
+                mock_id = "mock_ldoe_video"
+                return f"https://youtu.be/{mock_id}"
+
+            youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
+
+            body = {
+                "snippet": {
+                    "title": metadata.title,
+                    "description": metadata.description,
+                    "tags": metadata.tags,
+                    "categoryId": metadata.category_id,
+                },
+                "status": {
+                    "privacyStatus": metadata.privacy_status,
+                    "selfDeclaredMadeForKids": False,
+                },
+            }
+
+            media = MediaFileUpload(
+                str(video_path),
+                chunksize=10 * 1024 * 1024,
+                resumable=True,
+                mimetype="video/mp4",
+            )
+
+            request = youtube.videos().insert(
+                part="snippet,status",
+                body=body,
+                media_body=media,
+            )
+
+            response = None
+            while response is None:
+                status, response = request.next_chunk()
+                if status:
+                    logger.info(f"YouTube upload progress: {int(status.progress() * 100)}%")
+
+            video_id = response.get("id")
+            youtube_url = f"https://youtu.be/{video_id}"
+            logger.info(f"Video uploaded successfully to YouTube: {youtube_url}")
+            return youtube_url
+
+        except Exception as e:
+            logger.error(f"Failed to upload video to YouTube: {e}")
+            raise PublishingError(
+                operation="youtube_upload",
+                root_cause=str(e),
+                recovery_action="Check YouTube API quota, channel status, or re-run scripts/setup_google_auth.py.",
+                file_path=str(video_path),
+            )

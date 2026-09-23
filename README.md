@@ -55,38 +55,47 @@ LastDayOnEarth/
 ## Quickstart
 
 ### Prerequisites
-- Python 3.12+
+- Python 3.11+
 - FFmpeg 6.0+ (compiled with `libass` and `libx264`)
-- Google Cloud Project with Drive API & YouTube Data API v3 enabled
-- Gemini API Key
+- Google Cloud Project with Drive API, YouTube Data API v3, and Gmail API enabled
 
-### Installation
-
-1. **Clone & Setup Virtual Environment**:
+### Google Cloud Setup (One-Time)
+1. Enable **Google Drive API**, **YouTube Data API v3**, and **Gmail API** in Google Cloud Console.
+2. Create an OAuth 2.0 Desktop Application Client ID.
+3. Run the interactive setup helper:
    ```bash
-   python -m venv .venv
-   # Windows PowerShell
-   .venv\Scripts\Activate.ps1
-   # Linux/macOS
-   source .venv/bin/activate
-   pip install -r requirements.txt
+   python scripts/setup_google_auth.py
    ```
+4. This helper guides one-time browser approval, creates `config/token.json`, and prints the GitHub Secrets to configure:
+   - `GCP_CLIENT_ID`
+   - `GCP_CLIENT_SECRET`
+   - `GCP_REFRESH_TOKEN`
+   - `NOTIFICATION_RECIPIENTS`
 
-2. **Configure Environment**:
-   ```bash
-   copy .env.example .env
-   # Edit .env with your API keys and SMTP credentials
-   ```
+### Google Drive Safety Boundary
+The pipeline enforces a strict folder containment rule:
+- Path: `MyDrive -> youtube-projects -> LastDayOnEarth`
+- Put new raw gameplay recordings in: `Input/`
+- Processed recordings are automatically moved to: `Processed/`
 
-3. **Verify Installation**:
-   ```bash
-   python -m pytest tests/
-   ```
+### Running the Pipeline
+```bash
+# Inspect Drive Input without processing (dry run)
+python -m src.main drive-cron --dry-run
 
-4. **Run Local Pipeline**:
-   ```bash
-   python -m src.main process --input sample_gameplay.mp4 --local
-   ```
+# Run scheduled Drive ingestion and processing
+python -m src.main drive-cron --limit 1
+
+# Process a specific local video directly
+python -m src.main process --input "sample_gameplay.mp4" --local
+```
+
+### GitHub Actions Automation
+A scheduled workflow (`.github/workflows/scheduled_pipeline.yml`) runs **6 times daily at 4-hour intervals** (`0 */4 * * *`):
+- Connects to Google Drive API directly (no local file sync needed).
+- Checks `MyDrive/youtube-projects/LastDayOnEarth/Input`.
+- If no videos are pending, exits in ~30 seconds.
+- If a video is pending, downloads, renders with soothing music & action cues, uploads to YouTube, moves the video to `Processed` in Drive, and sends a Gmail alert!
 
 ---
 

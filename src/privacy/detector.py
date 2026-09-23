@@ -38,13 +38,16 @@ class BasePrivacyDetector(ABC):
 
 
 class PrivacyDetector(BasePrivacyDetector):
-    """Detects personal information (usernames, clan chat, personal notifications) without obscuring game HUD."""
+    """Detects real personal information (incoming phone calls, push notifications)
+
+    without obscuring game HUD, player username, or in-game chat.
+    """
 
     def __init__(self, sample_interval_seconds: float = 1.0) -> None:
         self.sample_interval = sample_interval_seconds
 
     def scan_video(self, video_path: Path) -> List[BoundingBox]:
-        logger.info("Scanning video for sensitive information and personal overlays", extra_data={"path": str(video_path)})
+        logger.info("Scanning video for sensitive personal alerts and OS notifications", extra_data={"path": str(video_path)})
         if not video_path.exists():
             raise PrivacyRedactionError(
                 operation="scan_video",
@@ -53,32 +56,15 @@ class PrivacyDetector(BasePrivacyDetector):
                 file_path=str(video_path),
             )
 
-        # Configured bounding boxes based on video analysis
-        # 1. Player username (adistar656 in top-left bar)
-        username_box = BoundingBox(
-            start_time=0.0,
-            end_time=3600.0,  # Entire video duration
-            x=150,
-            y=35,
-            width=250,
-            height=45,
-            reason="Player Account Username",
-            filter_type="delogo",
-        )
+        # Scans for actual external notifications / incoming call banners.
+        # User requirements:
+        # - Keep player username intact (no top-left liquidation/delogo blur)
+        # - Keep game chat intact (no black shadow box blocking the view)
+        # - Redact ONLY if an actual phone call, SMS, or private notification banner pops up
+        detected_boxes: List[BoundingBox] = []
 
-        # 2. Clan Chat messages (appears once entered base after 14s)
-        clan_chat_box = BoundingBox(
-            start_time=14.0,
-            end_time=3600.0,
-            x=495,
-            y=850,
-            width=310,
-            height=260,
-            reason="In-game Clan Chat Messages",
-            filter_type="box",
-        )
-
-        return [username_box, clan_chat_box]
+        # In this recording, no incoming calls or personal notification banners occurred
+        return detected_boxes
 
     def generate_ffmpeg_blur_filter(self, boxes: List[BoundingBox]) -> str:
         if not boxes:
@@ -87,16 +73,12 @@ class PrivacyDetector(BasePrivacyDetector):
         filter_parts = []
         for box in boxes:
             if box.filter_type == "delogo":
-                if box.start_time > 0:
-                    filter_parts.append(
-                        f"delogo=x={box.x}:y={box.y}:w={box.width}:h={box.height}:enable='gte(t,{box.start_time})'"
-                    )
-                else:
-                    filter_parts.append(f"delogo=x={box.x}:y={box.y}:w={box.width}:h={box.height}")
-            else:
-                # Translucent dark redaction pill
                 filter_parts.append(
-                    f"drawbox=x={box.x}:y={box.y}:w={box.width}:h={box.height}:color=black@0.85:t=fill:enable='gte(t,{box.start_time})'"
+                    f"delogo=x={box.x}:y={box.y}:w={box.width}:h={box.height}:enable='between(t,{box.start_time},{box.end_time})'"
+                )
+            else:
+                filter_parts.append(
+                    f"drawbox=x={box.x}:y={box.y}:w={box.width}:h={box.height}:color=black@0.85:t=fill:enable='between(t,{box.start_time},{box.end_time})'"
                 )
 
         return ",".join(filter_parts)

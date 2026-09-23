@@ -14,5 +14,91 @@
       "subtitles_burned": true,
       "privacy_redacted": true
     }
+  },
+  {
+    "job_id": "job_20260923_161047",
+    "timestamp": "2026-09-23T10:40:47.706104+00:00",
+    "input_filename": "ScreenRecording_09-23-2026 12-53-25_1.mp4",
+    "output_filename": "ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026.mp4",
+    "status": "SUCCESS",
+    "youtube_url": "N/A (Local execution)",
+    "details": {
+      "video_output": "output\\ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026.mp4",
+      "metadata_output": "output\\ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026_metadata.json",
+      "duration_seconds": 188.482222,
+      "soundtrack_tracks": [
+        "Daybreak Patrol",
+        "Midnight Gathering",
+        "Biter Rush",
+        "The Bunker",
+        "Wasteland Scavenger",
+        "Corrupted World",
+        "Survival Instinct"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true
+    }
+  },
+  {
+    "job_id": "job_20260923_162851",
+    "timestamp": "2026-09-23T10:58:51.043532+00:00",
+    "input_filename": "ScreenRecording_09-23-2026 12-53-25_1.mp4",
+    "output_filename": "ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026.mp4",
+    "status": "SUCCESS",
+    "youtube_url": "N/A (Local execution)",
+    "details": {
+      "video_output": "output\\ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026.mp4",
+      "metadata_output": "output\\ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026_metadata.json",
+      "duration_seconds": 188.482222,
+      "soundtrack_tracks": [
+        "The Safehouse",
+        "Biter Rush",
+        "Corrupted World",
+        "Darkling",
+        "Foggy Forest",
+        "Nightfall Survival",
+        "Zombies Approaching"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true
+    }
+  },
+  {
+    "job_id": "job_20260923_165217",
+    "timestamp": "2026-09-23T11:22:17.034582+00:00",
+    "input_filename": "ScreenRecording_09-23-2026 12-53-25_1.mp4",
+    "output_filename": "ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026.mp4",
+    "status": "SUCCESS",
+    "youtube_url": "N/A (Local execution)",
+    "details": {
+      "video_output": "output\\ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026.mp4",
+      "metadata_output": "output\\ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026_metadata.json",
+      "duration_seconds": 188.482222,
+      "soundtrack_tracks": [
+        "Private Reflection",
+        "Halls of the Undead"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true
+    }
+  },
+  {
+    "job_id": "job_20260923_170557",
+    "timestamp": "2026-09-23T11:35:57.489691+00:00",
+    "input_filename": "ScreenRecording_09-23-2026 12-53-25_1.mp4",
+    "output_filename": "ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026.mp4",
+    "status": "SUCCESS",
+    "youtube_url": "N/A (Local execution)",
+    "details": {
+      "video_output": "output\\ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026.mp4",
+      "metadata_output": "output\\ScreenRecording_09-23-2026_12-53-25_1_Processed_23092026_metadata.json",
+      "duration_seconds": 188.482222,
+      "soundtrack_tracks": [
+        "Pamgaea",
+        "Sweeter Vermouth"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true
+    }
   }
 ]

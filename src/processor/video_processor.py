@@ -29,6 +29,22 @@ class VideoProcessor:
     def get_output_path(self, original_filename: str) -> Path:
         return self.output_dir / self.generate_output_filename(original_filename)
 
+    def get_video_duration(self, video_path: Path) -> float:
+        """Determines the duration of the video in seconds using ffprobe."""
+        cmd = [
+            "ffprobe",
+            "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            str(video_path),
+        ]
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            return float(res.stdout.strip())
+        except Exception as e:
+            logger.warning("Could not probe video duration, defaulting to 180.0s", extra_data={"error": str(e)})
+            return 180.0
+
     def build_ffmpeg_command(
         self,
         input_video: Path,
@@ -36,7 +52,8 @@ class VideoProcessor:
         subtitle_file: Optional[Path] = None,
         music_file: Optional[Path] = None,
         privacy_filter: Optional[str] = None,
-        ducking_db: str = "-20dB",
+        ducking_db: str = "-8dB",
+        preset: str = "veryfast",
     ) -> List[str]:
         """Assembles robust FFmpeg command for composite rendering."""
         cmd = ["ffmpeg", "-y", "-i", str(input_video)]
@@ -55,12 +72,11 @@ class VideoProcessor:
             video_filters.append(f"subtitles='{escaped_sub}'")
 
         if video_filters and has_music:
-            # When using filter_complex with audio mix, combine video filters in filter_complex
             vf_string = ",".join(video_filters)
             filter_complex = (
                 f"[0:v]{vf_string}[vout];"
-                f"[1:a]aloop=loop=-1:size=2e+09,volume={ducking_db}[bg];"
-                f"[0:a][bg]amix=inputs=2:duration=first[aout]"
+                f"[1:a]volume={ducking_db}[bg];"
+                f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]"
             )
             cmd.extend([
                 "-filter_complex", filter_complex,
@@ -72,8 +88,8 @@ class VideoProcessor:
             cmd.extend(["-map", "0:v", "-map", "0:a?"])
         elif has_music:
             filter_complex = (
-                f"[1:a]aloop=loop=-1:size=2e+09,volume={ducking_db}[bg];"
-                f"[0:a][bg]amix=inputs=2:duration=first[aout]"
+                f"[1:a]volume={ducking_db}[bg];"
+                f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]"
             )
             cmd.extend([
                 "-filter_complex", filter_complex,
@@ -83,7 +99,7 @@ class VideoProcessor:
 
         cmd.extend([
             "-c:v", "libx264",
-            "-preset", "medium",
+            "-preset", preset,
             "-crf", "20",
             "-c:a", "aac",
             "-b:a", "192k",
@@ -100,7 +116,8 @@ class VideoProcessor:
         subtitle_file: Optional[Path] = None,
         music_file: Optional[Path] = None,
         privacy_filter: Optional[str] = None,
-        ducking_db: str = "-20dB",
+        ducking_db: str = "-8dB",
+        preset: str = "veryfast",
     ) -> Path:
         """Executes FFmpeg composite render."""
         cmd = self.build_ffmpeg_command(
@@ -110,6 +127,7 @@ class VideoProcessor:
             music_file=music_file,
             privacy_filter=privacy_filter,
             ducking_db=ducking_db,
+            preset=preset,
         )
 
         logger.info("Executing FFmpeg render command", extra_data={"output": str(output_video)})

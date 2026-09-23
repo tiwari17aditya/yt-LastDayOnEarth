@@ -1,0 +1,88 @@
+name: Scheduled Last Day on Earth Video Pipeline
+
+on:
+  # Run 6 times daily at every 4-hour interval
+  schedule:
+    - cron: '0 */4 * * *'
+
+  # Allow manual trigger anytime via GitHub UI
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (Inspect Google Drive without downloading or processing)'
+        required: false
+        type: boolean
+        default: false
+      upload:
+        description: 'Upload processed video to YouTube'
+        required: false
+        type: boolean
+        default: true
+      limit:
+        description: 'Maximum videos to process in this run'
+        required: false
+        type: number
+        default: 1
+
+jobs:
+  check-and-process:
+    name: Check Drive & Process Video
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install FFmpeg & Fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu fonts-liberation
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ensure Soothing Music Library is Present
+        run: |
+          python scripts/download_soothing_tracks.py
+
+      - name: Run Pipeline Scheduled Task
+        env:
+          GCP_CLIENT_ID: ${{ secrets.GCP_CLIENT_ID }}
+          GCP_CLIENT_SECRET: ${{ secrets.GCP_CLIENT_SECRET }}
+          GCP_REFRESH_TOKEN: ${{ secrets.GCP_REFRESH_TOKEN }}
+          NOTIFICATION_RECIPIENTS: ${{ secrets.NOTIFICATION_RECIPIENTS }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GDRIVE_PARENT_FOLDER_NAME: "youtube-projects"
+          GDRIVE_PROJECT_FOLDER_NAME: "LastDayOnEarth"
+          GDRIVE_INPUT_FOLDER_NAME: "Input"
+          GDRIVE_PROCESSED_FOLDER_NAME: "Processed"
+          VIDEO_PRESET: "veryfast"
+          ENVIRONMENT: "production"
+          LOG_LEVEL: "INFO"
+        run: |
+          EXTRA_ARGS=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            EXTRA_ARGS="$EXTRA_ARGS --dry-run"
+          fi
+          if [ "${{ github.event.inputs.upload }}" = "false" ]; then
+            EXTRA_ARGS="$EXTRA_ARGS --no-upload"
+          fi
+          LIMIT="${{ github.event.inputs.limit }}"
+          if [ -z "$LIMIT" ]; then
+            LIMIT="1"
+          fi
+          EXTRA_ARGS="$EXTRA_ARGS --limit $LIMIT"
+
+          echo "Executing: python -m src.main drive-cron $EXTRA_ARGS"
+          python -m src.main drive-cron $EXTRA_ARGS

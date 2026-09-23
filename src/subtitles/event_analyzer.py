@@ -39,67 +39,67 @@ class SubtitleGenerator(BaseSubtitleGenerator):
         self.model_name = model_name
 
     def analyze_events(self, video_path: Path) -> List[GameplayEvent]:
-        logger.info("Analyzing Last Day on Earth gameplay events", extra_data={"video": str(video_path)})
+        logger.info("Analyzing Last Day on Earth gameplay events for quick action cues", extra_data={"video": str(video_path)})
 
-        # Synchronized event milestones across the 3m 08s gameplay run
+        # Concise 2-3 word action cues, displayed for exactly 1.0 second during transitions
         return [
             GameplayEvent(
-                start_time=0.0,
+                start_time=0.5,
+                end_time=1.5,
+                action_type="exiting_entering",
+                description="Global Map",
+            ),
+            GameplayEvent(
+                start_time=14.0,
                 end_time=15.0,
-                action_type="location",
-                description="Global Map: Inspecting Pine Grove & Event Tasks",
+                action_type="exiting_entering",
+                description="Entering Base",
             ),
             GameplayEvent(
-                start_time=15.0,
-                end_time=38.0,
-                action_type="crafting",
-                description="Home Base: Processing Pine Logs at Woodworking Bench",
+                start_time=20.0,
+                end_time=21.0,
+                action_type="building_crafting",
+                description="Crafting Planks",
             ),
             GameplayEvent(
-                start_time=38.0,
-                end_time=65.0,
-                action_type="crafting",
-                description="Workshop: Inspecting Weapon Modifications & Grinder",
+                start_time=40.0,
+                end_time=41.0,
+                action_type="building_crafting",
+                description="Weapon Bench",
             ),
             GameplayEvent(
-                start_time=65.0,
-                end_time=95.0,
-                action_type="storage",
-                description="Storage: Storing Pine Planks in Base Chests",
+                start_time=66.0,
+                end_time=67.0,
+                action_type="quest_storage",
+                description="Organizing Chests",
             ),
             GameplayEvent(
-                start_time=95.0,
-                end_time=125.0,
-                action_type="settlement",
-                description="Settlement Progress: Reviewing Blueprints on Bulletin Board",
+                start_time=98.0,
+                end_time=99.0,
+                action_type="quest_storage",
+                description="Checking Blueprints",
             ),
             GameplayEvent(
-                start_time=125.0,
-                end_time=155.0,
-                action_type="crafting",
-                description="Crafting: Fueling Furnaces & Campfire Maintenance",
-            ),
-            GameplayEvent(
-                start_time=155.0,
-                end_time=188.0,
-                action_type="storage",
-                description="Base Management: Organizing Workshop & Survival Inventory",
+                start_time=128.0,
+                end_time=129.0,
+                action_type="building_crafting",
+                description="Smelting Iron",
             ),
         ]
 
     def generate_subtitles(self, events: List[GameplayEvent], output_path: Path) -> Path:
-        """Generate ASS subtitle file with high contrast, legible font, and clean background pill."""
-        logger.info("Writing styled ASS subtitles", extra_data={"output": str(output_path)})
+        """Generate sleek ASS action flash badges that appear for max 1 second and fade away."""
+        logger.info("Writing sleek ASS action flash cues", extra_data={"output": str(output_path)})
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Style specification:
         # PlayRes: 2796x1290 (matching source video resolution)
-        # Font: Arial / Outfit bold, size 52
-        # Outline: 4, Shadow: 0, BorderStyle: 3 (opaque pill background box)
-        # MarginV: 220 (places subtitle directly above bottom menu buttons)
+        # Font: Arial bold, size 52
+        # Outline: 3, Shadow: 2, BorderStyle: 1 (clean drop outline with subtle shadow)
+        # MarginV: 220 (places cue above bottom controls)
         ass_header = (
             "[Script Info]\n"
-            "Title: Last Day on Earth Gameplay Captions\n"
+            "Title: Last Day on Earth Action Cues\n"
             "ScriptType: v4.00+\n"
             "PlayResX: 2796\n"
             "PlayResY: 1290\n\n"
@@ -107,7 +107,7 @@ class SubtitleGenerator(BaseSubtitleGenerator):
             "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, "
             "Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
             "Alignment, MarginL, MarginR, MarginV, Encoding\n"
-            "Style: Default,Arial,52,&H00FFFFFF,&H000000FF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,3,4,0,2,60,60,220,1\n\n"
+            "Style: Default,Arial,52,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,3,2,2,60,60,220,1\n\n"
             "[Events]\n"
             "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
         )
@@ -122,7 +122,8 @@ class SubtitleGenerator(BaseSubtitleGenerator):
         for event in events:
             start_str = format_ass_time(event.start_time)
             end_str = format_ass_time(event.end_time)
-            lines.append(f"Dialogue: 0,{start_str},{end_str},Default,,0,0,0,,{event.description}\n")
+            # {\fad(150,150)} smoothly fades in for 150ms and fades out for 150ms at 1.0s mark
+            lines.append(f"Dialogue: 0,{start_str},{end_str},Default,,0,0,0,,{{\\fad(150,150)}}{event.description}\n")
 
         with open(output_path, "w", encoding="utf-8") as f:
             f.writelines(lines)

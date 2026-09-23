@@ -13,26 +13,27 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 ## 2. High-Level System Architecture
 
 ```text
-[ Google Drive: Input/Input 1 ]
+[ Google Drive: MyDrive -> youtube-projects -> LastDayOnEarth -> Input ]
              │
-             │ (Google Apps Script webhook or GitHub Actions cron)
+             │ (GitHub Actions cron: '0 */4 * * *' - 6 times daily)
              ▼
-[ Workflow Orchestrator: src/main.py ]
+[ Workflow Orchestrator: src/main.py drive-cron ]
              │
- ┌───────────┴───────────────────────────────────────────────┐
- │ 1. Ingestion: Download raw recording via Drive API v3    │
- │ 2. Privacy Guard: OCR + Bounding Box dynamic blur        │
- │ 3. Gameplay AI: Gemini Vision context & ASS captions      │
- │ 4. Audio Engine: Royalty-Free Music Ducking & Looping     │
- │ 5. Video Processor: FFmpeg composite render               │
- │ 6. Publisher: AI SEO metadata & YouTube Data API upload   │
- │ 7. Notifier: SMTP dispatch (success/failure)              │
- │ 8. Storage Tracker: Appends execution record to history   │
- └───────────┬───────────────────────────────────────────────┘
+ ┌───────────┴─────────────────────────────────────────────────────────────────┐
+ │ 1. Ingestion: Google Drive API v3 (Strict safety boundary lock)            │
+ │ 2. Privacy Guard: Redacts only real phone/OS popups (preserves HUD/username) │
+ │ 3. Gameplay AI: 1-sec sleek action cues ("Global Map", "Crafting", etc.)   │
+ │ 4. Audio Engine: 20 Soothing non-copyrighted CC-BY 4.0 tracks with ducking   │
+ │ 5. Video Processor: FFmpeg composite render (veryfast preset, 60fps)        │
+ │ 6. Publisher: YouTube Data API v3 upload & rich SEO metadata with CC-BY attr │
+ │ 7. Drive Archiver: Moves video from Input -> Processed in Google Drive      │
+ │ 8. Notifier: Google Gmail API v1 rich HTML notification dispatch           │
+ │ 9. Storage Tracker: Appends execution record to data/history.json           │
+ └───────────┬─────────────────────────────────────────────────────────────────┘
              │
              ├──► [ YouTube Channel (Published / Unlisted) ]
-             ├──► [ Email Notification (Operator Alert) ]
-             └──► [ Weekly & Monthly Summary Cron ]
+             ├──► [ Google Drive: Processed Folder (Archived) ]
+             └──► [ Gmail Notification (Direct via Gmail API) ]
 ```
 
 ---
