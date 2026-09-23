@@ -48,6 +48,9 @@ class YouTubeSettings(BaseModel):
     )
     token_file: str = Field(default_factory=lambda: os.getenv("YOUTUBE_TOKEN_FILE", "config/token.json"))
     privacy_status: str = Field(default_factory=lambda: os.getenv("YOUTUBE_PRIVACY_STATUS", "public"))
+    playlist_title: str = Field(
+        default_factory=lambda: os.getenv("YOUTUBE_PLAYLIST_TITLE", "Last Day on Earth: Survival — Official Gameplay Series")
+    )
     category_id: str = "20"  # Gaming category
 
 

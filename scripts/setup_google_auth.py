@@ -17,6 +17,7 @@ from google.oauth2.credentials import Credentials
 SCOPES = [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube.force-ssl",
     "https://www.googleapis.com/auth/gmail.send",
 ]
 
@@ -84,14 +85,39 @@ def run_auth_flow() -> None:
         f.write(creds.to_json())
 
     print(f"\n[SUCCESS] Token saved locally to {token_path}")
+
+    # Auto-update .env if it exists
+    env_path = Path(".env")
+    if env_path.exists():
+        content = env_path.read_text(encoding="utf-8")
+        if creds.refresh_token:
+            import re
+            content = re.sub(
+                r'GCP_REFRESH_TOKEN=.*',
+                f'GCP_REFRESH_TOKEN="{creds.refresh_token}"',
+                content,
+            )
+            env_path.write_text(content, encoding="utf-8")
+            print("[SUCCESS] Updated GCP_REFRESH_TOKEN in .env")
+
+    # Automatically sync secrets to GitHub Actions
+    try:
+        from scripts.sync_github_secrets import sync_secrets
+        owner = "tiwari17aditya"
+        repo = "yt-LastDayOnEarth"
+        secrets_to_sync = {
+            "GCP_CLIENT_ID": creds.client_id or os.getenv("GCP_CLIENT_ID", ""),
+            "GCP_CLIENT_SECRET": creds.client_secret or os.getenv("GCP_CLIENT_SECRET", ""),
+            "GCP_REFRESH_TOKEN": creds.refresh_token,
+            "NOTIFICATION_RECIPIENTS": os.getenv("NOTIFICATION_RECIPIENTS", "addytiwari3@gmail.com"),
+        }
+        print("\n[ACTION] Auto-syncing newly generated credentials to GitHub Actions...")
+        sync_secrets(owner, repo, secrets_to_sync)
+    except Exception as e:
+        print(f"[WARN] Automatic GitHub Secrets sync skipped: {e}")
+
     print("\n" + "=" * 70)
-    print("  GITHUB ACTIONS SECRETS CONFIGURATION")
-    print("=" * 70)
-    print("Copy and paste these 3 secret values into your GitHub Repository:")
-    print("Settings -> Secrets and variables -> Actions -> New repository secret\n")
-    print(f"GCP_CLIENT_ID:     {creds.client_id}")
-    print(f"GCP_CLIENT_SECRET: {creds.client_secret}")
-    print(f"GCP_REFRESH_TOKEN: {creds.refresh_token}")
+    print("  AUTHENTICATION & REPOSITORY SYNC COMPLETE")
     print("=" * 70)
 
 

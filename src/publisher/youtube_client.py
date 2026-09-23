@@ -50,10 +50,12 @@ class YouTubeClient(BasePublisher):
         client_secrets_file: str = "config/client_secrets.json",
         token_file: str = "config/token.json",
         privacy_status: str = "public",
+        playlist_title: str = "Last Day on Earth: Survival — Official Gameplay Series",
     ) -> None:
         self.client_secrets_file = client_secrets_file
         self.token_file = token_file
         self.privacy_status = privacy_status
+        self.playlist_title = playlist_title
 
     def generate_metadata(
         self,
@@ -148,6 +150,100 @@ class YouTubeClient(BasePublisher):
         logger.info("Exported publishing metadata to JSON", extra_data={"path": str(output_json_path)})
         return output_json_path
 
+    def get_or_create_playlist(
+        self,
+        youtube: Any,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        privacy_status: str = "public",
+    ) -> Optional[str]:
+        """Finds an existing playlist matching title or creates a new dedicated playlist."""
+        title = title or self.playlist_title
+        try:
+            # Check existing playlists on the channel
+            req = youtube.playlists().list(part="snippet,status", mine=True, maxResults=50)
+            while req:
+                res = req.execute()
+                for item in res.get("items", []):
+                    if item.get("snippet", {}).get("title") == title:
+                        logger.info(f"Found existing YouTube playlist: '{title}' (ID: {item['id']})")
+                        return item["id"]
+                req = youtube.playlists().list_next(req, res)
+
+            # Not found -> create dedicated playlist with comprehensive description
+            if not description:
+                description = (
+                    "Welcome to the official Last Day on Earth: Survival gameplay series! 🧟‍♂️🔨\n\n"
+                    "Follow our journey through the post-apocalyptic zombie wasteland as we optimize base layout, "
+                    "craft advanced weapons and gear, gather survival resources, and defend against zombie hordes.\n\n"
+                    "📌 In this playlist:\n"
+                    "• Home base organization & woodworking workbench guides\n"
+                    "• Pine & oak log processing, smelting furnaces, and resource hoarding\n"
+                    "• Weapon workshop tasks, modifications, and gear optimization\n"
+                    "• Base defense setup and zombie survival runs\n\n"
+                    "🔔 Subscribe and check back regularly for new daily episodes!\n\n"
+                    "#LastDayOnEarth #LDoE #ZombieSurvival #SurvivalGame #LDoEGameplay #SurvivalGaming"
+                )
+
+            logger.info(f"Creating new dedicated YouTube playlist: '{title}'")
+            create_body = {
+                "snippet": {
+                    "title": title,
+                    "description": description,
+                    "defaultLanguage": "en",
+                },
+                "status": {
+                    "privacyStatus": privacy_status,
+                },
+            }
+            create_resp = youtube.playlists().insert(part="snippet,status", body=create_body).execute()
+            playlist_id = create_resp.get("id")
+            logger.info(f"Created dedicated YouTube playlist: '{title}' (ID: {playlist_id})")
+            return playlist_id
+
+        except Exception as e:
+            logger.warning(
+                f"Could not manage YouTube playlist (requires 'youtube.force-ssl' scope): {e}",
+                extra_data={"playlist_title": title},
+            )
+            return None
+
+    def add_video_to_playlist(
+        self,
+        youtube: Any,
+        video_id: str,
+        playlist_id: str,
+    ) -> bool:
+        """Adds a video to a YouTube playlist if not already present."""
+        try:
+            check_req = youtube.playlistItems().list(
+                part="snippet",
+                playlistId=playlist_id,
+                videoId=video_id,
+                maxResults=1,
+            )
+            check_resp = check_req.execute()
+            if check_resp.get("items"):
+                logger.info(f"Video {video_id} is already in playlist {playlist_id}")
+                return True
+
+            body = {
+                "snippet": {
+                    "playlistId": playlist_id,
+                    "resourceId": {
+                        "kind": "youtube#video",
+                        "videoId": video_id,
+                    },
+                }
+            }
+            youtube.playlistItems().insert(part="snippet", body=body).execute()
+            logger.info(f"Video {video_id} added to YouTube playlist {playlist_id} successfully")
+            return True
+
+        except Exception as e:
+            logger.warning(f"Could not add video {video_id} to playlist {playlist_id}: {e}")
+            return False
+
     def upload_video(self, video_path: Path, metadata: VideoPublishMetadata) -> str:
         logger.info("Initiating YouTube video upload", extra_data={"title": metadata.title, "path": str(video_path)})
         if not video_path.exists():
@@ -163,7 +259,12 @@ class YouTubeClient(BasePublisher):
             from googleapiclient.http import MediaFileUpload
             from src.google_auth import get_google_credentials
 
-            creds = get_google_credentials(scopes=["https://www.googleapis.com/auth/youtube.upload"])
+            creds = get_google_credentials(
+                scopes=[
+                    "https://www.googleapis.com/auth/youtube.upload",
+                    "https://www.googleapis.com/auth/youtube.force-ssl",
+                ]
+            )
             if not creds:
                 logger.warning("No YouTube OAuth credentials configured; simulating upload (mock URL).")
                 mock_id = "mock_ldoe_video"
@@ -206,6 +307,18 @@ class YouTubeClient(BasePublisher):
             video_id = response.get("id")
             youtube_url = f"https://youtu.be/{video_id}"
             logger.info(f"Video uploaded successfully to YouTube: {youtube_url}")
+
+            # Automatically ensure dedicated playlist exists and add video to it
+            try:
+                playlist_id = self.get_or_create_playlist(
+                    youtube=youtube,
+                    privacy_status=metadata.privacy_status,
+                )
+                if playlist_id:
+                    self.add_video_to_playlist(youtube, video_id=video_id, playlist_id=playlist_id)
+            except Exception as pe:
+                logger.warning(f"Playlist auto-assignment skipped: {pe}")
+
             return youtube_url
 
         except Exception as e:

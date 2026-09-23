@@ -65,6 +65,7 @@ def run_pipeline(input_video_path: Path, local_only: bool = True, force: bool = 
         client_secrets_file=settings.youtube.client_secrets_file,
         token_file=settings.youtube.token_file,
         privacy_status=settings.youtube.privacy_status,
+        playlist_title=settings.youtube.playlist_title,
     )
     notifier = get_notifier(settings)
     tracker = HistoryTracker(history_file=settings.processing.history_file)
