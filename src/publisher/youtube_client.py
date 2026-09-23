@@ -49,7 +49,7 @@ class YouTubeClient(BasePublisher):
         self,
         client_secrets_file: str = "config/client_secrets.json",
         token_file: str = "config/token.json",
-        privacy_status: str = "unlisted",
+        privacy_status: str = "public",
     ) -> None:
         self.client_secrets_file = client_secrets_file
         self.token_file = token_file

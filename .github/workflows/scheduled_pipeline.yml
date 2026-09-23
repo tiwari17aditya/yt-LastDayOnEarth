@@ -66,6 +66,7 @@ jobs:
           GDRIVE_PROJECT_FOLDER_NAME: "LastDayOnEarth"
           GDRIVE_INPUT_FOLDER_NAME: "Input"
           GDRIVE_PROCESSED_FOLDER_NAME: "Processed"
+          YOUTUBE_PRIVACY_STATUS: "public"
           VIDEO_PRESET: "veryfast"
           ENVIRONMENT: "production"
           LOG_LEVEL: "INFO"

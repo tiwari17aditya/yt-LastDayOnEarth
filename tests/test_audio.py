@@ -23,7 +23,8 @@ def test_audio_ducking_filter():
 def test_random_loop_sequence(tmp_path):
     mixer = AudioMixer(library_path=Path("config/music_library.json"))
     out_audio = tmp_path / "stitched.m4a"
-    result_path, tracks = mixer.create_random_loop_sequence(target_duration=300.0, output_path=out_audio)
+    # 600 seconds guarantees multiple tracks since the longest single track is 336s
+    result_path, tracks = mixer.create_random_loop_sequence(target_duration=600.0, output_path=out_audio)
     
     assert result_path.exists()
     assert len(tracks) >= 2

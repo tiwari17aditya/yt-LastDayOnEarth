@@ -47,7 +47,7 @@ class YouTubeSettings(BaseModel):
         default_factory=lambda: os.getenv("YOUTUBE_CLIENT_SECRETS_FILE", "config/client_secrets.json")
     )
     token_file: str = Field(default_factory=lambda: os.getenv("YOUTUBE_TOKEN_FILE", "config/token.json"))
-    privacy_status: str = Field(default_factory=lambda: os.getenv("YOUTUBE_PRIVACY_STATUS", "unlisted"))
+    privacy_status: str = Field(default_factory=lambda: os.getenv("YOUTUBE_PRIVACY_STATUS", "public"))
     category_id: str = "20"  # Gaming category
 
 
