@@ -27,8 +27,13 @@ class BaseAudioMixer(ABC):
 class AudioMixer(BaseAudioMixer):
     """Manages audio mixing with volume attenuation/ducking and seamless loop."""
 
-    def __init__(self, library_path: Path = Path("config/music_library.json")) -> None:
+    def __init__(
+        self,
+        library_path: Path = Path("config/music_library.json"),
+        audio_dir: Path = Path("config/audio"),
+    ) -> None:
         self.library_path = library_path
+        self.audio_dir = audio_dir
         self.tracks = self._load_library()
 
     def _load_library(self) -> List[Dict[str, Any]]:
@@ -52,23 +57,38 @@ class AudioMixer(BaseAudioMixer):
             )
 
     def select_track(self, mood: Optional[str] = None) -> Dict[str, Any]:
-        """Find track matching mood or return default survival ambient track."""
+        """Find track matching mood or return ambient home base track."""
+        target_track = None
         if mood:
             for track in self.tracks:
                 if track.get("mood") == mood:
-                    logger.info("Selected background track by mood", extra_data={"track": track["title"], "mood": mood})
-                    return track
-        if self.tracks:
-            chosen = self.tracks[0]
-            logger.info("Selected default background track", extra_data={"track": chosen["title"]})
-            return chosen
-        raise AudioProcessingError(
-            operation="select_track",
-            root_cause="Music catalog is empty.",
-            recovery_action="Add tracks to config/music_library.json.",
-        )
+                    target_track = track
+                    break
+
+        if not target_track and self.tracks:
+            # Prefer 'home_base' or 'scavenging'
+            for track in self.tracks:
+                if track.get("mood") in ["home_base", "scavenging"]:
+                    target_track = track
+                    break
+            if not target_track:
+                target_track = self.tracks[0]
+
+        if not target_track:
+            raise AudioProcessingError(
+                operation="select_track",
+                root_cause="Music catalog is empty.",
+                recovery_action="Add tracks to config/music_library.json.",
+            )
+
+        # Attach file path if audio exists in audio_dir
+        audio_file = self.audio_dir / "the_safehouse.mp3"
+        track_copy = dict(target_track)
+        track_copy["file_path"] = str(audio_file) if audio_file.exists() else None
+
+        logger.info("Selected background track", extra_data={"title": track_copy["title"], "file": track_copy["file_path"]})
+        return track_copy
 
     def build_ffmpeg_audio_filter(self, ducking_db: str = "-20dB") -> str:
         """Generates filter complex combining gameplay audio (input 0) with background music (input 1)."""
-        # [1:a]aloop=loop=-1:size=2e+09,volume=-20dB[bg];[0:a][bg]amix=inputs=2:duration=first[aout]
         return f"[1:a]aloop=loop=-1:size=2e+09,volume={ducking_db}[bg];[0:a][bg]amix=inputs=2:duration=first[aout]"

@@ -47,6 +47,20 @@ class ConsoleFormatter(logging.Formatter):
         return f"[{timestamp}] [{record.levelname:<7}] [{component}] ({operation}) {record.getMessage()}"
 
 
+class CustomLoggerAdapter(logging.LoggerAdapter):
+    """Custom adapter that safely handles extra_data kwargs."""
+
+    def process(self, msg: str, kwargs: Dict[str, Any]) -> tuple:
+        extra = kwargs.get("extra", {})
+        if not isinstance(extra, dict):
+            extra = {}
+        extra.update(self.extra)
+        if "extra_data" in kwargs:
+            extra["extra_data"] = kwargs.pop("extra_data")
+        kwargs["extra"] = extra
+        return msg, kwargs
+
+
 def setup_logger(
     base_log_dir: str = "logs",
     level: int = logging.INFO,
@@ -81,10 +95,10 @@ def setup_logger(
     return logger
 
 
-def get_logger(component: str = "Pipeline", operation: str = "General") -> logging.LoggerAdapter:
-    """Returns a LoggerAdapter with preset component and operation context."""
+def get_logger(component: str = "Pipeline", operation: str = "General") -> CustomLoggerAdapter:
+    """Returns a CustomLoggerAdapter with preset component and operation context."""
     base_logger = setup_logger(component=component)
-    return logging.LoggerAdapter(
+    return CustomLoggerAdapter(
         base_logger,
         {"component": component, "operation": operation},
     )
