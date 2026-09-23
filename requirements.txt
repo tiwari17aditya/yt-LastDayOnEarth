@@ -1,0 +1,28 @@
+# Core Application & CLI
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.1
+pyyaml>=6.0.1
+click>=8.1.7
+
+# Google APIs (Drive, Gemini, YouTube)
+google-api-python-client>=2.128.0
+google-auth>=2.29.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+google-genai>=0.1.1
+
+# Computer Vision & OCR
+opencv-python-headless>=4.9.0.80
+pillow>=10.3.0
+pytesseract>=0.3.10
+numpy>=1.26.4
+
+# Subtitles & Media Metadata
+pysubs2>=1.7.1
+
+# Testing & Quality
+pytest>=8.2.0
+pytest-mock>=3.14.0
+flake8>=7.0.0
+black>=24.4.2
