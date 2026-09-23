@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-09-23
+
+### Added
+- **Dynamic YouTube Titles**: Implemented randomized high-CTR title rotation combined with formatted date `(DD Mon, YYYY)` to ensure unique and compliant YouTube metadata.
+- **Top 50 Trending Hashtags**: Embedded top 50 curated high-reach survival and gaming hashtags into YouTube video descriptions.
+- **Drive Output Hierarchy**: Structured `Output` into segregated `videos/` and `metadata/` trees organized by `Year/Month/` (`video_ddmmyyyy.mp4` and `metadata_ddmmyyyy.json`).
+- **Automated GitHub Secrets Sync**: Added `scripts/sync_github_secrets.py` to encrypt and synchronize Google Cloud OAuth secrets to GitHub Actions using the GitHub REST API and libsodium encryption.
+- **Test Staging Script**: Added `scripts/stage_input_test.py` for staging test recordings directly in Google Drive.
+
+### Changed
+- **Description Hygiene**: Removed soundtrack listing and Creative Commons attribution blocks from YouTube video descriptions.
+- **GitHub Runner Optimization**: Disabled pip caching in `.github/workflows/scheduled_pipeline.yml`, saving ~200 MB of repository storage.
+
 ## [0.3.0] - 2026-09-23
 
 ### Added
