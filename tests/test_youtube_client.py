@@ -57,6 +57,7 @@ def test_add_video_to_playlist_inserts_when_not_present():
     mock_check_req = MagicMock()
     mock_check_req.execute.return_value = {"items": []}
     mock_youtube.playlistItems().list.return_value = mock_check_req
+    mock_youtube.playlistItems().list_next.return_value = None
 
     # Mock insert
     mock_insert_req = MagicMock()
@@ -76,10 +77,13 @@ def test_add_video_to_playlist_skips_when_already_present():
     client = YouTubeClient()
     mock_youtube = MagicMock()
 
-    # Mock playlistItems().list returning existing item
+    # Mock playlistItems().list returning existing item matching videoId
     mock_check_req = MagicMock()
-    mock_check_req.execute.return_value = {"items": [{"id": "item_already_there"}]}
+    mock_check_req.execute.return_value = {
+        "items": [{"snippet": {"resourceId": {"videoId": "vid_123"}}}]
+    }
     mock_youtube.playlistItems().list.return_value = mock_check_req
+    mock_youtube.playlistItems().list_next.return_value = None
 
     success = client.add_video_to_playlist(mock_youtube, video_id="vid_123", playlist_id="pl_456")
 

@@ -216,16 +216,19 @@ class YouTubeClient(BasePublisher):
     ) -> bool:
         """Adds a video to a YouTube playlist if not already present."""
         try:
-            check_req = youtube.playlistItems().list(
+            # Check items in playlist to avoid duplicates
+            req = youtube.playlistItems().list(
                 part="snippet",
                 playlistId=playlist_id,
-                videoId=video_id,
-                maxResults=1,
+                maxResults=50,
             )
-            check_resp = check_req.execute()
-            if check_resp.get("items"):
-                logger.info(f"Video {video_id} is already in playlist {playlist_id}")
-                return True
+            while req:
+                resp = req.execute()
+                for item in resp.get("items", []):
+                    if item.get("snippet", {}).get("resourceId", {}).get("videoId") == video_id:
+                        logger.info(f"Video {video_id} is already in playlist {playlist_id}")
+                        return True
+                req = youtube.playlistItems().list_next(req, resp)
 
             body = {
                 "snippet": {
