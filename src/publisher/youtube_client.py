@@ -62,10 +62,27 @@ class YouTubeClient(BasePublisher):
         music_track: Optional[Dict[str, Any]] = None,
     ) -> VideoPublishMetadata:
         from datetime import datetime
+        import hashlib
 
-        # Dynamic date in title to keep YouTube uploads unique and easily manageable
-        date_str = datetime.now().strftime("%d/%m/%Y")
-        clean_title = f"Last Day on Earth: Survival — Home Base & Workshop [{date_str}]"
+        # Dynamic date format: ( 23 Sep, 2026 )
+        date_str = datetime.now().strftime("%d %b, %Y")
+
+        # Varied engaging titles to ensure every video is distinct and fresh
+        title_themes = [
+            "Home Base Workshop, Woodcrafting & Storage",
+            "Survival Preparation, Base Upgrades & Smelting",
+            "Optimizing Base Storage, Workbench & Planks",
+            "Resource Gathering, Woodworking & Gear Management",
+            "Base Defense Setup, Workshop Tasks & Smelting",
+            "Survival Routine: Workshop Operations & Storage",
+            "Crafting Essentials: Planks, Weapon Bench & Furnaces",
+            "Home Base Expansion & Resource Organization",
+            "Workshop Productivity: Woodcraft & Weapon Setup",
+            "Zombie Defense Prep: Workshop & Resource Hoarding",
+        ]
+        theme_index = int(hashlib.md5(f"{video_title}_{date_str}".encode()).hexdigest(), 16) % len(title_themes)
+        selected_theme = title_themes[theme_index]
+        clean_title = f"Last Day on Earth: Survival — {selected_theme} ({date_str})"
 
         description_lines = [
             "Surviving and thriving in Last Day on Earth: Survival! In this episode, we organize our Home Base, process pine logs into planks at the woodworking bench, manage base storage chests, inspect the weapon workbench, and fuel up the smelting furnaces.",
