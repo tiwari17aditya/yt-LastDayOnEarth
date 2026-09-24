@@ -275,6 +275,28 @@ class YouTubeClient(BasePublisher):
 
             youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
 
+            # Check if video with identical title was already uploaded recently (prevent duplicates)
+            try:
+                ch_resp = youtube.channels().list(mine=True, part="contentDetails").execute()
+                if ch_resp.get("items"):
+                    uploads_id = ch_resp["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+                    recent_items = youtube.playlistItems().list(
+                        playlistId=uploads_id,
+                        part="snippet",
+                        maxResults=25,
+                    ).execute()
+                    for item in recent_items.get("items", []):
+                        snip = item.get("snippet", {})
+                        if snip.get("title") == metadata.title:
+                            existing_vid_id = snip.get("resourceId", {}).get("videoId")
+                            logger.warning(
+                                f"Video with title '{metadata.title}' already published on YouTube (ID: {existing_vid_id}). "
+                                f"Skipping duplicate upload."
+                            )
+                            return f"https://youtu.be/{existing_vid_id}"
+            except Exception as ce:
+                logger.warning(f"Could not perform YouTube duplicate pre-check: {ce}")
+
             body = {
                 "snippet": {
                     "title": metadata.title,

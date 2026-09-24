@@ -77,6 +77,9 @@ class ProcessingSettings(BaseModel):
     output_dir: Path = Field(default_factory=lambda: Path(os.getenv("OUTPUT_DIR", "output")))
     music_library_file: Path = Field(default=Path("config/music_library.json"))
     history_file: Path = Field(default=Path("data/history.json"))
+    delete_input_after_processing: bool = Field(
+        default_factory=lambda: os.getenv("DELETE_INPUT_AFTER_PROCESSING", "true").lower() == "true"
+    )
 
 
 class PipelineSettings(BaseModel):

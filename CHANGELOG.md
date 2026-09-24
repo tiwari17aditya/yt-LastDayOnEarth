@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-09-24
+
+### Added
+- **Immediate Input Video Deletion**:
+  - Raw gameplay recordings in Google Drive are now permanently deleted from `Input` immediately upon video processing and publication, preventing duplicate processing on scheduled cron cycles.
+  - Added `delete_video` to `GoogleDriveClient` with automatic fallback to Google Drive Trash if hard deletion is restricted by permissions.
+  - Added configurable local input deletion via `delete_input_after_processing` setting and CLI flags (`--delete-input`, `--keep-input`).
+- **YouTube Pre-Upload Duplicate Guard**: `YouTubeClient.upload_video` now inspects recent channel uploads for identical titles prior to inserting, completely halting duplicate uploads at the API gateway.
+- **Pytest Configuration**: Added `pytest.ini` configuring standard test discovery paths.
+
+### Fixed
+- **Drive-Cron Processing Reentrancy**: Decoupled Input video deletion from secondary Drive Output uploads so that network or quota failures during archiving do not leave raw videos lingering in `Input`.
+- Cleaned up pending duplicate recording from Google Drive Input.
+
 ## [0.5.0] - 2026-09-23
 
 ### Added

@@ -150,3 +150,42 @@ def test_upload_processed_video_year_month_structure(mock_drive_service, tmp_pat
     assert result["metadata_id"] == "uploaded_meta_id"
     assert result["metadata_folder"] == "Output/metadata/2026/09"
 
+
+def test_delete_video_permanent_success(mock_drive_service):
+    """Test successful permanent deletion of a video file."""
+    client = GoogleDriveClient()
+    client.service = mock_drive_service
+
+    client.delete_video("file_xyz_123")
+    mock_drive_service.files().delete.assert_called_once_with(fileId="file_xyz_123")
+
+
+def test_delete_video_fallback_to_trash(mock_drive_service):
+    """Test fallback to trash when permanent delete raises an exception."""
+    client = GoogleDriveClient()
+    client.service = mock_drive_service
+
+    files_mock = MagicMock()
+    mock_drive_service.files.return_value = files_mock
+    files_mock.delete.return_value.execute.side_effect = Exception("Permission denied for delete")
+    files_mock.update.return_value.execute.return_value = {"id": "file_xyz_123", "trashed": True}
+
+    client.delete_video("file_xyz_123")
+    files_mock.update.assert_called_once_with(fileId="file_xyz_123", body={"trashed": True})
+
+
+def test_delete_video_fails_when_both_fail(mock_drive_service):
+    """Test that IngestionError is raised when both permanent delete and trash fail."""
+    client = GoogleDriveClient()
+    client.service = mock_drive_service
+
+    files_mock = MagicMock()
+    mock_drive_service.files.return_value = files_mock
+    files_mock.delete.return_value.execute.side_effect = Exception("Delete failed")
+    files_mock.update.return_value.execute.side_effect = Exception("Trash failed")
+
+    with pytest.raises(IngestionError) as exc_info:
+        client.delete_video("file_xyz_123")
+
+    assert exc_info.value.operation == "delete_video"
+

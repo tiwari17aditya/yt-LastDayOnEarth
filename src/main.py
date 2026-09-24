@@ -5,6 +5,7 @@ import hashlib
 import sys
 from pathlib import Path
 from datetime import datetime
+from typing import Optional
 
 from src.config import get_settings
 from src.logging_config import get_logger
@@ -47,9 +48,16 @@ def get_notifier(settings):
         )
 
 
-def run_pipeline(input_video_path: Path, local_only: bool = True, force: bool = False) -> Path:
+def run_pipeline(
+    input_video_path: Path,
+    local_only: bool = True,
+    force: bool = False,
+    delete_input: Optional[bool] = None,
+) -> Path:
     """Executes the complete video processing workflow for a single video file."""
     settings = get_settings()
+    if delete_input is None:
+        delete_input = settings.processing.delete_input_after_processing
     logger.info("Initiating video processing workflow", extra_data={"input": str(input_video_path)})
 
     if not input_video_path.exists():
@@ -166,6 +174,16 @@ def run_pipeline(input_video_path: Path, local_only: bool = True, force: bool = 
         )
 
         logger.info("Workflow execution completed successfully!")
+
+        # Step 7: Delete input video if configured to prevent duplicate processing
+        if delete_input:
+            if input_video_path.exists():
+                try:
+                    input_video_path.unlink()
+                    logger.info(f"Successfully deleted processed input video: {input_video_path}")
+                except Exception as de:
+                    logger.warning(f"Could not delete input video {input_video_path}: {de}")
+
         return output_path
 
     except PipelineError as pe:
@@ -222,20 +240,26 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
             drive_client.download_video(file_id=file_id, destination_path=local_download_path)
 
             try:
-                # Run full video pipeline
-                rendered_output = run_pipeline(local_download_path, local_only=not upload, force=force)
+                # Run full video pipeline (delete_input=False because temp file cleanup is managed explicitly below)
+                rendered_output = run_pipeline(local_download_path, local_only=not upload, force=force, delete_input=False)
+
+                # IMMEDIATELY delete raw video from Google Drive Input to prevent duplicate processing
+                logger.info(f"Deleting raw video '{file_name}' ({file_id}) from Google Drive Input...")
+                try:
+                    drive_client.delete_video(file_id)
+                except Exception as de:
+                    logger.error(f"Failed to delete video from Drive Input: {de}", extra_data={"file_id": file_id})
 
                 # Upload processed video & metadata to Google Drive Output (Year -> Month -> video_ddmmyyyy)
-                meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
-                logger.info("Uploading processed video to Google Drive Output organized by Year/Month...")
-                drive_client.upload_processed_video(
-                    local_video_path=rendered_output,
-                    metadata_path=meta_json if meta_json.exists() else None,
-                )
-
-                # Move raw video in Google Drive from Input -> Processed
-                logger.info(f"Archiving raw video {file_name} to Drive Processed folder...")
-                drive_client.mark_as_processed(file_id)
+                try:
+                    meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
+                    logger.info("Uploading processed video to Google Drive Output organized by Year/Month...")
+                    drive_client.upload_processed_video(
+                        local_video_path=rendered_output,
+                        metadata_path=meta_json if meta_json.exists() else None,
+                    )
+                except Exception as ue:
+                    logger.error(f"Google Drive Output upload failed: {ue}. (YouTube upload was already completed successfully).")
 
                 # Clean up local raw download to save runner disk space
                 if local_download_path.exists():
@@ -269,6 +293,8 @@ def main() -> None:
     process_parser.add_argument("--local", action="store_true", default=True, help="Run locally without uploading to YouTube")
     process_parser.add_argument("--upload", action="store_true", help="Upload to YouTube after processing")
     process_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
+    process_parser.add_argument("--delete-input", dest="delete_input", action="store_true", default=None, help="Delete input video file after successful processing")
+    process_parser.add_argument("--keep-input", dest="delete_input", action="store_false", help="Preserve input video file after processing")
 
     # Scheduled Google Drive CRON command
     cron_parser = subparsers.add_parser("drive-cron", help="Poll Google Drive for pending recordings and process")
@@ -281,7 +307,7 @@ def main() -> None:
 
     if args.command == "process":
         local_flag = not args.upload
-        run_pipeline(Path(args.input), local_only=local_flag, force=args.force)
+        run_pipeline(Path(args.input), local_only=local_flag, force=args.force, delete_input=args.delete_input)
     elif args.command == "drive-cron":
         upload_flag = not args.no_upload
         exit_code = run_drive_cron(dry_run=args.dry_run, limit=args.limit, upload=upload_flag, force=args.force)

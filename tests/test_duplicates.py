@@ -142,3 +142,72 @@ def test_drive_client_upload_output_collision_disambiguation(tmp_path):
     # Disambiguated names
     assert result["video_name"] == "video_23092026_1.mp4"
     assert result["metadata_name"] == "metadata_23092026_1.json"
+
+
+def test_youtube_client_skips_duplicate_title_upload(tmp_path):
+    """Verify YouTubeClient detects duplicate video by title from recent uploads and skips upload."""
+    from src.publisher.youtube_client import YouTubeClient, VideoPublishMetadata
+    from unittest.mock import patch, MagicMock
+
+    client = YouTubeClient()
+    dummy_video = tmp_path / "dummy.mp4"
+    dummy_video.write_bytes(b"data")
+
+    meta = VideoPublishMetadata(
+        title="Existing Video Title",
+        description="desc",
+        tags=[],
+        category_id="20",
+        privacy_status="public",
+    )
+
+    mock_service = MagicMock()
+    mock_service.channels().list().execute.return_value = {
+        "items": [{"contentDetails": {"relatedPlaylists": {"uploads": "uploads_id"}}}]
+    }
+    mock_service.playlistItems().list().execute.return_value = {
+        "items": [
+            {
+                "snippet": {
+                    "title": "Existing Video Title",
+                    "resourceId": {"videoId": "existing_vid_123"},
+                }
+            }
+        ]
+    }
+
+    with patch("src.google_auth.get_google_credentials", return_value=MagicMock()):
+        with patch("googleapiclient.discovery.build", return_value=mock_service):
+            url = client.upload_video(dummy_video, meta)
+
+    assert url == "https://youtu.be/existing_vid_123"
+    mock_service.videos().insert.assert_not_called()
+
+
+def test_run_pipeline_deletes_input_when_configured(tmp_path):
+    """Verify that run_pipeline removes input file when delete_input=True."""
+    from src.main import run_pipeline
+    from unittest.mock import patch, MagicMock
+
+    dummy_input = tmp_path / "test_recording.mp4"
+    dummy_input.write_bytes(b"dummy_video_bytes")
+
+    with patch("src.main.PrivacyDetector"), \
+         patch("src.main.SubtitleGenerator"), \
+         patch("src.main.AudioMixer") as mock_audio, \
+         patch("src.main.VideoProcessor") as mock_proc, \
+         patch("src.main.YouTubeClient"), \
+         patch("src.main.get_notifier"), \
+         patch("src.main.HistoryTracker"):
+
+        mock_audio.return_value.create_random_loop_sequence.return_value = (tmp_path / "bgm.m4a", [{"title": "Track"}])
+        mock_proc.return_value.get_video_duration.return_value = 60.0
+        mock_proc.return_value.get_output_path.return_value = tmp_path / "test_out.mp4"
+
+        # 1. When delete_input=False, file is kept
+        run_pipeline(dummy_input, local_only=True, force=True, delete_input=False)
+        assert dummy_input.exists()
+
+        # 2. When delete_input=True, file is deleted
+        run_pipeline(dummy_input, local_only=True, force=True, delete_input=True)
+        assert not dummy_input.exists()

@@ -329,6 +329,27 @@ class GoogleDriveClient(BaseIngestionClient):
                 recovery_action="Check file permissions in Google Drive.",
             )
 
+    def delete_video(self, file_id: str) -> None:
+        """Deletes processed raw video from Google Drive permanently (or trashes if delete is restricted)."""
+        if not self.service:
+            self.connect()
+
+        logger.info(f"Deleting raw video {file_id} from Google Drive")
+        try:
+            self.service.files().delete(fileId=file_id).execute()
+            logger.info(f"Video {file_id} permanently deleted from Google Drive Input.")
+        except Exception as e:
+            logger.warning(f"Permanent deletion failed for file {file_id}: {e}. Attempting to trash...")
+            try:
+                self.service.files().update(fileId=file_id, body={"trashed": True}).execute()
+                logger.info(f"Video {file_id} successfully trashed in Google Drive.")
+            except Exception as te:
+                raise IngestionError(
+                    operation="delete_video",
+                    root_cause=f"Delete failed: {e}; Trash failed: {te}",
+                    recovery_action="Check file ownership and delete permissions in Google Drive.",
+                )
+
     def upload_processed_video(
         self,
         local_video_path: Path,
