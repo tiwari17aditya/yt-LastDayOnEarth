@@ -27,15 +27,15 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
  │ 5. Video Processor: FFmpeg composite render (veryfast preset, 60fps)        │
  │ 6. Publisher: YouTube Data API v3 upload & rich SEO metadata (Public)       │
  │ 7. Playlist Manager: Dedicated playlist auto-discovery & video assignment   │
- │ 8. Drive Output: Uploads video & metadata to Output/videos & Output/metadata │
- │ 9. Drive Archiver: Moves video from Input -> Processed in Google Drive      │
+ │ 8. Input Video Cleanup: Immediately deletes raw video from Drive Input      │
+ │ 9. Drive Output: Uploads video & metadata to Output/videos & Output/metadata │
  │ 10. Notifier: Google Gmail API v1 rich HTML notification dispatch           │
  │ 11. Storage Tracker: Appends execution record to data/history.json          │
  └───────────┬─────────────────────────────────────────────────────────────────┘
              │
              ├──► [ YouTube Channel (Published / Public in Dedicated Playlist) ]
              ├──► [ Google Drive: Output/videos & Output/metadata ]
-             ├──► [ Google Drive: Processed Folder (Archived) ]
+             ├──► [ Google Drive: Input Video Deleted Immediately ]
              └──► [ Gmail Notification (Direct via Gmail API) ]
 ```
 
@@ -44,10 +44,11 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 ## 3. Module Boundaries & Interfaces
 
 ### 3.1 Ingestion (`src/ingestion/`)
-- **Responsibility**: Detect, download, and archive candidate gameplay files from Google Drive.
+- **Responsibility**: Detect, download, and delete/archive candidate gameplay files from Google Drive.
 - **Interface**: `BaseIngestionClient`
   - `list_pending_videos() -> List[RemoteFile]`
   - `download_video(file_id: str, dest_path: Path) -> Path`
+  - `delete_video(file_id: str) -> None`
   - `mark_as_processed(file_id: str) -> None`
 
 ### 3.2 Privacy & PII Redaction (`src/privacy/`)
