@@ -16,7 +16,7 @@ def test_growth_tracker_fetch_channel_overview_success():
         "items": [
             {
                 "id": "UC_TEST_123",
-                "snippet": {"title": "Pulse Vector"},
+                "snippet": {"title": "Last Day on Earth Official"},
                 "statistics": {
                     "subscriberCount": "1250",
                     "viewCount": "45000",
@@ -29,7 +29,7 @@ def test_growth_tracker_fetch_channel_overview_success():
 
     metrics = tracker.fetch_channel_overview(youtube=mock_yt)
     assert metrics.channel_id == "UC_TEST_123"
-    assert metrics.channel_title == "Pulse Vector"
+    assert metrics.channel_title == "Last Day on Earth Official"
     assert metrics.subscriber_count == 1250
     assert metrics.total_views == 45000
     assert metrics.video_count == 42
@@ -128,12 +128,13 @@ def test_growth_tracker_fetch_recent_comments():
     }
     mock_yt.commentThreads().list().execute.return_value = mock_resp
 
-    comments = tracker.fetch_recent_comments(channel_id="UC_TEST", limit=5, youtube=mock_yt)
+    comments = tracker.fetch_recent_comments(video_ids=["vid_001"], limit=5, youtube=mock_yt)
     assert len(comments) == 2
-    assert comments[0].author == "Gamer123"
-    assert comments[0].is_unanswered is True
-    assert comments[1].reply_count == 2
-    assert comments[1].is_unanswered is False
+    assert comments[0].author == "SurvivalPro"
+    assert comments[0].reply_count == 2
+    assert comments[0].is_unanswered is False
+    assert comments[1].author == "Gamer123"
+    assert comments[1].is_unanswered is True
 
 
 def test_growth_tracker_record_snapshot_delta(tmp_path):
@@ -159,7 +160,7 @@ def test_growth_tracker_record_snapshot_delta(tmp_path):
         "items": [
             {
                 "id": "UC_TEST",
-                "snippet": {"title": "Pulse Vector"},
+                "snippet": {"title": "Last Day on Earth Official"},
                 "statistics": {"subscriberCount": "35", "viewCount": "500", "videoCount": "10"},
             }
         ]
@@ -187,15 +188,15 @@ def test_growth_tracker_record_snapshot_delta(tmp_path):
     assert data[-1]["delta_subscribers"] == 5
 
 
-def test_growth_tracker_generate_growth_report():
-    tracker = GrowthTracker()
+def test_growth_tracker_generate_growth_report(tmp_path):
+    tracker = GrowthTracker(history_file=str(tmp_path / "growth_history.json"))
     mock_yt = MagicMock()
 
     mock_yt.channels().list().execute.return_value = {
         "items": [
             {
                 "id": "UC_TEST",
-                "snippet": {"title": "Pulse Vector"},
+                "snippet": {"title": "Last Day on Earth Official"},
                 "statistics": {"subscriberCount": "40", "viewCount": "1000", "videoCount": "12"},
             }
         ]
@@ -204,7 +205,6 @@ def test_growth_tracker_generate_growth_report():
     mock_yt.commentThreads().list().execute.return_value = {"items": []}
 
     report = tracker.generate_growth_report(youtube=mock_yt)
-    assert "YouTube Platform Reach & Audience Growth Intelligence" in report
-    assert "Pulse Vector" in report
-    assert "Executive Channel Growth Overview" in report
+    assert "Last Day on Earth: Survival" in report
+    assert "Executive Series Growth Overview" in report
     assert "Tactical Reach & Subscriber Acceleration Directives" in report

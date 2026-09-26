@@ -205,54 +205,60 @@ class GrowthTracker:
 
     def fetch_recent_comments(
         self,
-        channel_id: Optional[str] = None,
+        video_ids: Optional[List[str]] = None,
         limit: int = 15,
         youtube: Optional[Any] = None,
     ) -> List[CommentItem]:
-        """Retrieves latest comments across channel videos for engagement management."""
+        """Retrieves comments strictly on Last Day on Earth series videos."""
         yt = youtube or self.get_youtube_service()
 
-        if not channel_id:
+        if not video_ids and self.series_tracker_file.exists():
             try:
-                ch = self.fetch_channel_overview(yt)
-                channel_id = ch.channel_id
-            except Exception:
-                pass
+                tracker_data = json.loads(self.series_tracker_file.read_text(encoding="utf-8"))
+                video_ids = [
+                    ep.get("video_id")
+                    for ep in tracker_data.get("completed_episodes", [])
+                    if ep.get("video_id") and not ep.get("video_id").startswith("local")
+                ]
+            except Exception as e:
+                logger.warning(f"Could not read series video IDs for comments: {e}")
 
-        if not channel_id:
+        if not video_ids:
             return []
 
         comments: List[CommentItem] = []
-        try:
-            resp = yt.commentThreads().list(
-                part="snippet",
-                allThreadsRelatedToChannelId=channel_id,
-                order="time",
-                maxResults=min(limit, 50),
-            ).execute()
+        for vid in video_ids:
+            try:
+                resp = yt.commentThreads().list(
+                    part="snippet",
+                    videoId=vid,
+                    order="time",
+                    maxResults=min(limit, 20),
+                ).execute()
 
-            for item in resp.get("items", []):
-                snippet = item.get("snippet", {})
-                top = snippet.get("topLevelComment", {}).get("snippet", {})
-                reply_count = int(snippet.get("totalReplyCount", 0))
+                for item in resp.get("items", []):
+                    snippet = item.get("snippet", {})
+                    top = snippet.get("topLevelComment", {}).get("snippet", {})
+                    reply_count = int(snippet.get("totalReplyCount", 0))
 
-                comments.append(
-                    CommentItem(
-                        comment_id=item.get("id", ""),
-                        video_id=snippet.get("videoId", ""),
-                        author=top.get("authorDisplayName", "Anonymous"),
-                        text=top.get("textDisplay", ""),
-                        like_count=int(top.get("likeCount", 0)),
-                        published_at=top.get("publishedAt", ""),
-                        reply_count=reply_count,
-                        is_unanswered=(reply_count == 0),
+                    comments.append(
+                        CommentItem(
+                            comment_id=item.get("id", ""),
+                            video_id=vid,
+                            author=top.get("authorDisplayName", "Anonymous"),
+                            text=top.get("textDisplay", ""),
+                            like_count=int(top.get("likeCount", 0)),
+                            published_at=top.get("publishedAt", ""),
+                            reply_count=reply_count,
+                            is_unanswered=(reply_count == 0),
+                        )
                     )
-                )
-            return comments
+            except Exception:
+                # Handle videos with no comments or disabled comments gracefully
+                continue
 
-        except Exception as e:
-            logger.warning(f"Could not fetch recent comment threads: {e}")
-            return []
+        comments.sort(key=lambda c: c.published_at, reverse=True)
+        return comments[:limit]
 
     def record_snapshot(
         self,
@@ -301,13 +307,12 @@ class GrowthTracker:
         )
 
         history.append(asdict(snapshot))
-        # Keep last 100 historical snapshots
         if len(history) > 100:
             history = history[-100:]
 
         try:
             self.history_file.write_text(json.dumps(history, indent=2), encoding="utf-8")
-            logger.info("Successfully recorded YouTube growth snapshot", extra_data={
+            logger.info("Successfully recorded Last Day on Earth growth snapshot", extra_data={
                 "subscribers": channel.subscriber_count,
                 "delta_subs": delta_subs,
                 "series_views": total_views,
@@ -318,33 +323,34 @@ class GrowthTracker:
         return snapshot
 
     def generate_growth_report(self, youtube: Optional[Any] = None) -> str:
-        """Generates an in-depth, human-readable YouTube growth & reach audit."""
+        """Generates an in-depth, human-readable Last Day on Earth growth & reach audit."""
         yt = youtube or self.get_youtube_service()
         snapshot = self.record_snapshot(youtube=yt)
         channel = self.fetch_channel_overview(youtube=yt)
         videos = self.fetch_series_metrics(youtube=yt)
-        comments = self.fetch_recent_comments(channel_id=channel.channel_id, limit=10, youtube=yt)
+        comments = self.fetch_recent_comments(limit=10, youtube=yt)
 
-        # Markdown Report Generation
+        # Markdown Report Generation strictly branded for Last Day on Earth
         lines = [
-            f"# YouTube Platform Reach & Audience Growth Intelligence",
+            f"# Last Day on Earth: Survival — YouTube Growth & Reach Intelligence",
             f"",
-            f"**Channel:** `{channel.channel_title}` ({channel.channel_id})  ",
+            f"**Series:** `Last Day on Earth: Survival`  ",
+            f"**Playlist:** `Last Day on Earth: Survival — Official Gameplay Series`  ",
+            f"**Channel Subscribers:** `{channel.subscriber_count:,}`  ",
             f"**Timestamp:** `{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}`  ",
             f"**Audit Status:** Active Monitoring  ",
             f"",
             f"---",
             f"",
-            f"## 1. Executive Channel Growth Overview",
+            f"## 1. Executive Series Growth Overview",
             f"",
-            f"| Metric | Current Count | Net Change Since Last Run | Status |",
+            f"| Metric | Current Series Count | Net Change Since Last Run | Status |",
             f"| :--- | :---: | :---: | :---: |",
-            f"| **Subscribers** | **{channel.subscriber_count:,}** | {('+' if snapshot.delta_subscribers >= 0 else '')}{snapshot.delta_subscribers} | {('🟢 Growing' if snapshot.delta_subscribers > 0 else '⚪ Stable')} |",
-            f"| **Total Channel Views** | **{channel.total_views:,}** | — | 🟢 Monitored |",
+            f"| **Series Episodes** | **{len(videos)}** | — | 📦 Content Library |",
             f"| **Series Video Views** | **{snapshot.total_series_views:,}** | {('+' if snapshot.delta_views >= 0 else '')}{snapshot.delta_views} | {('🚀 Surging' if snapshot.delta_views > 5 else '📈 Active')} |",
             f"| **Series Likes** | **{snapshot.total_series_likes:,}** | {('+' if snapshot.delta_likes >= 0 else '')}{snapshot.delta_likes} | 🎯 Target |",
             f"| **Series Comments** | **{snapshot.total_series_comments:,}** | {('+' if snapshot.delta_comments >= 0 else '')}{snapshot.delta_comments} | 💬 Community |",
-            f"| **Total Published Videos** | **{channel.video_count}** | — | 📦 Content Library |",
+            f"| **Channel Subscribers** | **{channel.subscriber_count:,}** | {('+' if snapshot.delta_subscribers >= 0 else '')}{snapshot.delta_subscribers} | {('🟢 Growing' if snapshot.delta_subscribers > 0 else '⚪ Baseline')} |",
             f"",
             f"---",
             f"",
@@ -359,7 +365,6 @@ class GrowthTracker:
         else:
             for v in videos:
                 ep_label = f"#{v.episode_number}" if v.episode_number else "N/A"
-                # Extract hook from title before separator
                 hook = v.title.split("|")[0].strip() if "|" in v.title else v.title[:30]
                 lines.append(
                     f"| **{ep_label}** | [{v.title[:38]}...](https://youtu.be/{v.video_id}) | "
@@ -371,12 +376,12 @@ class GrowthTracker:
             f"",
             f"---",
             f"",
-            f"## 3. Audience Engagement & Comment Sentiment",
+            f"## 3. Last Day on Earth Viewer Comments & Community Sentiment",
             f"",
         ])
 
         unanswered = [c for c in comments if c.is_unanswered]
-        lines.append(f"**Recent Comments:** {len(comments)} total | **Unreplied / Actionable:** {len(unanswered)}")
+        lines.append(f"**Series Comments:** {len(comments)} total | **Unreplied / Actionable:** {len(unanswered)}")
         lines.append("")
 
         if comments:
@@ -387,7 +392,7 @@ class GrowthTracker:
                 needs_reply = "⚠️ **YES** (Boosts CTR)" if c.is_unanswered else "✅ Replied"
                 lines.append(f"| `{c.author}` | \"{clean_text}...\" | [{c.video_id}](https://youtu.be/{c.video_id}) | {c.like_count} | {needs_reply} |")
         else:
-            lines.append("*No recent comments detected on the channel.*")
+            lines.append("*No viewer comments posted on Last Day on Earth episodes yet. Implement the First-Hour Pinned Question routine below to drive viewer comments.*")
 
         lines.extend([
             f"",
