@@ -235,3 +235,26 @@ class NotificationError(PipelineError):
             status=status,
             details=details,
         )
+
+
+class GrowthTrackingError(PipelineError):
+    """Raised when YouTube platform reach, statistics, or comment fetching fails."""
+
+    def __init__(
+        self,
+        operation: str,
+        root_cause: str,
+        recovery_action: str,
+        file_path: Optional[str] = None,
+        status: str = "FAILED",
+        details: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            operation=operation,
+            component="GrowthTracker",
+            root_cause=root_cause,
+            recovery_action=recovery_action,
+            file_path=file_path,
+            status=status,
+            details=details,
+        )

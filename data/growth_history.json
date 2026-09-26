@@ -1,0 +1,74 @@
+[
+  {
+    "timestamp": "2026-09-26T14:59:11.074303+00:00",
+    "channel": {
+      "channel_id": "UCt154eXNnEfKtRNBrAnay7A",
+      "channel_title": "Pulse Vector ",
+      "subscriber_count": 36,
+      "total_views": 10013,
+      "video_count": 247,
+      "timestamp": "2026-09-26T14:59:10.939124+00:00"
+    },
+    "total_series_views": 14,
+    "total_series_likes": 0,
+    "total_series_comments": 0,
+    "delta_subscribers": 0,
+    "delta_views": 0,
+    "delta_likes": 0,
+    "delta_comments": 0
+  },
+  {
+    "timestamp": "2026-09-26T14:59:34.742975+00:00",
+    "channel": {
+      "channel_id": "UC_TEST",
+      "channel_title": "Pulse Vector",
+      "subscriber_count": 40,
+      "total_views": 1000,
+      "video_count": 12,
+      "timestamp": "2026-09-26T14:59:34.742975+00:00"
+    },
+    "total_series_views": 0,
+    "total_series_likes": 0,
+    "total_series_comments": 0,
+    "delta_subscribers": 4,
+    "delta_views": -14,
+    "delta_likes": 0,
+    "delta_comments": 0
+  },
+  {
+    "timestamp": "2026-09-26T15:00:00.433005+00:00",
+    "channel": {
+      "channel_id": "UC_TEST",
+      "channel_title": "Pulse Vector",
+      "subscriber_count": 40,
+      "total_views": 1000,
+      "video_count": 12,
+      "timestamp": "2026-09-26T15:00:00.432454+00:00"
+    },
+    "total_series_views": 0,
+    "total_series_likes": 0,
+    "total_series_comments": 0,
+    "delta_subscribers": 0,
+    "delta_views": 0,
+    "delta_likes": 0,
+    "delta_comments": 0
+  },
+  {
+    "timestamp": "2026-09-26T15:08:17.077310+00:00",
+    "channel": {
+      "channel_id": "UC_TEST",
+      "channel_title": "Pulse Vector",
+      "subscriber_count": 40,
+      "total_views": 1000,
+      "video_count": 12,
+      "timestamp": "2026-09-26T15:08:17.076772+00:00"
+    },
+    "total_series_views": 0,
+    "total_series_likes": 0,
+    "total_series_comments": 0,
+    "delta_subscribers": 0,
+    "delta_views": 0,
+    "delta_likes": 0,
+    "delta_comments": 0
+  }
+]
