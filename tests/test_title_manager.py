@@ -49,7 +49,7 @@ def test_title_manager_synthesizes_action_hook(tmp_path):
 
     pkg = mgr.generate_titles(events=events, episode_number=1)
 
-    assert "WOODCRAFT & PLANKS" in pkg.action_hook or "FURNACE SMELTING" in pkg.action_hook
+    assert "WOODCRAFT & PLANKS" in pkg.action_hook.upper() or "FURNACE SMELTING" in pkg.action_hook.upper()
     assert "#1" in pkg.action_hook
     assert pkg.primary_title == pkg.action_hook
     assert len(pkg.primary_title) <= 100

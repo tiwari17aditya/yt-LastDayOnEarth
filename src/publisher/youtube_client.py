@@ -85,13 +85,15 @@ class YouTubeClient(BasePublisher):
 
         date_str = datetime.now().strftime("%d %b, %Y")
 
-        # Top 2 lines: Front-loaded high-retention hook before YouTube's "...more" cutoff
+        # Natural, human-friendly presentation
+        summary_clean = title_pkg.summary.strip()
         description_lines = [
-            f"Surviving and building in Last Day on Earth: Survival! In Episode #{title_pkg.episode_number}, we focus on {title_pkg.summary}.",
+            f"Welcome back to Last Day on Earth: Survival! In Episode #{title_pkg.episode_number}, we focus on {summary_clean}.",
             "Watch as we optimize our base layout, advance our workshop crafting, and prepare for the zombie wasteland.",
             "",
-            "🔔 Subscribe for regular Last Day on Earth gameplay guides and survival runs!",
+            "If you enjoyed the video, make sure to like and subscribe for more survival guides and wasteland runs! 🧟‍♂️🔨",
             "",
+            "────────────────────────────────────────",
             "⏱️ TIMESTAMPS & CHAPTERS:",
         ]
 
@@ -111,19 +113,10 @@ class YouTubeClient(BasePublisher):
             formatted_chapters.insert(0, f"00:00 - Intro & {first_event_desc}")
 
         description_lines.extend(formatted_chapters)
-
-        # Curated high-engagement trending hashtags
-        trending_hashtags = [
-            "#LastDayOnEarth", "#LDoE", "#LastDayOnEarthSurvival", "#LDoEGameplay", "#LDoEGuide",
-            "#LDoETips", "#LDoEBunker", "#LDoEBase", "#LDoERaid", "#LDoEUpdate",
-            "#LDoESurvival", "#LDoESettlement", "#LDoECrafting", "#LDoEWorkshop",
-            "#ZombieSurvival", "#SurvivalGame", "#ZombieApocalypse", "#SurvivalGaming",
-            "#MobileGaming", "#Gaming", "#AndroidGaming", "#iOSGaming", "#LetsPlay"
-        ]
-
         description_lines.extend([
+            "────────────────────────────────────────",
             "",
-            " ".join(trending_hashtags),
+            "#LastDayOnEarth #LDoE #ZombieSurvival",
         ])
 
         tags = [

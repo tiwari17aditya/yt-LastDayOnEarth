@@ -113,8 +113,7 @@ class TitleManager:
 
     def extract_key_activities(self, events: List[Any]) -> List[str]:
         """Filters out mundane loading/nav events and selects primary gameplay activities."""
-        # Generic transitions to de-prioritize in titles
-        low_priority = {"global map", "entering base", "exiting", "loading"}
+        low_priority = ["global map", "entering base", "exiting", "loading", "navigation", "intro"]
         activities = []
 
         for ev in events:
@@ -122,7 +121,10 @@ class TitleManager:
             if not desc:
                 continue
             clean = desc.strip()
-            if clean.lower() not in low_priority and clean not in activities:
+            # Skip mundane navigation or transition screens
+            if any(k in clean.lower() for k in low_priority):
+                continue
+            if clean not in activities:
                 activities.append(clean)
 
         if not activities and events:
@@ -132,21 +134,26 @@ class TitleManager:
         return activities
 
     def synthesize_hook_phrases(self, activities: List[str]) -> tuple[str, str]:
-        """Transforms activity list into punchy, high-CTR action phrases."""
+        """Transforms activity list into punchy, high-CTR action phrases in clean Title Case."""
         if not activities:
-            return "ULTIMATE BASE SURVIVAL & WORKSHOP", "Crafting, Building & Resource Prep"
+            return "Ultimate Base Survival & Workshop", "Crafting, Building & Resource Prep"
 
-        # Map common activities into high-energy hook verbs
+        # Map common activities into clean high-energy hook phrases
         enhancements = {
-            "crafting planks": "WOODCRAFT & PLANKS",
-            "weapon bench": "WEAPON WORKBENCH SETUP",
-            "organizing chests": "MAX BASE STORAGE",
-            "smelting iron": "FURNACE SMELTING",
-            "checking blueprints": "BLUEPRINT UPGRADES",
-            "bunker alfa": "BUNKER ALFA RAID",
-            "chopping trees": "PINE LOG HARVEST",
-            "mining iron": "IRON ORE SCAVENGE",
-            "base defense": "ZOMBIE HORDE DEFENSE",
+            "crafting planks": "Woodcraft & Planks",
+            "weapon bench": "Weapon Workbench Setup",
+            "workbench & blueprints": "Blueprint Upgrades",
+            "workbench": "Workbench Crafting",
+            "blueprints": "Blueprint Upgrades",
+            "organizing chests": "Base Storage Optimization",
+            "storage & chests": "Base Storage Optimization",
+            "smelting iron": "Furnace Smelting",
+            "bunker alfa": "Bunker Alfa Raid",
+            "chopping trees": "Pine Log Harvest",
+            "mining iron": "Iron Ore Scavenge",
+            "base defense": "Zombie Horde Defense",
+            "workshop & smelting": "Workshop & Smelting",
+            "workshop": "Workshop Expansion",
         }
 
         upgraded = []
@@ -158,17 +165,21 @@ class TitleManager:
                         upgraded.append(v)
                     matched = True
                     break
-            if not matched and act.upper() not in upgraded:
-                upgraded.append(act.upper())
+            if not matched:
+                clean_title = act.strip().title()
+                if clean_title not in upgraded:
+                    upgraded.append(clean_title)
 
-        # Select top 2-3 activities
+        # Select top 2 activities and combine naturally
         if len(upgraded) >= 2:
-            hook_lead = f"{upgraded[0]} & {upgraded[1]}"
+            first, second = upgraded[0], upgraded[1]
+            separator = " + " if ("&" in first or "&" in second) else " & "
+            hook_lead = f"{first}{separator}{second}"
             sub_summary = f"{activities[0]} and {activities[1]}"
             if len(activities) > 2:
                 sub_summary += f" plus {activities[2]}"
         else:
-            hook_lead = upgraded[0] if upgraded else "BASE EXPANSION"
+            hook_lead = upgraded[0] if upgraded else "Base Expansion"
             sub_summary = activities[0] if activities else "Base Operations"
 
         return hook_lead, sub_summary
