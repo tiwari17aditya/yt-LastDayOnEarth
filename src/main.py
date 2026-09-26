@@ -183,14 +183,23 @@ def run_pipeline(
 
         # Step 6: History Logging & Notifications
         logger.info("Step 6/6: Recording job execution to history")
+        video_id = ""
+        if youtube_url and "youtu" in youtube_url:
+            cleaned = youtube_url.rstrip("/").split("/")[-1].split("?v=")[-1]
+            if cleaned and cleaned != "N/A (Local execution)":
+                video_id = cleaned
+
         tracker.record_job(
             job_id=f"job_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
             input_filename=input_video_path.name,
             output_filename=output_path.name,
             status="SUCCESS",
             youtube_url=youtube_url,
+            video_id=video_id,
             md5_checksum=file_md5,
             details={
+                "video_id": video_id,
+                "youtube_url": youtube_url,
                 "video_output": str(output_path),
                 "metadata_output": str(metadata_json_path),
                 "thumbnail_output": str(thumbnail_path) if thumbnail_path else None,

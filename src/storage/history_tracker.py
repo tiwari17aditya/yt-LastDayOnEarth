@@ -55,11 +55,21 @@ class HistoryTracker:
         youtube_url: str = "",
         details: Dict[str, Any] = None,
         md5_checksum: Optional[str] = None,
+        video_id: Optional[str] = None,
     ) -> None:
         records = self.load_records()
         details = details or {}
         if md5_checksum:
             details["md5_checksum"] = md5_checksum
+
+        # Auto-extract video_id if not provided directly
+        if not video_id and youtube_url and "youtu" in youtube_url:
+            cleaned = youtube_url.rstrip("/").split("/")[-1].split("?v=")[-1]
+            if cleaned and cleaned != "N/A (Local execution)":
+                video_id = cleaned
+
+        if video_id:
+            details["video_id"] = video_id
 
         new_record = {
             "job_id": job_id,
@@ -67,11 +77,12 @@ class HistoryTracker:
             "input_filename": input_filename,
             "output_filename": output_filename,
             "status": status,
+            "video_id": video_id or "",
             "youtube_url": youtube_url,
             "details": details,
         }
         records.append(new_record)
         with open(self.history_file, "w", encoding="utf-8") as f:
             json.dump(records, f, indent=2)
-        logger.info("Recorded job execution to history", extra_data={"job_id": job_id, "status": status})
+        logger.info("Recorded job execution to history", extra_data={"job_id": job_id, "video_id": video_id, "status": status})
 

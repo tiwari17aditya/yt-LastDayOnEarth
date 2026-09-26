@@ -371,7 +371,12 @@ class YouTubeClient(BasePublisher):
 
             # Advance series episode tracker upon successful publish
             try:
-                self.title_manager.advance_episode(title=metadata.title, job_id=video_id)
+                self.title_manager.advance_episode(
+                    title=metadata.title,
+                    video_id=video_id,
+                    youtube_url=youtube_url,
+                    job_id=video_id,
+                )
             except Exception as se:
                 logger.warning(f"Could not advance episode counter in series tracker: {se}")
 

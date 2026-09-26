@@ -67,8 +67,14 @@ class TitleManager:
             logger.warning(f"Error reading current episode from tracker: {e}")
             return 1
 
-    def advance_episode(self, title: str, job_id: Optional[str] = None) -> int:
-        """Records the published episode and increments the episode counter."""
+    def advance_episode(
+        self,
+        title: str,
+        video_id: Optional[str] = None,
+        youtube_url: Optional[str] = None,
+        job_id: Optional[str] = None,
+    ) -> int:
+        """Records the published episode with its video ID and increments the episode counter."""
         current_ep = 1
         data = {
             "series_name": self.series_name,
@@ -84,17 +90,22 @@ class TitleManager:
 
         next_ep = current_ep + 1
         completed = data.get("completed_episodes", [])
+        resolved_vid = video_id or job_id
+        resolved_url = youtube_url or (f"https://youtu.be/{resolved_vid}" if resolved_vid and not resolved_vid.startswith("local") else "")
+
         completed.append({
             "episode": current_ep,
             "title": title,
-            "job_id": job_id,
+            "video_id": resolved_vid,
+            "youtube_url": resolved_url,
+            "job_id": job_id or resolved_vid,
         })
         data["current_episode"] = next_ep
         data["completed_episodes"] = completed
 
         try:
             self.tracker_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
-            logger.info(f"Advanced series episode from #{current_ep} to #{next_ep}")
+            logger.info(f"Advanced series episode from #{current_ep} to #{next_ep} (Video ID: {resolved_vid})")
         except Exception as e:
             logger.error(f"Failed to update series tracker: {e}")
 
