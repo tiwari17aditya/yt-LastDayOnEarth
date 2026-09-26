@@ -1,5 +1,11 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 1,
-  "completed_episodes": []
+  "current_episode": 2,
+  "completed_episodes": [
+    {
+      "episode": 1,
+      "title": "GLOBAL MAP NAVIGATION & WORKSHOP & SMELTING FURNACES! | LDoE Survival #1",
+      "job_id": "JMa211Yc4YU"
+    }
+  ]
 }
