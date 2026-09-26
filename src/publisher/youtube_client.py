@@ -112,30 +112,6 @@ class YouTubeClient(BasePublisher):
 
         description_lines.extend(formatted_chapters)
 
-        # Music Tracklist & Credits
-        if isinstance(music_track, list) and music_track:
-            description_lines.extend([
-                "",
-                "🎵 SOUNDTRACK (Royalty-Free):",
-            ])
-            for t in music_track:
-                t_title = t.get("title", "Survival Track")
-                t_artist = t.get("artist", "Kevin MacLeod")
-                description_lines.append(f"- {t_title} — {t_artist}")
-            description_lines.extend([
-                "",
-                "📜 MUSIC LICENSING & ATTRIBUTION:",
-                "Licensed under Creative Commons: By Attribution 4.0 License (incompetech.com / freemusicarchive.org)",
-            ])
-        elif isinstance(music_track, dict) and music_track:
-            t_title = music_track.get("title", "Survival Track")
-            t_artist = music_track.get("artist", "Kevin MacLeod")
-            description_lines.extend([
-                "",
-                "🎵 SOUNDTRACK (Royalty-Free):",
-                f"- {t_title} — {t_artist}",
-            ])
-
         # Curated high-engagement trending hashtags
         trending_hashtags = [
             "#LastDayOnEarth", "#LDoE", "#LastDayOnEarthSurvival", "#LDoEGameplay", "#LDoEGuide",

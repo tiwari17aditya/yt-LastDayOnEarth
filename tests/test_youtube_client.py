@@ -125,5 +125,6 @@ def test_generate_metadata_includes_candidates_and_chapters(tmp_path):
     assert meta.thumbnail_path == str(tmp_path / "thumb.jpg")
     # Ensures 00:00 chapter exists
     assert "00:00" in meta.description
-    assert "🎵 SOUNDTRACK" in meta.description
-    assert "Track 1 — Artist 1" in meta.description
+    # Ensures soundtrack and licensing blocks are strictly omitted for description hygiene
+    assert "SOUNDTRACK" not in meta.description
+    assert "LICENSING" not in meta.description
