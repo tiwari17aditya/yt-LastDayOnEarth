@@ -50,6 +50,7 @@ logs/
 # Video / Audio Processing Temporary & Output Files
 temp/
 tmp/
+scratch/
 output/
 downloads/
 *.mp4

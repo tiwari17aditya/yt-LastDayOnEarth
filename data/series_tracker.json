@@ -1,11 +1,41 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 2,
+  "current_episode": 8,
   "completed_episodes": [
     {
       "episode": 1,
-      "title": "GLOBAL MAP NAVIGATION & WORKSHOP & SMELTING FURNACES! | LDoE Survival #1",
-      "job_id": "JMa211Yc4YU"
+      "title": "HOME BASE EXPANSION & RESOURCE ORGANIZATION! | LDoE Survival #1",
+      "video_id": "Aw80nniGs-E"
+    },
+    {
+      "episode": 2,
+      "title": "SURVIVAL ROUTINE & WORKSHOP OPERATIONS! | LDoE Survival #2",
+      "video_id": "3hWeXZ0EViQ"
+    },
+    {
+      "episode": 3,
+      "title": "BASE DEFENSE SETUP & WORKSHOP SMELTING! | LDoE Survival #3",
+      "video_id": "sH0NspDux9k"
+    },
+    {
+      "episode": 4,
+      "title": "SURVIVAL ROUTINE: WORKSHOP & STORAGE! | LDoE Survival #4",
+      "video_id": "MZ6slquprUU"
+    },
+    {
+      "episode": 5,
+      "title": "OPTIMIZING BASE STORAGE & WOODCRAFT PLANKS! | LDoE Survival #5",
+      "video_id": "L-Gpmo89uHk"
+    },
+    {
+      "episode": 6,
+      "title": "BASE DEFENSE PREP & SMELTING FURNACES! | LDoE Survival #6",
+      "video_id": "Kqctm5n01h4"
+    },
+    {
+      "episode": 7,
+      "title": "GLOBAL MAP NAVIGATION & WORKSHOP SMELTING! | LDoE Survival #7",
+      "video_id": "JMa211Yc4YU"
     }
   ]
 }
