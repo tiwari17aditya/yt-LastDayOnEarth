@@ -196,6 +196,7 @@ def test_run_pipeline_deletes_input_when_configured(tmp_path):
          patch("src.main.SubtitleGenerator"), \
          patch("src.main.AudioMixer") as mock_audio, \
          patch("src.main.VideoProcessor") as mock_proc, \
+         patch("src.main.ThumbnailGenerator"), \
          patch("src.main.YouTubeClient"), \
          patch("src.main.get_notifier"), \
          patch("src.main.HistoryTracker"):

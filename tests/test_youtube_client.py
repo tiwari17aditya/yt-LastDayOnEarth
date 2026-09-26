@@ -89,3 +89,41 @@ def test_add_video_to_playlist_skips_when_already_present():
 
     assert success is True
     mock_youtube.playlistItems().insert.assert_not_called()
+
+
+def test_generate_metadata_includes_candidates_and_chapters(tmp_path):
+    from dataclasses import dataclass
+    from src.publisher.title_manager import TitleManager
+
+    @dataclass
+    class DummyEvent:
+        start_time: float
+        end_time: float
+        action_type: str
+        description: str
+
+    tracker = tmp_path / "tracker.json"
+    tm = TitleManager(tracker_file=tracker)
+    client = YouTubeClient(title_manager=tm)
+
+    events = [
+        DummyEvent(15.0, 16.0, "nav", "Entering Base"),
+        DummyEvent(30.0, 31.0, "craft", "Crafting Planks"),
+    ]
+
+    meta = client.generate_metadata(
+        video_title="Test Video",
+        events=events,
+        music_track=[{"title": "Track 1", "artist": "Artist 1"}],
+        thumbnail_path=tmp_path / "thumb.jpg",
+        episode_number=5,
+    )
+
+    assert meta.episode_number == 5
+    assert meta.title_candidates is not None
+    assert "action_hook" in meta.title_candidates
+    assert meta.thumbnail_path == str(tmp_path / "thumb.jpg")
+    # Ensures 00:00 chapter exists
+    assert "00:00" in meta.description
+    assert "🎵 SOUNDTRACK" in meta.description
+    assert "Track 1 — Artist 1" in meta.description

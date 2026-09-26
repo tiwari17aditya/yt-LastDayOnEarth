@@ -52,6 +52,24 @@ class YouTubeSettings(BaseModel):
         default_factory=lambda: os.getenv("YOUTUBE_PLAYLIST_TITLE", "Last Day on Earth: Survival — Official Gameplay Series")
     )
     category_id: str = "20"  # Gaming category
+    series_title: str = Field(
+        default_factory=lambda: os.getenv("SERIES_TITLE", "Last Day on Earth: Survival")
+    )
+    series_prefix: str = Field(
+        default_factory=lambda: os.getenv("SERIES_PREFIX", "LDoE")
+    )
+    title_style: str = Field(
+        default_factory=lambda: os.getenv("TITLE_STYLE", "action_hook")
+    )
+    episode_numbering: bool = Field(
+        default_factory=lambda: os.getenv("EPISODE_NUMBERING_ENABLED", "true").lower() == "true"
+    )
+    series_tracker_file: Path = Field(
+        default_factory=lambda: Path(os.getenv("SERIES_TRACKER_FILE", "data/series_tracker.json"))
+    )
+    upload_thumbnail: bool = Field(
+        default_factory=lambda: os.getenv("UPLOAD_CUSTOM_THUMBNAIL", "true").lower() == "true"
+    )
 
 
 class SMTPSettings(BaseModel):
@@ -79,6 +97,9 @@ class ProcessingSettings(BaseModel):
     history_file: Path = Field(default=Path("data/history.json"))
     delete_input_after_processing: bool = Field(
         default_factory=lambda: os.getenv("DELETE_INPUT_AFTER_PROCESSING", "true").lower() == "true"
+    )
+    generate_thumbnail: bool = Field(
+        default_factory=lambda: os.getenv("GENERATE_THUMBNAIL", "true").lower() == "true"
     )
 
 

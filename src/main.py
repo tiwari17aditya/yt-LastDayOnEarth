@@ -22,7 +22,9 @@ from src.privacy.detector import PrivacyDetector
 from src.subtitles.event_analyzer import SubtitleGenerator
 from src.audio.selector import AudioMixer
 from src.processor.video_processor import VideoProcessor
+from src.processor.thumbnail_generator import ThumbnailGenerator
 from src.publisher.youtube_client import YouTubeClient
+from src.publisher.title_manager import TitleManager
 from src.notifications.email_client import EmailNotifier
 from src.notifications.gmail_client import GmailNotifier
 from src.storage.history_tracker import HistoryTracker
@@ -69,11 +71,20 @@ def run_pipeline(
     subtitle_engine = SubtitleGenerator(gemini_api_key=settings.gemini.api_key or "")
     audio_mixer = AudioMixer(library_path=settings.processing.music_library_file)
     processor = VideoProcessor(output_dir=settings.processing.output_dir)
+    title_mgr = TitleManager(
+        tracker_file=settings.youtube.series_tracker_file,
+        series_name=settings.youtube.series_title,
+        series_prefix=settings.youtube.series_prefix,
+        title_style=settings.youtube.title_style,
+        episode_numbering=settings.youtube.episode_numbering,
+    )
+    thumbnail_gen = ThumbnailGenerator(output_dir=settings.processing.output_dir)
     publisher = YouTubeClient(
         client_secrets_file=settings.youtube.client_secrets_file,
         token_file=settings.youtube.token_file,
         privacy_status=settings.youtube.privacy_status,
         playlist_title=settings.youtube.playlist_title,
+        title_manager=title_mgr,
     )
     notifier = get_notifier(settings)
     tracker = HistoryTracker(history_file=settings.processing.history_file)
@@ -131,9 +142,31 @@ def run_pipeline(
             preset=settings.processing.video_preset,
         )
 
-        # Step 5: YouTube Metadata Generation & Export
-        logger.info("Step 5/6: Generating YouTube publishing metadata")
-        metadata = publisher.generate_metadata(input_video_path.stem, events, track_sequence)
+        # Step 5: Custom HD Thumbnail & YouTube Publishing Metadata Generation
+        logger.info("Step 5/6: Generating custom HD thumbnail and YouTube publishing metadata")
+        thumbnail_path = None
+        if settings.processing.generate_thumbnail and output_path.exists():
+            thumbnail_path = output_path.with_name(f"{output_path.stem}_thumbnail.jpg")
+            current_ep = title_mgr.get_current_episode()
+            try:
+                thumbnail_gen.generate_thumbnail(
+                    video_path=output_path,
+                    output_path=thumbnail_path,
+                    events=events,
+                    duration=video_duration,
+                    episode_number=current_ep if settings.youtube.episode_numbering else None,
+                )
+                logger.info(f"Custom YouTube thumbnail saved at: {thumbnail_path}")
+            except Exception as te:
+                logger.warning(f"Could not generate custom thumbnail: {te}")
+                thumbnail_path = None
+
+        metadata = publisher.generate_metadata(
+            video_title=input_video_path.stem,
+            events=events,
+            music_track=track_sequence,
+            thumbnail_path=thumbnail_path,
+        )
         metadata_json_path = output_path.with_name(f"{output_path.stem}_metadata.json")
         publisher.export_metadata_json(metadata, metadata_json_path)
 
@@ -143,6 +176,10 @@ def run_pipeline(
             youtube_url = publisher.upload_video(output_path, metadata)
         else:
             logger.info("Local execution: Output generated in project output/ folder without upload.")
+            try:
+                title_mgr.advance_episode(title=metadata.title, job_id="local_execution")
+            except Exception as se:
+                logger.warning(f"Could not advance episode counter in local mode: {se}")
 
         # Step 6: History Logging & Notifications
         logger.info("Step 6/6: Recording job execution to history")
@@ -156,6 +193,8 @@ def run_pipeline(
             details={
                 "video_output": str(output_path),
                 "metadata_output": str(metadata_json_path),
+                "thumbnail_output": str(thumbnail_path) if thumbnail_path else None,
+                "title_candidates": metadata.title_candidates,
                 "duration_seconds": video_duration,
                 "soundtrack_tracks": [t["title"] for t in track_sequence],
                 "subtitles_burned": True,

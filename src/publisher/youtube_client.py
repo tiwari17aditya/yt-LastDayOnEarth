@@ -8,6 +8,8 @@ from typing import List, Dict, Any, Optional
 from src.logging_config import get_logger
 from src.exceptions import PublishingError
 
+from src.publisher.title_manager import TitleManager, TitlePackage
+
 logger = get_logger(component="YouTubePublisher")
 
 
@@ -18,6 +20,9 @@ class VideoPublishMetadata:
     tags: List[str]
     category_id: str
     privacy_status: str
+    thumbnail_path: Optional[str] = None
+    title_candidates: Optional[Dict[str, str]] = None
+    episode_number: Optional[int] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -32,6 +37,8 @@ class BasePublisher(ABC):
         video_title: str,
         events: List[Any],
         music_track: Optional[Dict[str, Any]] = None,
+        thumbnail_path: Optional[Path] = None,
+        episode_number: Optional[int] = None,
     ) -> VideoPublishMetadata:
         """Create optimized title, chapters, description, tags."""
         pass
@@ -43,7 +50,7 @@ class BasePublisher(ABC):
 
 
 class YouTubeClient(BasePublisher):
-    """Interacts with YouTube Data API v3 for upload and metadata application."""
+    """Interacts with YouTube Data API v3 for upload, metadata, and custom thumbnail application."""
 
     def __init__(
         self,
@@ -51,67 +58,91 @@ class YouTubeClient(BasePublisher):
         token_file: str = "config/token.json",
         privacy_status: str = "public",
         playlist_title: str = "Last Day on Earth: Survival — Official Gameplay Series",
+        title_manager: Optional[TitleManager] = None,
     ) -> None:
         self.client_secrets_file = client_secrets_file
         self.token_file = token_file
         self.privacy_status = privacy_status
         self.playlist_title = playlist_title
+        self.title_manager = title_manager or TitleManager()
 
     def generate_metadata(
         self,
         video_title: str,
         events: List[Any],
-        music_track: Optional[Dict[str, Any]] = None,
+        music_track: Optional[Any] = None,
+        thumbnail_path: Optional[Path] = None,
+        episode_number: Optional[int] = None,
     ) -> VideoPublishMetadata:
         from datetime import datetime
-        import hashlib
 
-        # Dynamic date format: ( 23 Sep, 2026 )
+        # Generate dynamic, high-CTR front-loaded title package
+        title_pkg = self.title_manager.generate_titles(
+            events=events,
+            episode_number=episode_number,
+        )
+        selected_title = title_pkg.primary_title
+
         date_str = datetime.now().strftime("%d %b, %Y")
 
-        # Varied engaging titles to ensure every video is distinct and fresh
-        title_themes = [
-            "Home Base Workshop, Woodcrafting & Storage",
-            "Survival Preparation, Base Upgrades & Smelting",
-            "Optimizing Base Storage, Workbench & Planks",
-            "Resource Gathering, Woodworking & Gear Management",
-            "Base Defense Setup, Workshop Tasks & Smelting",
-            "Survival Routine: Workshop Operations & Storage",
-            "Crafting Essentials: Planks, Weapon Bench & Furnaces",
-            "Home Base Expansion & Resource Organization",
-            "Workshop Productivity: Woodcraft & Weapon Setup",
-            "Zombie Defense Prep: Workshop & Resource Hoarding",
-        ]
-        theme_index = int(hashlib.md5(f"{video_title}_{date_str}".encode()).hexdigest(), 16) % len(title_themes)
-        selected_theme = title_themes[theme_index]
-        clean_title = f"Last Day on Earth: Survival — {selected_theme} ({date_str})"
-
+        # Top 2 lines: Front-loaded high-retention hook before YouTube's "...more" cutoff
         description_lines = [
-            "Surviving and thriving in Last Day on Earth: Survival! In this episode, we organize our Home Base, process pine logs into planks at the woodworking bench, manage base storage chests, inspect the weapon workbench, and fuel up the smelting furnaces.",
+            f"Surviving and building in Last Day on Earth: Survival! In Episode #{title_pkg.episode_number}, we focus on {title_pkg.summary}.",
+            "Watch as we optimize our base layout, advance our workshop crafting, and prepare for the zombie wasteland.",
             "",
             "🔔 Subscribe for regular Last Day on Earth gameplay guides and survival runs!",
             "",
             "⏱️ TIMESTAMPS & CHAPTERS:",
         ]
 
+        # Enforce YouTube 00:00 chapter requirement so video timeline scrubber splits into chapters
+        formatted_chapters = []
+        has_zero = False
         for ev in events:
             mins = int(getattr(ev, "start_time", 0) // 60)
             secs = int(getattr(ev, "start_time", 0) % 60)
             desc = getattr(ev, "description", "")
-            description_lines.append(f"{mins:02d}:{secs:02d} - {desc}")
+            if mins == 0 and secs == 0:
+                has_zero = True
+            formatted_chapters.append(f"{mins:02d}:{secs:02d} - {desc}")
 
-        # Top 50 curated high-engagement trending hashtags for maximum algorithm reach
+        if not has_zero:
+            first_event_desc = events[0].description if events else "Introduction"
+            formatted_chapters.insert(0, f"00:00 - Intro & {first_event_desc}")
+
+        description_lines.extend(formatted_chapters)
+
+        # Music Tracklist & Credits
+        if isinstance(music_track, list) and music_track:
+            description_lines.extend([
+                "",
+                "🎵 SOUNDTRACK (Royalty-Free):",
+            ])
+            for t in music_track:
+                t_title = t.get("title", "Survival Track")
+                t_artist = t.get("artist", "Kevin MacLeod")
+                description_lines.append(f"- {t_title} — {t_artist}")
+            description_lines.extend([
+                "",
+                "📜 MUSIC LICENSING & ATTRIBUTION:",
+                "Licensed under Creative Commons: By Attribution 4.0 License (incompetech.com / freemusicarchive.org)",
+            ])
+        elif isinstance(music_track, dict) and music_track:
+            t_title = music_track.get("title", "Survival Track")
+            t_artist = music_track.get("artist", "Kevin MacLeod")
+            description_lines.extend([
+                "",
+                "🎵 SOUNDTRACK (Royalty-Free):",
+                f"- {t_title} — {t_artist}",
+            ])
+
+        # Curated high-engagement trending hashtags
         trending_hashtags = [
             "#LastDayOnEarth", "#LDoE", "#LastDayOnEarthSurvival", "#LDoEGameplay", "#LDoEGuide",
             "#LDoETips", "#LDoEBunker", "#LDoEBase", "#LDoERaid", "#LDoEUpdate",
-            "#LDoESurvival", "#LDoESettlement", "#LDoECrafting", "#LDoEWorkshop", "#LDoEAlfa",
-            "#ZombieSurvival", "#SurvivalGame", "#ZombieApocalypse", "#SurvivalGaming", "#ZombieHunter",
-            "#PostApocalyptic", "#SurvivalCraft", "#ZombieGame", "#SurviveTheApocalypse", "#ZombieHorde",
-            "#MobileGaming", "#Gaming", "#Gamer", "#GamingCommunity", "#GameWalkthrough",
-            "#AndroidGaming", "#iOSGaming", "#GamingClips", "#Gameplay", "#LetsPlay",
-            "#YouTubeGaming", "#GamingVideos", "#Trending", "#ViralGaming", "#ExplorePage",
-            "#GamingLife", "#ProGamer", "#SurvivalCrafting", "#MobileGames", "#ZombieSurvivalGame",
-            "#ApocalypseSurvival", "#ZombieAttack", "#BaseBuilding", "#SurvivalRun", "#ZombieSurvivalRun"
+            "#LDoESurvival", "#LDoESettlement", "#LDoECrafting", "#LDoEWorkshop",
+            "#ZombieSurvival", "#SurvivalGame", "#ZombieApocalypse", "#SurvivalGaming",
+            "#MobileGaming", "#Gaming", "#AndroidGaming", "#iOSGaming", "#LetsPlay"
         ]
 
         description_lines.extend([
@@ -134,12 +165,21 @@ class YouTubeClient(BasePublisher):
             "Kefir Games",
         ]
 
+        title_candidates = {
+            "action_hook": title_pkg.action_hook,
+            "curiosity": title_pkg.curiosity,
+            "walkthrough": title_pkg.walkthrough,
+        }
+
         return VideoPublishMetadata(
-            title=clean_title[:100],
+            title=selected_title[:100],
             description="\n".join(description_lines),
             tags=tags,
             category_id="20",
             privacy_status=self.privacy_status,
+            thumbnail_path=str(thumbnail_path) if thumbnail_path else None,
+            title_candidates=title_candidates,
+            episode_number=title_pkg.episode_number,
         )
 
     def export_metadata_json(self, metadata: VideoPublishMetadata, output_json_path: Path) -> Path:
@@ -332,6 +372,32 @@ class YouTubeClient(BasePublisher):
             video_id = response.get("id")
             youtube_url = f"https://youtu.be/{video_id}"
             logger.info(f"Video uploaded successfully to YouTube: {youtube_url}")
+
+            # Upload custom thumbnail if generated
+            if metadata.thumbnail_path and Path(metadata.thumbnail_path).exists():
+                try:
+                    logger.info(f"Setting custom thumbnail for video {video_id}: {metadata.thumbnail_path}")
+                    thumb_media = MediaFileUpload(
+                        str(metadata.thumbnail_path),
+                        mimetype="image/jpeg",
+                        resumable=False,
+                    )
+                    youtube.thumbnails().set(
+                        videoId=video_id,
+                        media_body=thumb_media,
+                    ).execute()
+                    logger.info(f"Custom thumbnail uploaded successfully for video {video_id}")
+                except Exception as te:
+                    logger.warning(
+                        f"Could not set custom thumbnail on YouTube (requires phone-verified channel or quota): {te}",
+                        extra_data={"thumbnail_path": metadata.thumbnail_path},
+                    )
+
+            # Advance series episode tracker upon successful publish
+            try:
+                self.title_manager.advance_episode(title=metadata.title, job_id=video_id)
+            except Exception as se:
+                logger.warning(f"Could not advance episode counter in series tracker: {se}")
 
             # Automatically ensure dedicated playlist exists and add video to it
             try:

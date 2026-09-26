@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-09-26
+
+### Added
+- **Front-Loaded Dynamic Title Management (`TitleManager`)**:
+  - Event-aware dynamic title synthesis that extracts actual gameplay achievements (crafting benches, smelting, storage, raids) into high-impact hook leads.
+  - Front-loaded formulas keeping primary hooks within the first 45 characters, avoiding mobile app truncation.
+  - Generates 3 title variations per video: Action Hook, Curiosity/Story Challenge, and Clean Walkthrough Guide.
+  - Persistent series episode tracking in `data/series_tracker.json` with automatic episode numbering (`#1`, `#2`, `#3`...).
+- **Automated High-Impact Custom Thumbnail Generator (`ThumbnailGenerator`)**:
+  - Intelligent keyframe selection extracting gameplay frames during active player workshop & bench tasks (>=30s) rather than loading/intro screens.
+  - Dynamic color grading via FFmpeg filter (`eq=contrast=1.12:brightness=0.02:saturation=1.25,unsharp=5:5:0.8:5:5:0.0`) optimizing visuals for YouTube's dark mode UI.
+  - Crisp, modern dark-mode pill badge overlay (`#EPISODE 01` / series tag) in the top-left corner using Pillow.
+  - Native YouTube API thumbnail upload integration via `youtube.thumbnails().set()`.
+- **YouTube "First Look" Metadata Excellence**:
+  - Enforced `00:00` start timestamp requirement enabling YouTube's interactive timeline scrubber chapters.
+  - Formatted 2-line above-the-fold description hook specifically tailored for mobile and search snippet previews.
+  - Clean soundtrack list, attribution, and top 25 curated hashtags.
+- **Unit & Integration Test Suite**:
+  - Added `tests/test_title_manager.py` and `tests/test_thumbnail_generator.py`, bringing total tests to 42 (all passing).
+
 ## [0.6.0] - 2026-09-24
 
 ### Added
