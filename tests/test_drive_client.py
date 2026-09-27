@@ -189,3 +189,66 @@ def test_delete_video_fails_when_both_fail(mock_drive_service):
 
     assert exc_info.value.operation == "delete_video"
 
+
+def test_cleanup_processed_folder(mock_drive_service):
+    """Test purging all files from Drive Processed folder."""
+    client = GoogleDriveClient()
+    client.service = mock_drive_service
+    client.processed_folder_id = "proc_123"
+
+    mock_drive_service.files().list().execute.return_value = {
+        "files": [
+            {"id": "p1", "name": "processed_video_1.mp4", "mimeType": "video/mp4"},
+            {"id": "p2", "name": "processed_video_2.mp4", "mimeType": "video/mp4"},
+        ]
+    }
+
+    with patch.object(client, "delete_video") as mock_delete:
+        deleted = client.cleanup_processed_folder()
+        assert deleted == 2
+        assert mock_delete.call_count == 2
+        mock_delete.assert_any_call("p1")
+        mock_delete.assert_any_call("p2")
+
+
+def test_cleanup_old_output_videos(mock_drive_service):
+    """Test deleting output videos older than 7 days while preserving newer videos."""
+    from datetime import datetime, timezone, timedelta
+
+    client = GoogleDriveClient()
+    client.service = mock_drive_service
+    client.output_folder_id = "out_root"
+
+    # Mock finding 'videos' folder in output_folder_id
+    # Call 1: _find_single_folder("videos", parent_id="out_root")
+    # Call 2: list year folders
+    # Call 3: list month folders
+    # Call 4: list files in month folder
+    # Call 5: scan videos_root
+    # Call 6: scan output_folder_id root
+    old_time = (datetime.now(timezone.utc) - timedelta(days=10)).isoformat().replace("+00:00", "Z")
+    new_time = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat().replace("+00:00", "Z")
+
+    mock_drive_service.files().list().execute.side_effect = [
+        # _find_single_folder("videos")
+        {"files": [{"id": "vid_root_id", "name": "videos"}]},
+        # Year folders
+        {"files": [{"id": "year_2026", "name": "2026"}]},
+        # Month folders
+        {"files": [{"id": "month_09", "name": "09"}]},
+        # Files in month folder: 1 old, 1 new
+        {"files": [
+            {"id": "old_vid_1", "name": "video_10092026.mp4", "mimeType": "video/mp4", "createdTime": old_time},
+            {"id": "new_vid_2", "name": "video_25092026.mp4", "mimeType": "video/mp4", "createdTime": new_time},
+        ]},
+        # Scan vid_root_id directly
+        {"files": []},
+        # Scan out_root directly
+        {"files": []},
+    ]
+
+    with patch.object(client, "delete_video") as mock_delete:
+        deleted = client.cleanup_old_output_videos(retention_days=7)
+        assert deleted == 1
+        mock_delete.assert_called_once_with("old_vid_1")
+

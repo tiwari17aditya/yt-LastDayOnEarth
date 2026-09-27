@@ -88,15 +88,15 @@ def test_drive_client_skips_processed_and_twin_input_duplicates():
     assert pending[0]["id"] == "file_2"
     assert pending[0]["name"] == "vid2.mp4"
 
-    # Both file_1 (duplicate of processed) and file_3 (duplicate twin) should be archived
-    called_file_ids = [
+    # Both file_1 (duplicate of processed) and file_3 (duplicate twin) should be deleted directly
+    deleted_file_ids = [
         call.kwargs["fileId"]
-        for call in mock_service.files().update.call_args_list
+        for call in mock_service.files().delete.call_args_list
         if "fileId" in call.kwargs
     ]
-    assert len(called_file_ids) == 2
-    assert "file_1" in called_file_ids
-    assert "file_3" in called_file_ids
+    assert len(deleted_file_ids) == 2
+    assert "file_1" in deleted_file_ids
+    assert "file_3" in deleted_file_ids
 
 
 def test_drive_client_upload_output_collision_disambiguation(tmp_path):

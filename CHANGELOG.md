@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-27
+
+### Added
+- **7-Day Drive Output Video Retention & Auto-Purge**:
+  - Implemented `cleanup_old_output_videos(retention_days=7)` in [src/ingestion/drive_client.py](file:///d:/youtube-projects/LastDayOnEarth/src/ingestion/drive_client.py).
+  - Automatically identifies and permanently deletes videos in `Output/videos/` older than 7 days using file creation timestamps and name-based fallback parsing.
+  - Added configurable `output_retention_days` to `GoogleDriveSettings` and `.env.example`.
+- **Daily Drive Processed Folder Purge**:
+  - Implemented `cleanup_processed_folder()` in [src/ingestion/drive_client.py](file:///d:/youtube-projects/LastDayOnEarth/src/ingestion/drive_client.py) to purge the `Processed` folder daily and immediately after pipeline runs.
+  - Direct auto-deletion of duplicate recordings found in `Input` without sending them to `Processed`.
+- **Unit Test Suite Expansion**: Added unit tests in `tests/test_drive_client.py` bringing total passed tests to 50.
+
 ## [1.2.0] - 2026-09-27
 
 ### Added

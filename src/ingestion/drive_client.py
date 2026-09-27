@@ -230,18 +230,18 @@ class GoogleDriveClient(BaseIngestionClient):
                     if md5 and md5 in processed_md5s:
                         logger.warning(
                             f"Input video '{name}' (MD5: {md5}) is a duplicate of an already processed file. "
-                            f"Auto-moving directly to Processed folder."
+                            f"Auto-deleting duplicate directly from Input."
                         )
-                        self.mark_as_processed(file_id)
+                        self.delete_video(file_id)
                         continue
 
                     # Check 2: Duplicate twin inside the same Input folder
                     if md5 and md5 in seen_input_md5s:
                         logger.warning(
-                            f"Input video '{name}' is a duplicate of another file in Input. "
-                            f"Archiving duplicate to Processed folder."
+                            f"Input video '{name}' is a duplicate twin of another file in Input. "
+                            f"Auto-deleting duplicate directly from Input."
                         )
-                        self.mark_as_processed(file_id)
+                        self.delete_video(file_id)
                         continue
 
                     if md5:
@@ -349,6 +349,135 @@ class GoogleDriveClient(BaseIngestionClient):
                     root_cause=f"Delete failed: {e}; Trash failed: {te}",
                     recovery_action="Check file ownership and delete permissions in Google Drive.",
                 )
+
+    def cleanup_processed_folder(self) -> int:
+        """Purges all files from the Drive Processed folder.
+        
+        Since videos are tracked by file ID/checksum and history tracker,
+        the Processed directory is cleared daily to conserve cloud storage.
+        """
+        if not self.service or not self.processed_folder_id:
+            self.connect()
+
+        logger.info("Initiating cleanup of Drive Processed folder", extra_data={"folder_id": self.processed_folder_id})
+        query = f"'{self.processed_folder_id}' in parents and trashed = false"
+        deleted_count = 0
+
+        try:
+            results = self.service.files().list(
+                q=query,
+                spaces="drive",
+                fields="files(id, name, mimeType)",
+                pageSize=100,
+            ).execute()
+
+            files = results.get("files", [])
+            for f in files:
+                file_id = f.get("id")
+                file_name = f.get("name")
+                logger.info(f"Purging file from Drive Processed folder: {file_name} ({file_id})")
+                try:
+                    self.delete_video(file_id)
+                    deleted_count += 1
+                except Exception as de:
+                    logger.warning(f"Could not delete processed file {file_name} ({file_id}): {de}")
+
+            logger.info(f"Processed folder cleanup complete: removed {deleted_count} file(s).")
+            return deleted_count
+        except Exception as e:
+            logger.warning(f"Failed to query files for Processed folder cleanup: {e}")
+            return deleted_count
+
+    def cleanup_old_output_videos(self, retention_days: int = 7) -> int:
+        """Deletes video files from Google Drive Output folder older than retention_days (default: 7 days)."""
+        if not self.service or not self.output_folder_id:
+            self.connect()
+
+        from datetime import datetime, timezone, timedelta
+        cutoff_dt = datetime.now(timezone.utc) - timedelta(days=retention_days)
+        cutoff_iso = cutoff_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        logger.info(
+            f"Scanning Drive Output folder for videos older than {retention_days} days (cutoff: {cutoff_iso})",
+            extra_data={"output_folder_id": self.output_folder_id, "retention_days": retention_days},
+        )
+
+        deleted_count = 0
+
+        def _purge_old_videos_in_folder(folder_id: str) -> None:
+            nonlocal deleted_count
+            q = (
+                f"'{folder_id}' in parents and trashed = false and "
+                f"mimeType != 'application/vnd.google-apps.folder'"
+            )
+            try:
+                res = self.service.files().list(
+                    q=q,
+                    spaces="drive",
+                    fields="files(id, name, mimeType, createdTime)",
+                    pageSize=100,
+                ).execute()
+                for item in res.get("files", []):
+                    name = item.get("name", "")
+                    fid = item.get("id")
+                    suffix = Path(name).suffix.lower()
+                    mime = item.get("mimeType", "")
+                    created_time_str = item.get("createdTime")
+
+                    if suffix in VIDEO_EXTENSIONS or mime.startswith("video/"):
+                        is_old = False
+                        if created_time_str:
+                            try:
+                                dt_parsed = datetime.fromisoformat(created_time_str.replace("Z", "+00:00"))
+                                if dt_parsed < cutoff_dt:
+                                    is_old = True
+                            except Exception:
+                                pass
+
+                        if not is_old and "video_" in name:
+                            try:
+                                date_part = name.split("video_")[1].split(".")[0].split("_")[0]
+                                dt_from_name = datetime.strptime(date_part, "%d%m%Y").replace(tzinfo=timezone.utc)
+                                if dt_from_name < cutoff_dt:
+                                    is_old = True
+                            except Exception:
+                                pass
+
+                        if is_old:
+                            logger.info(
+                                f"Deleting expired output video (> {retention_days} days): {name} ({fid}, created: {created_time_str})"
+                            )
+                            try:
+                                self.delete_video(fid)
+                                deleted_count += 1
+                            except Exception as de:
+                                logger.warning(f"Could not delete expired output video {name} ({fid}): {de}")
+            except Exception as e:
+                logger.warning(f"Could not scan folder {folder_id} for output videos: {e}")
+
+        try:
+            # 1. Check Output/videos/ root
+            videos_root_id = self._find_single_folder("videos", parent_id=self.output_folder_id)
+            if videos_root_id:
+                q_years = f"'{videos_root_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+                res_years = self.service.files().list(q=q_years, spaces="drive", fields="files(id, name)").execute()
+                for yf in res_years.get("files", []):
+                    q_months = f"'{yf['id']}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+                    res_months = self.service.files().list(q=q_months, spaces="drive", fields="files(id, name)").execute()
+                    for mf in res_months.get("files", []):
+                        _purge_old_videos_in_folder(mf["id"])
+
+                _purge_old_videos_in_folder(videos_root_id)
+
+            # 2. Also check direct files in output_folder_id
+            _purge_old_videos_in_folder(self.output_folder_id)
+
+            logger.info(f"Drive Output retention cleanup complete: deleted {deleted_count} video(s).")
+            return deleted_count
+
+        except Exception as e:
+            logger.warning(f"Error executing Drive Output retention cleanup: {e}")
+            return deleted_count
 
     def upload_processed_video(
         self,

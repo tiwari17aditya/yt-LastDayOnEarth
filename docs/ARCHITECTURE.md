@@ -50,6 +50,8 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `download_video(file_id: str, dest_path: Path) -> Path`
   - `delete_video(file_id: str) -> None`
   - `mark_as_processed(file_id: str) -> None`
+  - `cleanup_processed_folder() -> int`
+  - `cleanup_old_output_videos(retention_days: int = 7) -> int`
 
 ### 3.2 Privacy & PII Redaction (`src/privacy/`)
 - **Responsibility**: Detect personal identifiers (email addresses, phone push notifications, personal chat bubbles) in video frames and produce dynamic bounding boxes.

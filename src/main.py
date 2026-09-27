@@ -264,6 +264,19 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
 
     try:
         drive_client.connect()
+
+        # Step A: Daily cleanup of Drive Processed folder
+        try:
+            drive_client.cleanup_processed_folder()
+        except Exception as ce:
+            logger.warning(f"Drive Processed folder cleanup skipped: {ce}")
+
+        # Step B: 7-day retention cleanup of Drive Output videos
+        try:
+            drive_client.cleanup_old_output_videos(retention_days=settings.drive.output_retention_days)
+        except Exception as oe:
+            logger.warning(f"Drive Output video retention cleanup skipped: {oe}")
+
         pending_videos = drive_client.list_pending_videos()
 
         if not pending_videos:
@@ -321,6 +334,12 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                 if local_download_path.exists():
                     local_download_path.unlink()
                 return 1
+
+        # Post-processing routine: ensure Processed folder is empty
+        try:
+            drive_client.cleanup_processed_folder()
+        except Exception as ce:
+            logger.warning(f"Post-processing Processed folder cleanup skipped: {ce}")
 
         logger.info("All pending jobs processed successfully.")
         return 0
