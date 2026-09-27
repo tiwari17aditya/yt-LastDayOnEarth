@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-09-27
+
+### Added
+- **Dynamic ~50 Trending Hashtags & Tag Engine**:
+  - Implemented `DynamicTagGenerator` in [src/publisher/metadata_generator.py](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/metadata_generator.py).
+  - Dynamically extracts gameplay events and episode titles to generate ~50 trending hashtags tailored to the specific gameplay actions.
+  - Multi-cluster contextual engine with seeded rotation guarantees unique, non-repetitive combinations across episodes while preserving core LDoE identity.
+  - Google Gemini AI integration with offline local algorithmic fallback.
+  - Dynamically generates up to 500 characters of YouTube video keyword tags (`metadata.tags`).
+- **Unit Test Suite**: Added `tests/test_dynamic_tags.py` with 6 dedicated test cases bringing test suite to 48 passing tests.
+
 ## [1.1.0] - 2026-09-26
 
 ### Added

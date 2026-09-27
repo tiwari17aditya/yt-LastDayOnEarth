@@ -49,6 +49,9 @@ class BasePublisher(ABC):
         pass
 
 
+from src.publisher.metadata_generator import DynamicTagGenerator
+
+
 class YouTubeClient(BasePublisher):
     """Interacts with YouTube Data API v3 for upload, metadata, and custom thumbnail application."""
 
@@ -59,12 +62,19 @@ class YouTubeClient(BasePublisher):
         privacy_status: str = "public",
         playlist_title: str = "Last Day on Earth: Survival — Official Gameplay Series",
         title_manager: Optional[TitleManager] = None,
+        gemini_api_key: Optional[str] = None,
+        gemini_model: str = "gemini-2.5-flash",
     ) -> None:
         self.client_secrets_file = client_secrets_file
         self.token_file = token_file
         self.privacy_status = privacy_status
         self.playlist_title = playlist_title
         self.title_manager = title_manager or TitleManager()
+        self.tag_generator = DynamicTagGenerator(
+            gemini_api_key=gemini_api_key,
+            gemini_model=gemini_model,
+            target_hashtag_count=50,
+        )
 
     def generate_metadata(
         self,
@@ -112,27 +122,26 @@ class YouTubeClient(BasePublisher):
             first_event_desc = events[0].description if events else "Introduction"
             formatted_chapters.insert(0, f"00:00 - Intro & {first_event_desc}")
 
+        # Top ~50 dynamically generated trending hashtags for maximum algorithm reach
+        trending_hashtags = self.tag_generator.generate_dynamic_hashtags(
+            video_title=selected_title,
+            events=events,
+            date_str=date_str,
+        )
+
         description_lines.extend(formatted_chapters)
         description_lines.extend([
             "────────────────────────────────────────",
             "",
-            "#LastDayOnEarth #LDoE #ZombieSurvival",
+            " ".join(trending_hashtags),
         ])
 
-        tags = [
-            "Last Day on Earth",
-            "Last Day on Earth Survival",
-            "LDoE",
-            "LDoE Home Base",
-            "LDoE Crafting",
-            "LDoE Woodworking",
-            "LDoE Settlement",
-            "Zombie Survival Mobile",
-            "Mobile Gaming",
-            "Survival Run",
-            "LDoE Guide",
-            "Kefir Games",
-        ]
+        # Dynamic keyword tags for YouTube (under 500 characters)
+        tags = self.tag_generator.generate_video_tags(
+            video_title=selected_title,
+            events=events,
+            hashtags=trending_hashtags,
+        )
 
         title_candidates = {
             "action_hook": title_pkg.action_hook,

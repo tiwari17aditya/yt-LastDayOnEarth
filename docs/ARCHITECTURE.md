@@ -74,10 +74,14 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 - **Responsibility**: Assemble video streams, blur filters, burned-in styled subtitles, and mixed audio using FFmpeg into a YouTube-ready MP4.
 - **Naming Rule**: `<Original_Title>_Processed_<DDMMYYYY>.mp4`
 
-### 3.6 Publisher (`src/publisher/`)
-- **Responsibility**: Formulate engaging, SEO-optimized rotating titles with date format `(DD Mon, YYYY)`, description with chapter markers, 50 trending hashtags, direct Public upload via YouTube Data API v3, and automated dedicated playlist management.
+### 3.6 Publisher & Dynamic Metadata (`src/publisher/`)
+- **Responsibility**: Formulate engaging, SEO-optimized front-loaded titles, descriptions with chapter markers & ~50 dynamic trending hashtags, dynamic video tags, automated custom HD thumbnail generation, direct Public upload via YouTube Data API v3, and dedicated playlist management.
+- **Components**:
+  - `YouTubeClient`: Handles OAuth upload, thumbnail upload, playlist management, and video assignment.
+  - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations and persistent series episode tracking.
+  - `DynamicTagGenerator` (`src/publisher/metadata_generator.py`): Dynamically analyzes gameplay events and titles to synthesize ~50 trending hashtags via Gemini AI or multi-cluster contextual algorithmic selection with seeded rotation.
 - **Interface**: `BasePublisher`
-  - `generate_metadata(video_title: str, events: List[GameplayEvent]) -> VideoPublishMetadata`
+  - `generate_metadata(video_title: str, events: List[GameplayEvent], ...) -> VideoPublishMetadata`
   - `upload_video(video_path: Path, metadata: VideoPublishMetadata) -> str`
   - `get_or_create_playlist(youtube, title: str, description: str, privacy_status: str) -> Optional[str]`
   - `add_video_to_playlist(youtube, video_id: str, playlist_id: str) -> bool`
