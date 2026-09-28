@@ -15,7 +15,7 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 ```text
 [ Google Drive: MyDrive -> youtube-projects -> LastDayOnEarth -> Input ]
              │
-             │ (GitHub Actions cron: '0 */4 * * *' - 6 times daily)
+             │ (GitHub Actions cron: '0 */3 * * *' - 8 times daily)
              ▼
 [ Workflow Orchestrator: src/main.py drive-cron ]
              │

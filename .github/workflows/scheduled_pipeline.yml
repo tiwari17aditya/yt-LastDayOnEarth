@@ -1,9 +1,9 @@
 name: Scheduled Last Day on Earth Video Pipeline
 
 on:
-  # Run 6 times daily at every 4-hour interval
+  # Run 8 times daily at every 3-hour interval
   schedule:
-    - cron: '0 */4 * * *'
+    - cron: '0 */3 * * *'
 
   # Allow manual trigger anytime via GitHub UI
   workflow_dispatch:

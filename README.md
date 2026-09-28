@@ -104,11 +104,11 @@ python scripts/sync_github_secrets.py
 ```
 
 ### GitHub Actions Automation
-A scheduled workflow (`.github/workflows/scheduled_pipeline.yml`) runs **6 times daily at 4-hour intervals** (`0 */4 * * *`):
+A scheduled workflow (`.github/workflows/scheduled_pipeline.yml`) runs **8 times daily at 3-hour intervals** (`0 */3 * * *`):
 - Connects to Google Drive API directly (no local file sync needed).
 - Checks `MyDrive/youtube-projects/LastDayOnEarth/Input`.
 - If no videos are pending, exits in ~30 seconds.
-- If a video is pending, downloads, renders with soothing music & action cues, uploads to YouTube, moves the video to `Processed` in Drive, and sends a Gmail alert!
+- If a video is pending, downloads, renders with soothing music & action cues, uploads to YouTube, deletes raw input, cleans old outputs, and sends a Gmail alert!
 
 ---
 
