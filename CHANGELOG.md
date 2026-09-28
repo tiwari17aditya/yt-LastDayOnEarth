@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-09-28
+
+### Fixed
+- **YouTube `invalidTags` (HttpError 400) Video Upload Rejection**:
+  - Identified root cause preventing YouTube video upload and subsequent success email notification: YouTube Data API wraps keywords containing spaces in double quotes when calculating the serialized length against the 500-character ceiling, which pushed tag strings to ~542 characters.
+  - Updated `generate_video_tags` in [src/publisher/metadata_generator.py](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/metadata_generator.py) to accurately account for YouTube quotation marks and comma separators, with a safe 400-character ceiling.
+  - Sanitized keywords to strip forbidden characters (angle brackets `<`, `>`, commas `,`, double quotes `"`) and handle acronyms (`LDoE`) cleanly.
+  - Implemented automatic retry with safe minimal core keywords in [src/publisher/youtube_client.py](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/youtube_client.py) if YouTube API returns `invalidTags`, ensuring uploads never abort.
+  - Added unit tests for serialized YouTube tag length validation and upload retry on `invalidTags` in `tests/test_dynamic_tags.py` and `tests/test_youtube_client.py`.
+
 ## [1.3.0] - 2026-09-27
+
 
 ### Added
 - **7-Day Drive Output Video Retention & Auto-Purge**:

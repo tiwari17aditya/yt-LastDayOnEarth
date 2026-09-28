@@ -74,16 +74,28 @@ def test_dynamic_tags_adapt_to_gameplay_content():
 def test_generate_video_tags_under_500_chars():
     generator = DynamicTagGenerator(target_hashtag_count=50)
     events = [
-        GameplayEvent(start_time=0.0, end_time=1.0, action_type="craft", description="Crafting Planks"),
-        GameplayEvent(start_time=10.0, end_time=11.0, action_type="smelt", description="Smelting Iron"),
+        GameplayEvent(start_time=0.0, end_time=1.0, action_type="craft", description="Crafting & Planks"),
+        GameplayEvent(start_time=10.0, end_time=11.0, action_type="smelt", description="Smelting <Iron> & Furnaces, Ore"),
     ]
     hashtags = generator.generate_dynamic_hashtags("LDoE Workshop", events)
     video_tags = generator.generate_video_tags("LDoE Workshop", events, hashtags)
 
     assert isinstance(video_tags, list)
     assert len(video_tags) > 10
-    total_len = sum(len(t) for t in video_tags) + len(video_tags) - 1
-    assert total_len <= 500
+
+    # Ensure no forbidden characters
+    for tag in video_tags:
+        assert "<" not in tag
+        assert ">" not in tag
+        assert "," not in tag
+        assert '"' not in tag
+        assert not tag.startswith("#")
+
+    # YouTube serialized length: accounts for double quotes on multi-word tags and commas
+    serialized_len = generator.calculate_youtube_tags_length(video_tags)
+    assert serialized_len <= 400
+    assert serialized_len <= 500
+
 
 
 def test_gemini_fallback_on_api_error():

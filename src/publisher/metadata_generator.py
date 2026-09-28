@@ -395,14 +395,30 @@ class DynamicTagGenerator:
 
         return deduped[: self.target_hashtag_count]
 
+    def calculate_youtube_tags_length(self, tags: List[str]) -> int:
+        """Calculates exact serialized length as evaluated by YouTube API v3.
+        
+        YouTube wraps keywords containing spaces in double quotes, and separates tags with commas.
+        Example: ['LDoE', 'Last Day on Earth'] -> 'LDoE,"Last Day on Earth"' (length: 4 + 1 + 21 = 26).
+        """
+        if not tags:
+            return 0
+        return sum((len(t) + 2 if " " in t else len(t)) for t in tags) + (len(tags) - 1)
+
     def generate_video_tags(
         self,
         video_title: str,
         events: List[Any],
         hashtags: List[str],
-        max_chars: int = 490,
+        max_chars: int = 400,
     ) -> List[str]:
-        """Generates dynamic keyword tags for YouTube's metadata.tags field (no #, <= 500 chars)."""
+        """Generates dynamic keyword tags for YouTube's metadata.tags field (no #, <= 500 chars).
+        
+        YouTube API v3 constraints:
+        - Total serialized tags string (including commas and quotation marks around multi-word tags)
+          MUST not exceed 500 characters.
+        - Angle brackets '<' and '>', commas, and quotes are forbidden in individual tag keywords.
+        """
         base_tags = [
             "Last Day on Earth",
             "Last Day on Earth Survival",
@@ -414,18 +430,34 @@ class DynamicTagGenerator:
         ]
 
         # Extract words from events and hashtags
-        extracted = []
+        extracted: List[str] = []
         for ev in events:
             desc = getattr(ev, "description", "")
-            if desc and desc not in extracted:
-                extracted.append(f"LDoE {desc}")
-                extracted.append(desc)
+            if desc:
+                # Replace ampersands and sanitize
+                clean_desc = desc.replace("&", "and")
+                clean_desc = re.sub(r"[^\w\s-]", "", clean_desc).strip()
+                clean_desc = re.sub(r"\s+", " ", clean_desc)
+                if clean_desc and clean_desc not in extracted:
+                    extracted.append(f"LDoE {clean_desc}")
+                    extracted.append(clean_desc)
 
         for ht in hashtags:
             clean = ht.lstrip("#")
-            # Separate camelcase words if needed
-            spaced = re.sub(r"([a-z])([A-Z])", r"\1 \2", clean)
-            if spaced not in extracted and len(spaced) > 2:
+            # Separate camelcase words if needed, preserving 'LDoE'
+            if clean.lower().startswith("ldoe"):
+                remainder = clean[4:]
+                if remainder:
+                    spaced_remainder = re.sub(r"([a-z])([A-Z])", r"\1 \2", remainder)
+                    spaced = f"LDoE {spaced_remainder}".strip()
+                else:
+                    spaced = "LDoE"
+            else:
+                spaced = re.sub(r"([a-z])([A-Z])", r"\1 \2", clean)
+
+            spaced = re.sub(r"[^\w\s-]", "", spaced).strip()
+            spaced = re.sub(r"\s+", " ", spaced)
+            if spaced and len(spaced) > 2 and spaced not in extracted:
                 extracted.append(spaced)
 
         all_candidate_tags = base_tags + extracted
@@ -434,17 +466,23 @@ class DynamicTagGenerator:
         seen = set()
 
         for t in all_candidate_tags:
-            t = t.strip()
-            if not t or t.lower() in seen:
+            # Clean forbidden characters: commas, angle brackets, quotes, newlines
+            t = re.sub(r'[<>,"]', "", t).strip()
+            if not t or len(t) < 2 or len(t) > 60:
                 continue
-            seen.add(t.lower())
 
-            # Comma + tag length check
-            added_len = len(t) + (1 if final_tags else 0)
-            if total_len + added_len > max_chars:
+            t_lower = t.lower()
+            if t_lower in seen:
+                continue
+            seen.add(t_lower)
+
+            # Compute serialized YouTube cost: quotes for spaced tags + comma separator
+            tag_cost = (len(t) + 2 if " " in t else len(t)) + (1 if final_tags else 0)
+            if total_len + tag_cost > max_chars:
                 break
 
             final_tags.append(t)
-            total_len += added_len
+            total_len += tag_cost
 
         return final_tags
+

@@ -1,6 +1,7 @@
 """YouTube publishing client and AI metadata generator."""
 
 import json
+import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -315,11 +316,26 @@ class YouTubeClient(BasePublisher):
             except Exception as ce:
                 logger.warning(f"Could not perform YouTube duplicate pre-check: {ce}")
 
+            # Sanitize and strictly enforce YouTube tag constraints (serialized length <= 400 chars)
+            safe_tags: List[str] = []
+            seen_tags = set()
+            running_len = 0
+            for tag in metadata.tags or []:
+                clean_tag = re.sub(r'[<>,"]', "", str(tag)).strip()
+                if not clean_tag or clean_tag.lower() in seen_tags or len(clean_tag) < 2 or len(clean_tag) > 60:
+                    continue
+                seen_tags.add(clean_tag.lower())
+                cost = (len(clean_tag) + 2 if " " in clean_tag else len(clean_tag)) + (1 if safe_tags else 0)
+                if running_len + cost > 400:
+                    break
+                safe_tags.append(clean_tag)
+                running_len += cost
+
             body = {
                 "snippet": {
                     "title": metadata.title,
                     "description": metadata.description,
-                    "tags": metadata.tags,
+                    "tags": safe_tags,
                     "categoryId": metadata.category_id,
                 },
                 "status": {
@@ -328,24 +344,51 @@ class YouTubeClient(BasePublisher):
                 },
             }
 
-            media = MediaFileUpload(
-                str(video_path),
-                chunksize=10 * 1024 * 1024,
-                resumable=True,
-                mimetype="video/mp4",
-            )
+            def _execute_upload(upload_body: dict):
+                media = MediaFileUpload(
+                    str(video_path),
+                    chunksize=10 * 1024 * 1024,
+                    resumable=True,
+                    mimetype="video/mp4",
+                )
+                req = youtube.videos().insert(
+                    part="snippet,status",
+                    body=upload_body,
+                    media_body=media,
+                )
+                resp = None
+                while resp is None:
+                    status, resp = req.next_chunk()
+                    if status:
+                        logger.info(f"YouTube upload progress: {int(status.progress() * 100)}%")
+                return resp
 
-            request = youtube.videos().insert(
-                part="snippet,status",
-                body=body,
-                media_body=media,
-            )
+            try:
+                response = _execute_upload(body)
+            except Exception as upload_err:
+                err_str = str(upload_err)
+                content_bytes = getattr(upload_err, "content", b"")
+                content_str = content_bytes.decode("utf-8", errors="ignore") if isinstance(content_bytes, bytes) else str(content_bytes)
+                details_str = str(getattr(upload_err, "error_details", ""))
+                combined_err = f"{err_str} {content_str} {details_str}".lower()
 
-            response = None
-            while response is None:
-                status, response = request.next_chunk()
-                if status:
-                    logger.info(f"YouTube upload progress: {int(status.progress() * 100)}%")
+                if "invalidtags" in combined_err or "invalid video keywords" in combined_err:
+                    logger.warning(
+                        "YouTube rejected tags with 'invalidTags' error. "
+                        "Retrying upload with minimal safe core tags...",
+                        extra_data={"original_tags": safe_tags, "error": err_str},
+                    )
+                    fallback_body = dict(body)
+                    fallback_body["snippet"] = dict(body["snippet"])
+                    fallback_body["snippet"]["tags"] = [
+                        "Last Day on Earth",
+                        "Last Day on Earth Survival",
+                        "LDoE Gameplay",
+                        "Zombie Survival",
+                    ]
+                    response = _execute_upload(fallback_body)
+                else:
+                    raise upload_err
 
             video_id = response.get("id")
             youtube_url = f"https://youtu.be/{video_id}"

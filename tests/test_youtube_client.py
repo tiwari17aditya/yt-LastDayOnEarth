@@ -128,3 +128,61 @@ def test_generate_metadata_includes_candidates_and_chapters(tmp_path):
     # Ensures soundtrack and licensing blocks are strictly omitted for description hygiene
     assert "SOUNDTRACK" not in meta.description
     assert "LICENSING" not in meta.description
+
+
+def test_upload_video_retries_on_invalid_tags(tmp_path):
+    from unittest.mock import patch
+    from googleapiclient.errors import HttpError
+    from httplib2 import Response
+    from src.publisher.youtube_client import VideoPublishMetadata
+    from src.publisher.title_manager import TitleManager
+
+    tm = TitleManager(tracker_file=tmp_path / "tracker.json")
+    client = YouTubeClient(title_manager=tm)
+    video_file = tmp_path / "test.mp4"
+    video_file.write_bytes(b"dummy video data")
+
+    meta = VideoPublishMetadata(
+        title="Test Title",
+        description="Test Description",
+        tags=["InvalidTag<1>", "Tag,With,Comma", "Tag2"],
+        category_id="20",
+        privacy_status="private",
+    )
+
+    mock_youtube = MagicMock()
+    # Mock channel check to bypass duplicate pre-check
+    mock_youtube.channels().list().execute.return_value = {"items": []}
+    mock_youtube.playlists().list().execute.return_value = {"items": []}
+    mock_youtube.playlists().list_next.return_value = None
+    mock_youtube.playlistItems().list().execute.return_value = {"items": []}
+    mock_youtube.playlistItems().list_next.return_value = None
+
+    err_resp = Response({"status": 400, "reason": "Bad Request"})
+    err_content = b'{"error": {"errors": [{"reason": "invalidTags", "message": "The request metadata specifies invalid video keywords."}]}}'
+    http_err = HttpError(err_resp, err_content)
+
+    mock_fail_req = MagicMock()
+    mock_fail_req.next_chunk.side_effect = http_err
+
+    mock_success_req = MagicMock()
+    mock_success_req.next_chunk.return_value = (None, {"id": "uploaded_vid_999"})
+
+    mock_youtube.videos().insert.side_effect = [mock_fail_req, mock_success_req]
+
+    with patch("src.google_auth.get_google_credentials", return_value=MagicMock()), \
+         patch("googleapiclient.discovery.build", return_value=mock_youtube):
+        url = client.upload_video(video_path=video_file, metadata=meta)
+
+    assert url == "https://youtu.be/uploaded_vid_999"
+    assert mock_youtube.videos().insert.call_count == 2
+    second_call_body = mock_youtube.videos().insert.call_args_list[1][1]["body"]
+    assert second_call_body["snippet"]["tags"] == [
+        "Last Day on Earth",
+        "Last Day on Earth Survival",
+        "LDoE Gameplay",
+        "Zombie Survival",
+    ]
+
+
+
