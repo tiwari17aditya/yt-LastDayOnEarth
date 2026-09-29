@@ -128,7 +128,7 @@ class VideoProcessor:
         subtitle_file: Optional[Path] = None,
         music_file: Optional[Path] = None,
         privacy_filter: Optional[str] = None,
-        ducking_db: str = "-8dB",
+        ducking_db: str = "-15dB",
         preset: str = "veryfast",
     ) -> Path:
         """Executes FFmpeg composite render."""

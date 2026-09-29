@@ -159,6 +159,35 @@ class GmailNotifier:
         """
         self._dispatch(subject, body_html)
 
+    def send_digest_email(
+        self,
+        subject: str,
+        html_body: str,
+        recipients: Optional[List[str]] = None,
+    ) -> bool:
+        """Send rich HTML analytics or digest report via Gmail API."""
+        target_recipients = recipients or self.recipients
+        if not target_recipients:
+            logger.warning("No notification recipients configured; skipping digest email dispatch.")
+            return False
+
+        try:
+            self.connect()
+            if not self.service:
+                logger.warning("Gmail API service unavailable; skipping digest dispatch.")
+                return False
+
+            original_recipients = self.recipients
+            self.recipients = target_recipients
+            try:
+                self._dispatch(subject, html_body)
+                return True
+            finally:
+                self.recipients = original_recipients
+        except Exception as e:
+            logger.warning(f"Could not dispatch digest email: {e}")
+            return False
+
     def _dispatch(self, subject: str, html_body: str) -> None:
         """Encodes and sends message via Gmail API."""
         try:

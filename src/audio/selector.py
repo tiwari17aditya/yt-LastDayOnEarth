@@ -19,7 +19,7 @@ class BaseAudioMixer(ABC):
         pass
 
     @abstractmethod
-    def build_ffmpeg_audio_filter(self, ducking_db: str = "-8dB") -> str:
+    def build_ffmpeg_audio_filter(self, ducking_db: str = "-15dB") -> str:
         """Construct FFmpeg filtergraph for seamless looping and ducking."""
         pass
 
@@ -193,6 +193,6 @@ class AudioMixer(BaseAudioMixer):
         )
         return output_path, playlist_tracks
 
-    def build_ffmpeg_audio_filter(self, ducking_db: str = "-8dB") -> str:
+    def build_ffmpeg_audio_filter(self, ducking_db: str = "-15dB") -> str:
         """Generates filter complex combining gameplay audio (input 0) with background music (input 1)."""
         return f"[1:a]aloop=loop=-1:size=2e+09,volume={ducking_db}[bg];[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]"

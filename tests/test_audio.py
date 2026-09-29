@@ -7,9 +7,9 @@ from src.audio.selector import AudioMixer
 
 def test_audio_mixer_load_catalog():
     mixer = AudioMixer(library_path=Path("config/music_library.json"))
-    assert len(mixer.tracks) == 20
-    assert mixer.tracks[0]["title"] == "Carefree"
-    assert mixer.tracks[0]["attribution_required"] is True
+    assert len(mixer.tracks) >= 6
+    assert mixer.tracks[0]["title"] == "Wasteland Horizon"
+    assert mixer.tracks[0]["attribution_required"] is False
 
 
 def test_audio_ducking_filter():

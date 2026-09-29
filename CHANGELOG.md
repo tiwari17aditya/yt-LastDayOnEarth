@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-29
+
+### Added
+- **Automated Creator First Engagement Comment Hook**:
+  - Implemented `post_engagement_comment()` in [`src/publisher/youtube_client.py`](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/youtube_client.py), automatically posting a top community comment with an episode discussion question, series playlist link, and subscription callout immediately after publishing.
+  - Added CLI tool [`scripts/post_engagement_comments.py`](file:///d:/youtube-projects/LastDayOnEarth/scripts/post_engagement_comments.py) to manage engagement comments across any episode or channel video.
+
+- **Automated YouTube Shorts (9:16) Auto-Clipper**:
+  - Implemented [`src/processor/shorts_generator.py`](file:///d:/youtube-projects/LastDayOnEarth/src/processor/shorts_generator.py) converting 16:9 gameplay footage to high-impact 1080x1920 vertical format using a fast bicubic downscale-upscale blurred backdrop and centered HD gameplay box.
+  - Generates high-contrast distressed branding header, episode badge, and call-to-action overlays.
+  - Added CLI tool [`scripts/generate_short.py`](file:///d:/youtube-projects/LastDayOnEarth/scripts/generate_short.py) for rendering YouTube Shorts clips with custom timestamps.
+
+- **End-Screen & Cards Outro Slate Generator**:
+  - Implemented [`src/processor/endscreen_generator.py`](file:///d:/youtube-projects/LastDayOnEarth/src/processor/endscreen_generator.py) rendering 1920x1080 cinematic outro video bumpers with visual guide card boxes for YouTube Studio's interactive elements (Next Episode, Series Playlist, Subscribe Pill).
+  - Added CLI tool [`scripts/generate_endscreen.py`](file:///d:/youtube-projects/LastDayOnEarth/scripts/generate_endscreen.py).
+
+- **Channel Growth Analytics & Retention Digest**:
+  - Implemented [`src/analytics/channel_digest.py`](file:///d:/youtube-projects/LastDayOnEarth/src/analytics/channel_digest.py) querying YouTube Data API for subscriber counts, total views, per-video engagement metrics (like-to-view and comment-to-view ratios), and algorithmic channel health.
+  - Generates Markdown reports under `reports/analytics/` and dispatches executive HTML digests via [`GmailNotifier`](file:///d:/youtube-projects/LastDayOnEarth/src/notifications/gmail_client.py).
+  - Added CLI tool [`scripts/generate_channel_digest.py`](file:///d:/youtube-projects/LastDayOnEarth/scripts/generate_channel_digest.py).
+
+- **Dynamic Milestone Chapters with Emoji Badges**:
+  - Enhanced chapter generation in [`src/publisher/youtube_client.py`](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/youtube_client.py) with contextual event badges (`🛠️`, `⚔️`, `🎒`, `☢️`, `🎬`, `🏡`, `🏆`) to optimize the video scrub bar and Google Search rich snippet indexation.
+
+## [1.4.0] - 2026-09-29
+
+### Added
+- **Cinematic Grunge Thumbnail Engine**:
+  - Implemented high-CTR cinematic survival branding in [src/processor/cinematic_branding.py](file:///d:/youtube-projects/LastDayOnEarth/src/processor/cinematic_branding.py), rendering the distressed stencil "LAST DAY ON EARTH" logo and organic paint-splatter episode badges (`#<N>`) with dynamic rotating survivor color palettes (Crimson, Amber, Emerald, Cobalt, Purple, Flame).
+  - Upgraded [ThumbnailGenerator](file:///d:/youtube-projects/LastDayOnEarth/src/processor/thumbnail_generator.py) with automatic pre-generated episode thumbnail discovery and default grunge aesthetic for future video pipeline runs.
+  - Added dedicated CLI tool [scripts/generate_thumbnail.py](file:///d:/youtube-projects/LastDayOnEarth/scripts/generate_thumbnail.py) supporting automated episode thumbnail generation, keyframe branding, AI prompt generation for custom scenarios (Bunker Alfa, Farm, Chopper, Workshop, Base Defense), and YouTube thumbnail upload.
+  - Added [scripts/update_youtube_thumbnails.py](file:///d:/youtube-projects/LastDayOnEarth/scripts/update_youtube_thumbnails.py) for batch thumbnail updating across channel videos.
+  - Curated and saved high-resolution 1280x720 cinematic thumbnails for Episodes 1 through 13 in `data/thumbnails/`.
+
+- **Copyright Claim Prevention & Attribution System**:
+  - Automatically injected Creative Commons Attribution 4.0 (CC BY 4.0) and Kefir Games Fair Use disclaimers in [YouTubeClient.generate_metadata](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/youtube_client.py) across all published descriptions.
+  - Adjusted default background music volume ducking from `-8dB` to `-15dB` across [src/config.py](file:///d:/youtube-projects/LastDayOnEarth/src/config.py), [src/audio/selector.py](file:///d:/youtube-projects/LastDayOnEarth/src/audio/selector.py), and [src/processor/video_processor.py](file:///d:/youtube-projects/LastDayOnEarth/src/processor/video_processor.py) to prevent aggressive Content ID audio fingerprint triggering.
+  - Added [scripts/resolve_copyright_claims.py](file:///d:/youtube-projects/LastDayOnEarth/scripts/resolve_copyright_claims.py) utility to audit channel videos and resolve Content ID notices.
+  - Purged claimed track `Morning` (`morning.mp3`) from audio library and replaced with 100% copyright-free original theme `Wasteland Horizon` (`wasteland_horizon.mp3`, CC0 Public Domain).
+  - Added [scripts/generate_safe_ambient_theme.py](file:///d:/youtube-projects/LastDayOnEarth/scripts/generate_safe_ambient_theme.py) for algorithmic synthesis of Content-ID-immune ambient music.
+
+### Changed
+- **Updated All Existing YouTube Video Thumbnails**:
+  - Synchronized and updated custom thumbnails across all 12 published LDoE videos on YouTube (Episodes #1 through #11) with the new cinematic grunge aesthetic.
+
 ## [1.3.5] - 2026-09-29
 
 ### Added

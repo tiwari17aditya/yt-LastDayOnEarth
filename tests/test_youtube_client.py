@@ -125,9 +125,9 @@ def test_generate_metadata_includes_candidates_and_chapters(tmp_path):
     assert meta.thumbnail_path == str(tmp_path / "thumb.jpg")
     # Ensures 00:00 chapter exists
     assert "00:00" in meta.description
-    # Ensures soundtrack and licensing blocks are strictly omitted for description hygiene
-    assert "SOUNDTRACK" not in meta.description
-    assert "LICENSING" not in meta.description
+    # Ensures music licensing and copyright attribution blocks exist to prevent Content ID claims
+    assert "MUSIC" in meta.description
+    assert "COPYRIGHT" in meta.description
 
 
 def test_upload_video_retries_on_invalid_tags(tmp_path):
@@ -183,6 +183,44 @@ def test_upload_video_retries_on_invalid_tags(tmp_path):
         "LDoE Gameplay",
         "Zombie Survival",
     ]
+
+
+def test_post_engagement_comment_success():
+    client = YouTubeClient()
+    mock_youtube = MagicMock()
+    mock_insert_req = MagicMock()
+    mock_insert_req.execute.return_value = {"id": "comment_123"}
+    mock_youtube.commentThreads().insert.return_value = mock_insert_req
+
+    cid = client.post_engagement_comment(
+        youtube=mock_youtube,
+        video_id="vid_test_1",
+        episode_number=5,
+        playlist_url="https://youtube.com/playlist?list=PL123",
+    )
+
+    assert cid == "comment_123"
+    mock_youtube.commentThreads().insert.assert_called_once()
+    body = mock_youtube.commentThreads().insert.call_args[1]["body"]
+    assert body["snippet"]["videoId"] == "vid_test_1"
+    comment_text = body["snippet"]["topLevelComment"]["snippet"]["textOriginal"]
+    assert "https://youtube.com/playlist?list=PL123" in comment_text
+    assert "Survivor checkpoint" in comment_text or "survival" in comment_text.lower()
+
+
+def test_post_engagement_comment_handles_failure_gracefully():
+    client = YouTubeClient()
+    mock_youtube = MagicMock()
+    mock_youtube.commentThreads().insert.side_effect = Exception("Quota exceeded")
+
+    cid = client.post_engagement_comment(
+        youtube=mock_youtube,
+        video_id="vid_test_1",
+        episode_number=5,
+    )
+
+    assert cid is None
+
 
 
 

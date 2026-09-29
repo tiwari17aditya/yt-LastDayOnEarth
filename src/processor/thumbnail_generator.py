@@ -217,19 +217,53 @@ class ThumbnailGenerator:
         duration: float = 180.0,
         episode_number: Optional[int] = None,
         badge_text: Optional[str] = None,
-        hook_text: Optional[str] = None,
-        timestamp: Optional[float] = None,
+        branding_style: str = "grunge",
     ) -> Path:
-        """Full orchestration: keyframe extraction, 16:9 focus zoom, color enhancement, and studio branding."""
+        """Full orchestration: checks pre-generated episode art, or extracts 16:9 focus frame and applies branding."""
+        import shutil
+
+        # 1. Check if a high-CTR cinematic thumbnail already exists for this episode
+        if episode_number is not None:
+            candidate_dirs = [
+                Path("data/thumbnails"),
+                Path("assets/thumbnails"),
+                self.output_dir / "thumbnails",
+            ]
+            for cdir in candidate_dirs:
+                curated_file = cdir / f"episode_{episode_number:02d}.jpg"
+                if curated_file.exists():
+                    logger.info(f"Using curated cinematic thumbnail for Episode #{episode_number}: {curated_file}")
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(curated_file, output_path)
+                    return output_path
+
+        # 2. Extract enhanced 16:9 frame from video
         ts = timestamp if timestamp is not None else self.select_best_timestamp(events=events, duration=duration)
         self.extract_enhanced_frame(video_path, output_path, ts)
 
-        # Default badge text if episode given
+        # 3. Apply branding overlay
         label = badge_text
+        if not label and episode_number is not None:
+            label = f"#{episode_number}"
+
+        if branding_style == "grunge":
+            try:
+                from src.processor.cinematic_branding import apply_cinematic_grunge_branding
+                apply_cinematic_grunge_branding(
+                    image_path=output_path,
+                    episode_number=episode_number,
+                    badge_text=label,
+                    output_path=output_path,
+                )
+                logger.info(f"Applied cinematic grunge branding to {output_path.name}")
+                return output_path
+            except Exception as ge:
+                logger.warning(f"Could not apply grunge branding, falling back to studio badge: {ge}")
+
+        # Fallback to studio plate
         if not label and episode_number is not None:
             label = f"EPISODE #{episode_number:02d}"
 
-        # If hook text is not provided, derive from key gameplay event
         if not hook_text and events:
             action_keywords = ["bench", "crafting", "smelting", "storage", "chests", "workshop"]
             for ev in events:
