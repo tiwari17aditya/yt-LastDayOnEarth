@@ -130,5 +130,35 @@
       "privacy_redacted": true,
       "md5_checksum": "13c93909933698703b2431bf6c28fed8"
     }
+  },
+  {
+    "job_id": "job_20260929_171951",
+    "timestamp": "2026-09-29T17:19:51.390361+00:00",
+    "input_filename": "ScreenRecording_09-29-2026 17-46-45_1.mp4",
+    "output_filename": "ScreenRecording_09-29-2026_17-46-45_1_Processed_29092026.mp4",
+    "status": "SUCCESS",
+    "video_id": "wV_epRelsEg",
+    "youtube_url": "https://youtu.be/wV_epRelsEg",
+    "details": {
+      "video_id": "wV_epRelsEg",
+      "youtube_url": "https://youtu.be/wV_epRelsEg",
+      "video_output": "output/ScreenRecording_09-29-2026_17-46-45_1_Processed_29092026.mp4",
+      "metadata_output": "output/ScreenRecording_09-29-2026_17-46-45_1_Processed_29092026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_09-29-2026_17-46-45_1_Processed_29092026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Home Base Operations! | LDoE Survival #12",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Home Base Operations Plus Workshop &... #12",
+        "walkthrough": "Surviving Day 12: Entering Home Base And Home Base Operations Plus Workshop & Smelting... #12"
+      },
+      "duration_seconds": 282.636622,
+      "soundtrack_tracks": [
+        "Sneaky Adventure",
+        "Water Lily",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "c1625dd88557d3f519e1e7e596c329bb"
+    }
   }
 ]
