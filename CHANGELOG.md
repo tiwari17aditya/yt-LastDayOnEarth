@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-09-29
+
+### Fixed
+- **Episode #12 Thumbnail Synchronization & Formatting**:
+  - Uploaded high-CTR cinematic template thumbnail [`data/thumbnails/episode_12.jpg`](file:///d:/youtube-projects/LastDayOnEarth/data/thumbnails/episode_12.jpg) to published YouTube video `wV_epRelsEg` with signature distressed "LAST DAY ON EARTH" stencil logo and `#12` splatter badge.
+  - Added Episode #12 to [`scripts/update_youtube_thumbnails.py`](file:///d:/youtube-projects/LastDayOnEarth/scripts/update_youtube_thumbnails.py) mapping.
+  - Fixed parameter signature in [`ThumbnailGenerator.generate_thumbnail`](file:///d:/youtube-projects/LastDayOnEarth/src/processor/thumbnail_generator.py) to prevent unbound `timestamp` and `hook_text` variable references during keyframe extraction fallbacks.
+
+### Documentation
+- Updated [`docs/ENHANCEMENTS.md`](file:///d:/youtube-projects/LastDayOnEarth/docs/ENHANCEMENTS.md) with Phase 2 & 3 roadmap enhancements:
+  - Priority 6: Automated AI Image Pre-Generation for Future Episode Thumbnails (Episodes 14–50).
+  - Priority 7: YouTube Shorts Automated Scheduling & Pipeline Hook.
+  - Priority 8: Automated Community Tab Posts & Interactive Polls.
+  - Priority 9: Advanced SFX Dynamic Audio Ducking for Combat.
+  - Priority 10: YouTube Premiere Mode & Milestone Outro Slates.
+
 ## [1.5.0] - 2026-09-29
 
 ### Added
