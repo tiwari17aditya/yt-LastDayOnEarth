@@ -34,6 +34,7 @@ class TitleManager:
         title_style: str = "action_hook",
         episode_numbering: bool = True,
         max_title_length: int = 100,
+        sync_youtube: bool = False,
     ) -> None:
         self.tracker_file = tracker_file
         self.series_name = series_name
@@ -41,6 +42,8 @@ class TitleManager:
         self.title_style = title_style
         self.episode_numbering = episode_numbering
         self.max_title_length = max_title_length
+        self.sync_youtube = sync_youtube
+        self._synced_with_youtube = False
         self._ensure_tracker_exists()
 
     def _ensure_tracker_exists(self) -> None:
@@ -57,7 +60,7 @@ class TitleManager:
             except Exception as e:
                 logger.warning(f"Could not initialize series tracker: {e}")
 
-    def get_current_episode(self) -> int:
+    def _read_tracker_episode(self) -> int:
         if not self.tracker_file.exists():
             return 1
         try:
@@ -66,6 +69,101 @@ class TitleManager:
         except Exception as e:
             logger.warning(f"Error reading current episode from tracker: {e}")
             return 1
+
+    def _update_current_episode(self, episode_number: int) -> None:
+        data = {
+            "series_name": self.series_name,
+            "current_episode": episode_number,
+            "completed_episodes": [],
+        }
+        if self.tracker_file.exists():
+            try:
+                data = json.loads(self.tracker_file.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        data["current_episode"] = episode_number
+        try:
+            self.tracker_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        except Exception as e:
+            logger.warning(f"Failed to update tracker with synced episode #{episode_number}: {e}")
+
+    def sync_with_youtube(self, youtube_service: Optional[Any] = None) -> int:
+        """Inspects YouTube channel/playlist to detect the highest published episode number.
+        
+        Ensures consecutive episode numbering across ephemeral runners (e.g. GitHub Actions)
+        and updates local tracker file if YouTube reflects higher episode numbers.
+        """
+        self._synced_with_youtube = True
+        try:
+            if youtube_service is None:
+                from src.google_auth import get_google_credentials
+                from googleapiclient.discovery import build
+                creds = get_google_credentials()
+                if not creds:
+                    return self._read_tracker_episode()
+                youtube_service = build("youtube", "v3", credentials=creds, cache_discovery=False)
+
+            highest_ep = 0
+
+            # 1. Search in dedicated playlist
+            try:
+                p_req = youtube_service.playlists().list(part="snippet", mine=True, maxResults=50)
+                p_res = p_req.execute()
+                for p in p_res.get("items", []):
+                    title = p.get("snippet", {}).get("title", "")
+                    if "Last Day on Earth" in title or self.series_prefix.lower() in title.lower():
+                        pid = p["id"]
+                        pi_req = youtube_service.playlistItems().list(part="snippet", playlistId=pid, maxResults=50)
+                        while pi_req:
+                            pi_res = pi_req.execute()
+                            for item in pi_res.get("items", []):
+                                t = item.get("snippet", {}).get("title", "")
+                                match = re.findall(r"#(\d+)", t)
+                                if match:
+                                    highest_ep = max(highest_ep, int(match[-1]))
+                            pi_req = youtube_service.playlistItems().list_next(pi_req, pi_res)
+            except Exception as pe:
+                logger.debug(f"Playlist check during YouTube episode sync encountered: {pe}")
+
+            # 2. Search in channel recent uploads
+            try:
+                ch_resp = youtube_service.channels().list(mine=True, part="contentDetails").execute()
+                if ch_resp.get("items"):
+                    uploads_id = ch_resp["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+                    up_req = youtube_service.playlistItems().list(part="snippet", playlistId=uploads_id, maxResults=50)
+                    up_res = up_req.execute()
+                    for it in up_res.get("items", []):
+                        t = it.get("snippet", {}).get("title", "")
+                        if self.series_prefix.lower() in t.lower() or "last day on earth" in t.lower():
+                            match = re.findall(r"#(\d+)", t)
+                            if match:
+                                highest_ep = max(highest_ep, int(match[-1]))
+            except Exception as ue:
+                logger.debug(f"Uploads check during YouTube episode sync encountered: {ue}")
+
+            if highest_ep > 0:
+                next_ep = highest_ep + 1
+                tracker_ep = self._read_tracker_episode()
+                if next_ep > tracker_ep:
+                    logger.info(
+                        f"Synchronized series episode with YouTube: highest published is #{highest_ep}. "
+                        f"Updating tracker next episode from #{tracker_ep} to #{next_ep}"
+                    )
+                    self._update_current_episode(next_ep)
+                    return next_ep
+                return tracker_ep
+
+            return self._read_tracker_episode()
+
+        except Exception as e:
+            logger.warning(f"Could not synchronize episode counter with YouTube: {e}")
+            return self._read_tracker_episode()
+
+    def get_current_episode(self, sync_youtube: Optional[bool] = None) -> int:
+        should_sync = self.sync_youtube if sync_youtube is None else sync_youtube
+        if should_sync and not self._synced_with_youtube:
+            return self.sync_with_youtube()
+        return self._read_tracker_episode()
 
     def advance_episode(
         self,
@@ -102,6 +200,7 @@ class TitleManager:
         })
         data["current_episode"] = next_ep
         data["completed_episodes"] = completed
+        self._synced_with_youtube = True
 
         try:
             self.tracker_file.write_text(json.dumps(data, indent=2), encoding="utf-8")

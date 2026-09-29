@@ -1,41 +1,66 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 8,
+  "current_episode": 11,
   "completed_episodes": [
     {
       "episode": 1,
       "title": "HOME BASE EXPANSION & RESOURCE ORGANIZATION! | LDoE Survival #1",
-      "video_id": "Aw80nniGs-E"
+      "video_id": "Aw80nniGs-E",
+      "youtube_url": "https://youtu.be/Aw80nniGs-E"
     },
     {
       "episode": 2,
       "title": "SURVIVAL ROUTINE & WORKSHOP OPERATIONS! | LDoE Survival #2",
-      "video_id": "3hWeXZ0EViQ"
+      "video_id": "3hWeXZ0EViQ",
+      "youtube_url": "https://youtu.be/3hWeXZ0EViQ"
     },
     {
       "episode": 3,
       "title": "BASE DEFENSE SETUP & WORKSHOP SMELTING! | LDoE Survival #3",
-      "video_id": "sH0NspDux9k"
+      "video_id": "sH0NspDux9k",
+      "youtube_url": "https://youtu.be/sH0NspDux9k"
     },
     {
       "episode": 4,
       "title": "SURVIVAL ROUTINE: WORKSHOP & STORAGE! | LDoE Survival #4",
-      "video_id": "MZ6slquprUU"
+      "video_id": "MZ6slquprUU",
+      "youtube_url": "https://youtu.be/MZ6slquprUU"
     },
     {
       "episode": 5,
       "title": "OPTIMIZING BASE STORAGE & WOODCRAFT PLANKS! | LDoE Survival #5",
-      "video_id": "L-Gpmo89uHk"
+      "video_id": "L-Gpmo89uHk",
+      "youtube_url": "https://youtu.be/L-Gpmo89uHk"
     },
     {
       "episode": 6,
       "title": "BASE DEFENSE PREP & SMELTING FURNACES! | LDoE Survival #6",
-      "video_id": "Kqctm5n01h4"
+      "video_id": "Kqctm5n01h4",
+      "youtube_url": "https://youtu.be/Kqctm5n01h4"
     },
     {
       "episode": 7,
-      "title": "GLOBAL MAP NAVIGATION & WORKSHOP SMELTING! | LDoE Survival #7",
-      "video_id": "JMa211Yc4YU"
+      "title": "Workshop & Smelting + Blueprint Upgrades! | LDoE Survival #7",
+      "video_id": "JMa211Yc4YU",
+      "youtube_url": "https://youtu.be/JMa211Yc4YU"
+    },
+    {
+      "episode": 8,
+      "title": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #8",
+      "video_id": "Wf50vxO0NHs",
+      "youtube_url": "https://youtu.be/Wf50vxO0NHs"
+    },
+    {
+      "episode": 9,
+      "title": "Base Storage Optimization + Inventory & Resource Sorting! | LDoE Survival #9",
+      "video_id": "VP7g6-VqNY4",
+      "youtube_url": "https://youtu.be/VP7g6-VqNY4"
+    },
+    {
+      "episode": 10,
+      "title": "Workshop & Smelting + Entering Home Base! | LDoE Survival #10",
+      "video_id": "eYny9FafrjI",
+      "youtube_url": "https://youtu.be/eYny9FafrjI"
     }
   ]
 }

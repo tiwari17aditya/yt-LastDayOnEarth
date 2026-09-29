@@ -83,3 +83,58 @@ def test_title_manager_length_truncation(tmp_path):
     pkg = mgr.generate_titles(events, episode_number=99)
     assert len(pkg.primary_title) <= 40
     assert "#99" in pkg.primary_title
+
+
+def test_title_manager_sync_with_youtube_service(tmp_path):
+    from unittest.mock import MagicMock
+    tracker_file = tmp_path / "series_tracker.json"
+    mgr = TitleManager(tracker_file=tracker_file)
+
+    mock_yt = MagicMock()
+    mock_yt.playlists().list().execute.return_value = {
+        "items": [
+            {"id": "p_ldoe", "snippet": {"title": "Last Day on Earth Series"}}
+        ]
+    }
+    mock_yt.playlistItems().list().execute.return_value = {
+        "items": [
+            {"snippet": {"title": "Base Defense #10"}},
+            {"snippet": {"title": "Smelting Planks #9"}},
+        ]
+    }
+    mock_yt.playlistItems().list_next.return_value = None
+
+    next_ep = mgr.sync_with_youtube(youtube_service=mock_yt)
+    assert next_ep == 11
+    assert mgr.get_current_episode() == 11
+
+
+def test_title_manager_sync_does_not_regress_if_tracker_higher(tmp_path):
+    from unittest.mock import MagicMock
+    tracker_file = tmp_path / "series_tracker.json"
+    tracker_file.write_text(json.dumps({"series_name": "LDoE", "current_episode": 15}), encoding="utf-8")
+    mgr = TitleManager(tracker_file=tracker_file)
+
+    mock_yt = MagicMock()
+    mock_yt.playlists().list().execute.return_value = {
+        "items": [{"id": "p_ldoe", "snippet": {"title": "Last Day on Earth Series"}}]
+    }
+    mock_yt.playlistItems().list().execute.return_value = {
+        "items": [{"snippet": {"title": "Base Defense #10"}}]
+    }
+    mock_yt.playlistItems().list_next.return_value = None
+
+    next_ep = mgr.sync_with_youtube(youtube_service=mock_yt)
+    assert next_ep == 15
+    assert mgr.get_current_episode() == 15
+
+
+def test_title_manager_sync_graceful_on_no_creds(tmp_path, monkeypatch):
+    tracker_file = tmp_path / "series_tracker.json"
+    mgr = TitleManager(tracker_file=tracker_file)
+    monkeypatch.setattr("src.google_auth.get_google_credentials", lambda *a, **kw: None)
+
+    # Should safely return tracker value without error
+    ep = mgr.get_current_episode(sync_youtube=True)
+    assert ep == 1
+

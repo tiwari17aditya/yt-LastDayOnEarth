@@ -29,6 +29,8 @@ jobs:
     name: Check Drive & Process Video
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository
@@ -86,3 +88,15 @@ jobs:
 
           echo "Executing: python -m src.main drive-cron $EXTRA_ARGS"
           python -m src.main drive-cron $EXTRA_ARGS
+
+      - name: Persist Series Tracker & History Changes
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/series_tracker.json data/history.json || true
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: persist series tracker & history updates [skip ci]"
+            git pull --rebase origin main || true
+            git push origin HEAD || true
+          fi

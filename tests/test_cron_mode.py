@@ -32,3 +32,86 @@ def test_drive_cron_dry_run_does_not_download(mock_drive_cls):
     assert exit_code == 0
     mock_instance.download_video.assert_not_called()
     mock_instance.mark_as_processed.assert_not_called()
+
+
+@patch("src.main.run_pipeline")
+@patch("src.main.GoogleDriveClient")
+def test_drive_cron_preserves_input_video_when_upload_false(mock_drive_cls, mock_pipeline, tmp_path):
+    """When upload=False, the raw video MUST NOT be deleted from Google Drive Input."""
+    mock_instance = MagicMock()
+    mock_instance.list_pending_videos.return_value = [
+        {"id": "drive_vid_123", "name": "gameplay.mp4", "size": 1024}
+    ]
+    mock_drive_cls.return_value = mock_instance
+
+    from src.main import RenderResult
+    dummy_render = RenderResult(tmp_path / "gameplay_Processed.mp4")
+    dummy_render.touch()
+    dummy_render.uploaded_to_youtube = False
+    dummy_render.youtube_url = "N/A (Local execution)"
+    mock_pipeline.return_value = dummy_render
+
+    exit_code = run_drive_cron(dry_run=False, limit=1, upload=False)
+    assert exit_code == 0
+    mock_instance.delete_video.assert_not_called()
+
+
+@patch("src.main.run_pipeline")
+@patch("src.main.GoogleDriveClient")
+def test_drive_cron_preserves_input_video_when_pipeline_errors(mock_drive_cls, mock_pipeline):
+    """When pipeline fails, the raw video MUST NOT be deleted from Google Drive Input."""
+    mock_instance = MagicMock()
+    mock_instance.list_pending_videos.return_value = [
+        {"id": "drive_vid_999", "name": "failed.mp4", "size": 1024}
+    ]
+    mock_drive_cls.return_value = mock_instance
+    mock_pipeline.side_effect = RuntimeError("YouTube quota exceeded or processing crashed")
+
+    exit_code = run_drive_cron(dry_run=False, limit=1, upload=True)
+    assert exit_code == 1
+    mock_instance.delete_video.assert_not_called()
+
+
+@patch("src.main.run_pipeline")
+@patch("src.main.GoogleDriveClient")
+def test_drive_cron_preserves_input_video_when_youtube_upload_not_confirmed(mock_drive_cls, mock_pipeline, tmp_path):
+    """When YouTube upload cannot be verified, the raw video MUST NOT be deleted from Drive Input."""
+    mock_instance = MagicMock()
+    mock_instance.list_pending_videos.return_value = [
+        {"id": "drive_vid_456", "name": "unconfirmed.mp4", "size": 1024}
+    ]
+    mock_drive_cls.return_value = mock_instance
+
+    from src.main import RenderResult
+    dummy_render = RenderResult(tmp_path / "gameplay_Processed.mp4")
+    dummy_render.touch()
+    dummy_render.uploaded_to_youtube = False
+    mock_pipeline.return_value = dummy_render
+
+    exit_code = run_drive_cron(dry_run=False, limit=1, upload=True)
+    assert exit_code == 0
+    mock_instance.delete_video.assert_not_called()
+
+
+@patch("src.main.run_pipeline")
+@patch("src.main.GoogleDriveClient")
+def test_drive_cron_deletes_input_video_only_after_youtube_upload_confirmed(mock_drive_cls, mock_pipeline, tmp_path):
+    """When video is confirmed uploaded to YouTube, the raw video IS deleted from Drive Input."""
+    mock_instance = MagicMock()
+    mock_instance.list_pending_videos.return_value = [
+        {"id": "drive_vid_777", "name": "success.mp4", "size": 1024}
+    ]
+    mock_drive_cls.return_value = mock_instance
+
+    from src.main import RenderResult
+    dummy_render = RenderResult(tmp_path / "gameplay_Processed.mp4")
+    dummy_render.touch()
+    dummy_render.uploaded_to_youtube = True
+    dummy_render.youtube_url = "https://youtu.be/real_vid_123"
+    dummy_render.video_id = "real_vid_123"
+    mock_pipeline.return_value = dummy_render
+
+    exit_code = run_drive_cron(dry_run=False, limit=1, upload=True)
+    assert exit_code == 0
+    mock_instance.delete_video.assert_called_once_with("drive_vid_777")
+

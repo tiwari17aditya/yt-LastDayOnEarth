@@ -48,7 +48,7 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 - **Interface**: `BaseIngestionClient`
   - `list_pending_videos() -> List[RemoteFile]`
   - `download_video(file_id: str, dest_path: Path) -> Path`
-  - `delete_video(file_id: str) -> None`
+  - `delete_video(file_id: str) -> None` *(Strict Safety Guard: called only after verified confirmation of YouTube publishing)*
   - `mark_as_processed(file_id: str) -> None`
   - `cleanup_processed_folder() -> int`
   - `cleanup_old_output_videos(retention_days: int = 7) -> int`
@@ -80,7 +80,7 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 - **Responsibility**: Formulate engaging, SEO-optimized front-loaded titles, descriptions with chapter markers & ~50 dynamic trending hashtags, dynamic video tags, automated custom HD thumbnail generation, direct Public upload via YouTube Data API v3, and dedicated playlist management.
 - **Components**:
   - `YouTubeClient`: Handles OAuth upload, thumbnail upload, playlist management, and video assignment.
-  - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations and persistent series episode tracking.
+  - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`) to ensure consecutive numbering across ephemeral CI/CD environments.
   - `DynamicTagGenerator` (`src/publisher/metadata_generator.py`): Dynamically analyzes gameplay events and titles to synthesize ~50 trending hashtags via Gemini AI or multi-cluster contextual algorithmic selection with seeded rotation.
 - **Interface**: `BasePublisher`
   - `generate_metadata(video_title: str, events: List[GameplayEvent], ...) -> VideoPublishMetadata`

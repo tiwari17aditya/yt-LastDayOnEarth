@@ -9,7 +9,7 @@ from typing import Optional
 
 from src.config import get_settings
 from src.logging_config import get_logger
-from src.exceptions import PipelineError, IngestionError
+from src.exceptions import PipelineError, IngestionError, PublishingError
 
 def calculate_file_md5(file_path: Path) -> str:
     """Calculates MD5 hash for a local file to ensure reliable duplicate detection."""
@@ -31,6 +31,13 @@ from src.storage.history_tracker import HistoryTracker
 from src.ingestion.drive_client import GoogleDriveClient
 
 logger = get_logger(component="PipelineOrchestrator")
+
+
+class RenderResult(type(Path())):
+    """Path subclass returned by run_pipeline carrying YouTube upload verification details."""
+    youtube_url: str = ""
+    uploaded_to_youtube: bool = False
+    video_id: str = ""
 
 
 def get_notifier(settings):
@@ -55,7 +62,7 @@ def run_pipeline(
     local_only: bool = True,
     force: bool = False,
     delete_input: Optional[bool] = None,
-) -> Path:
+) -> RenderResult:
     """Executes the complete video processing workflow for a single video file."""
     settings = get_settings()
     if delete_input is None:
@@ -77,6 +84,7 @@ def run_pipeline(
         series_prefix=settings.youtube.series_prefix,
         title_style=settings.youtube.title_style,
         episode_numbering=settings.youtube.episode_numbering,
+        sync_youtube=settings.youtube.sync_episode_with_youtube,
     )
     thumbnail_gen = ThumbnailGenerator(output_dir=settings.processing.output_dir)
     publisher = YouTubeClient(
@@ -146,17 +154,19 @@ def run_pipeline(
 
         # Step 5: Custom HD Thumbnail & YouTube Publishing Metadata Generation
         logger.info("Step 5/6: Generating custom HD thumbnail and YouTube publishing metadata")
+        current_ep = title_mgr.get_current_episode()
+        ep_num_for_publishing = current_ep if settings.youtube.episode_numbering else None
+
         thumbnail_path = None
         if settings.processing.generate_thumbnail and output_path.exists():
             thumbnail_path = output_path.with_name(f"{output_path.stem}_thumbnail.jpg")
-            current_ep = title_mgr.get_current_episode()
             try:
                 thumbnail_gen.generate_thumbnail(
                     video_path=output_path,
                     output_path=thumbnail_path,
                     events=events,
                     duration=video_duration,
-                    episode_number=current_ep if settings.youtube.episode_numbering else None,
+                    episode_number=ep_num_for_publishing,
                 )
                 logger.info(f"Custom YouTube thumbnail saved at: {thumbnail_path}")
             except Exception as te:
@@ -168,14 +178,30 @@ def run_pipeline(
             events=events,
             music_track=track_sequence,
             thumbnail_path=thumbnail_path,
+            episode_number=ep_num_for_publishing,
         )
         metadata_json_path = output_path.with_name(f"{output_path.stem}_metadata.json")
         publisher.export_metadata_json(metadata, metadata_json_path)
 
         youtube_url = "N/A (Local execution)"
+        uploaded_to_youtube = False
+        video_id = ""
         if not local_only:
             logger.info("Uploading video to YouTube")
             youtube_url = publisher.upload_video(output_path, metadata)
+            if youtube_url and "youtu" in youtube_url:
+                cleaned = youtube_url.rstrip("/").split("/")[-1].split("?v=")[-1]
+                if cleaned and cleaned not in ("N/A (Local execution)", "mock_ldoe_video"):
+                    video_id = cleaned
+                    uploaded_to_youtube = True
+
+            if not uploaded_to_youtube:
+                raise PublishingError(
+                    operation="upload_video",
+                    root_cause=f"YouTube upload failed to return a verified published video ID (URL: {youtube_url}).",
+                    recovery_action="Verify YouTube credentials, channel verification status, and API quota.",
+                    file_path=str(output_path),
+                )
         else:
             logger.info("Local execution: Output generated in project output/ folder without upload.")
             try:
@@ -185,8 +211,7 @@ def run_pipeline(
 
         # Step 6: History Logging & Notifications
         logger.info("Step 6/6: Recording job execution to history")
-        video_id = ""
-        if youtube_url and "youtu" in youtube_url:
+        if not video_id and youtube_url and "youtu" in youtube_url:
             cleaned = youtube_url.rstrip("/").split("/")[-1].split("?v=")[-1]
             if cleaned and cleaned != "N/A (Local execution)":
                 video_id = cleaned
@@ -234,7 +259,11 @@ def run_pipeline(
                 except Exception as de:
                     logger.warning(f"Could not delete input video {input_video_path}: {de}")
 
-        return output_path
+        result = RenderResult(output_path)
+        result.youtube_url = youtube_url
+        result.uploaded_to_youtube = uploaded_to_youtube
+        result.video_id = video_id
+        return result
 
     except PipelineError as pe:
         logger.error(f"Pipeline error occurred: {pe}", extra_data=pe.to_dict())
@@ -306,12 +335,23 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                 # Run full video pipeline (delete_input=False because temp file cleanup is managed explicitly below)
                 rendered_output = run_pipeline(local_download_path, local_only=not upload, force=force, delete_input=False)
 
-                # IMMEDIATELY delete raw video from Google Drive Input to prevent duplicate processing
-                logger.info(f"Deleting raw video '{file_name}' ({file_id}) from Google Drive Input...")
-                try:
-                    drive_client.delete_video(file_id)
-                except Exception as de:
-                    logger.error(f"Failed to delete video from Drive Input: {de}", extra_data={"file_id": file_id})
+                # STRICT CONFIRMATION: NEVER delete raw video from Google Drive Input until confirmed uploaded to YouTube
+                is_uploaded = upload and getattr(rendered_output, "uploaded_to_youtube", False)
+                if is_uploaded:
+                    logger.info(
+                        f"Video confirmed uploaded to YouTube ({getattr(rendered_output, 'youtube_url', '')}). "
+                        f"Deleting raw video '{file_name}' ({file_id}) from Google Drive Input..."
+                    )
+                    try:
+                        drive_client.delete_video(file_id)
+                        logger.info(f"Confirmed: raw video '{file_name}' ({file_id}) deleted from Google Drive Input after verified YouTube upload.")
+                    except Exception as de:
+                        logger.error(f"Failed to delete video from Drive Input: {de}", extra_data={"file_id": file_id})
+                else:
+                    logger.warning(
+                        f"SAFETY LOCK: Preserving raw video '{file_name}' ({file_id}) in Google Drive Input. "
+                        f"Video will NOT be deleted from Drive Input until successfully uploaded to YouTube (upload={upload}, is_uploaded={is_uploaded})."
+                    )
 
                 # Upload processed video & metadata to Google Drive Output (Year -> Month -> video_ddmmyyyy)
                 try:
@@ -330,7 +370,10 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                     logger.info(f"Cleaned temporary downloaded file: {local_download_path}")
 
             except Exception as pe:
-                logger.error(f"Failed to process video {file_name}: {pe}")
+                logger.error(
+                    f"Failed to process video '{file_name}' ({file_id}): {pe}. "
+                    f"Raw video will NOT be deleted from Google Drive Input."
+                )
                 if local_download_path.exists():
                     local_download_path.unlink()
                 return 1

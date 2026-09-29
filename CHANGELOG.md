@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.4] - 2026-09-29
+
+### Fixed & Enhanced
+- **Continuous YouTube Episode Numbering Maintenance**:
+  - Implemented dynamic live episode synchronization in [TitleManager](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/title_manager.py) (`sync_with_youtube`), automatically discovering the highest published series episode number (`#N`) on the YouTube playlist/channel uploads upon initialization or publishing.
+  - Guarantees consecutive episode progression across ephemeral CI/CD runners (e.g. GitHub Actions) without ever resetting or producing duplicate episode numbers.
+  - Added persistence step in [.github/workflows/scheduled_pipeline.yml](file:///d:/youtube-projects/LastDayOnEarth/.github/workflows/scheduled_pipeline.yml) to push updated tracker and history state back to GitHub on scheduled runs.
+  - Synchronized episode numbers between thumbnail generation and video metadata generation in [src/main.py](file:///d:/youtube-projects/LastDayOnEarth/src/main.py).
+
+### Fixed
+- **Corrected Current Video Titles & Descriptions on YouTube**:
+  - Identified and repaired duplicate `#8` title suffixes across published videos on YouTube.
+  - Updated Video 7 (`JMa211Yc4YU`) from `#8` to `#7`.
+  - Maintained Video 8 (`Wf50vxO0NHs`) as `#8`.
+  - Updated Video 9 (`VP7g6-VqNY4`) from `#8` to `#9`.
+  - Updated Video 10 (`eYny9FafrjI`) from `#8` to `#10`.
+  - Updated matching description episode headers (`In Episode #N`) on YouTube.
+  - Verified `data/series_tracker.json` reflects all 10 episodes and targets `#11` for the next video.
+
+## [1.3.3] - 2026-09-28
+
+### Fixed & Enhanced
+- **Strict YouTube Upload Confirmation Before Drive Input Deletion**:
+  - Implemented an immutable safety lock in [src/main.py](file:///d:/youtube-projects/LastDayOnEarth/src/main.py) guaranteeing that videos in Google Drive (`Input/`) are NEVER deleted unless YouTube upload has completed and returned a verified published video ID (`uploaded_to_youtube=True`).
+  - Prohibited deletion when running in local or dry-run modes (`upload=False` or `--no-upload`), preserving raw recordings in Drive Input.
+  - Eliminated mock/silent upload fallback when OAuth credentials are unset in [src/publisher/youtube_client.py](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/youtube_client.py), raising `PublishingError` instead of returning mock video URLs to prevent accidental deletion of un-uploaded files.
+  - Added unit test suite in `tests/test_cron_mode.py` verifying preservation of input video on upload disabled, pipeline crashes, and unconfirmed uploads.
+
 ## [1.3.2] - 2026-09-28
 
 ### Changed

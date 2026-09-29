@@ -288,9 +288,12 @@ class YouTubeClient(BasePublisher):
                 ]
             )
             if not creds:
-                logger.warning("No YouTube OAuth credentials configured; simulating upload (mock URL).")
-                mock_id = "mock_ldoe_video"
-                return f"https://youtu.be/{mock_id}"
+                raise PublishingError(
+                    operation="upload_video",
+                    root_cause="Missing YouTube OAuth credentials. Set GCP_CLIENT_ID, GCP_CLIENT_SECRET, and GCP_REFRESH_TOKEN (or GDRIVE_REFRESH_TOKEN).",
+                    recovery_action="Configure YouTube OAuth credentials in .env before initiating YouTube upload.",
+                    file_path=str(video_path),
+                )
 
             youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
 

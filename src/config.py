@@ -68,6 +68,9 @@ class YouTubeSettings(BaseModel):
     series_tracker_file: Path = Field(
         default_factory=lambda: Path(os.getenv("SERIES_TRACKER_FILE", "data/series_tracker.json"))
     )
+    sync_episode_with_youtube: bool = Field(
+        default_factory=lambda: os.getenv("SYNC_EPISODE_WITH_YOUTUBE", "true").lower() == "true"
+    )
     upload_thumbnail: bool = Field(
         default_factory=lambda: os.getenv("UPLOAD_CUSTOM_THUMBNAIL", "true").lower() == "true"
     )
