@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns='http://www.w3.org/2005/Atom' xmlns:apps='http://schemas.google.com/apps/2006'>
+	<title>Mail Filters</title>
+	<id>tag:mail.google.com,2008:filters:</id>
+	<updated>2026-09-29T04:00:00Z</updated>
+	<author>
+		<name>Gmail</name>
+		<email>no-reply@gmail.com</email>
+	</author>
+	<entry>
+		<category term='filter'></category>
+		<title>Mail Filter</title>
+		<id>tag:mail.google.com,2008:filter:1727581000</id>
+		<updated>2026-09-29T04:00:00Z</updated>
+		<content></content>
+		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
+		<apps:property name='label' value='lastDayOnEarth-yt'/>
+		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldNeverSpam' value='true'/>
+	</entry>
+	<entry>
+		<category term='filter'></category>
+		<title>Mail Filter</title>
+		<id>tag:mail.google.com,2008:filter:1727581001</id>
+		<updated>2026-09-29T04:00:00Z</updated>
+		<content></content>
+		<apps:property name='subject' value='[SUCCESS] OR &quot;Published to YouTube&quot;'/>
+		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
+		<apps:property name='label' value='lastDayOnEarth-yt/Success'/>
+		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldNeverSpam' value='true'/>
+	</entry>
+	<entry>
+		<category term='filter'></category>
+		<title>Mail Filter</title>
+		<id>tag:mail.google.com,2008:filter:1727581002</id>
+		<updated>2026-09-29T04:00:00Z</updated>
+		<content></content>
+		<apps:property name='subject' value='&quot;Weekly Report&quot; OR &quot;[WEEKLY REPORT]&quot;'/>
+		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
+		<apps:property name='label' value='lastDayOnEarth-yt/Weekly Reports'/>
+		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldNeverSpam' value='true'/>
+	</entry>
+	<entry>
+		<category term='filter'></category>
+		<title>Mail Filter</title>
+		<id>tag:mail.google.com,2008:filter:1727581003</id>
+		<updated>2026-09-29T04:00:00Z</updated>
+		<content></content>
+		<apps:property name='subject' value='&quot;Monthly Report&quot; OR &quot;[MONTHLY REPORT]&quot;'/>
+		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
+		<apps:property name='label' value='lastDayOnEarth-yt/Monthly Reports'/>
+		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldNeverSpam' value='true'/>
+	</entry>
+	<entry>
+		<category term='filter'></category>
+		<title>Mail Filter</title>
+		<id>tag:mail.google.com,2008:filter:1727581004</id>
+		<updated>2026-09-29T04:00:00Z</updated>
+		<content></content>
+		<apps:property name='subject' value='[ALERT] OR [FAILED] OR &quot;Pipeline Failed&quot;'/>
+		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
+		<apps:property name='label' value='lastDayOnEarth-yt/Alerts'/>
+		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldNeverSpam' value='true'/>
+		<apps:property name='shouldAlwaysMarkAsImportant' value='true'/>
+	</entry>
+</feed>

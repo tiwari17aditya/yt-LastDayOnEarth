@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.5] - 2026-09-29
+
+### Added
+- **Gmail Automation & Mail Segregation Rules**:
+  - Added [config/gmail_filters.xml](file:///d:/youtube-projects/LastDayOnEarth/config/gmail_filters.xml) import template to automatically route emails into a hierarchical folder tree under parent label `lastDayOnEarth-yt` (`Success`, `Weekly Reports`, `Monthly Reports`, `Alerts`).
+  - Configured filters to automatically skip the Inbox (`shouldArchive=true`) and bypass spam (`shouldNeverSpam=true`).
+  - Added [scripts/setup_gmail_rules.py](file:///d:/youtube-projects/LastDayOnEarth/scripts/setup_gmail_rules.py) for programmatic Gmail API filter and label configuration.
+
 ## [1.3.4] - 2026-09-29
 
 ### Fixed & Enhanced
