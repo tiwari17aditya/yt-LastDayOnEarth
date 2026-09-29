@@ -97,10 +97,37 @@ python -m src.main drive-cron --dry-run
 python -m src.main drive-cron --limit 1
 
 # Process a specific local video directly (with optional --delete-input or --keep-input)
+# Process a specific local video directly (with optional --delete-input or --keep-input)
 python -m src.main process --input "sample_gameplay.mp4" --local [--delete-input | --keep-input] [--force]
 
 # Automatically sync Google Cloud credentials to GitHub Actions repository secrets
 python scripts/sync_github_secrets.py
+```
+
+### Production CLI Tools & Operations
+
+```bash
+# Playlist Management (Audit, Chronological Sorting #1 -> #N, and Deduplication)
+python scripts/manage_playlist.py --audit
+python scripts/manage_playlist.py --sort
+python scripts/manage_playlist.py --dedup
+
+# Vertical YouTube Shorts (9:16) Auto-Clipper
+python scripts/generate_short.py --video data/output/gameplay.mp4 --start 45.0 --duration 35.0 --episode 12
+
+# Cinematic Outro End-Screen Video Generator (1080p)
+python scripts/generate_endscreen.py --duration 12.0 --output data/endscreens/outro_slate.mp4
+
+# Channel Growth & Retention Performance Digest
+python scripts/generate_channel_digest.py
+python scripts/generate_channel_digest.py --email
+
+# Creator Engagement First Comments Manager
+python scripts/post_engagement_comments.py --video-id <ID> --episode <NUM>
+python scripts/post_engagement_comments.py --all-episodes
+
+# High-CTR Cinematic Grunge Thumbnail Engine
+python scripts/generate_thumbnail.py --episode 13 --upload --video-id <ID>
 ```
 
 ### GitHub Actions Automation
