@@ -100,5 +100,35 @@
       "subtitles_burned": true,
       "privacy_redacted": true
     }
+  },
+  {
+    "job_id": "job_20260929_115700",
+    "timestamp": "2026-09-29T11:57:00.933023+00:00",
+    "input_filename": "ScreenRecording_09-29-2026 14-30-46_1.mp4",
+    "output_filename": "ScreenRecording_09-29-2026_14-30-46_1_Processed_29092026.mp4",
+    "status": "SUCCESS",
+    "video_id": "E_6ayR0DyHs",
+    "youtube_url": "https://youtu.be/E_6ayR0DyHs",
+    "details": {
+      "video_id": "E_6ayR0DyHs",
+      "youtube_url": "https://youtu.be/E_6ayR0DyHs",
+      "video_output": "output/ScreenRecording_09-29-2026_14-30-46_1_Processed_29092026.mp4",
+      "metadata_output": "output/ScreenRecording_09-29-2026_14-30-46_1_Processed_29092026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_09-29-2026_14-30-46_1_Processed_29092026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #11",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #11",
+        "walkthrough": "Surviving Day 11: Workbench & Blueprints And Crafting Planks & Upgrades Plus Entering Home... #11"
+      },
+      "duration_seconds": 583.017506,
+      "soundtrack_tracks": [
+        "Wallpaper",
+        "Fretless",
+        "Fresh Air"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "13c93909933698703b2431bf6c28fed8"
+    }
   }
 ]

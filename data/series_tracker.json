@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 11,
+  "current_episode": 12,
   "completed_episodes": [
     {
       "episode": 1,
@@ -61,6 +61,13 @@
       "title": "Workshop & Smelting + Entering Home Base! | LDoE Survival #10",
       "video_id": "eYny9FafrjI",
       "youtube_url": "https://youtu.be/eYny9FafrjI"
+    },
+    {
+      "episode": 11,
+      "title": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #11",
+      "video_id": "E_6ayR0DyHs",
+      "youtube_url": "https://youtu.be/E_6ayR0DyHs",
+      "job_id": "E_6ayR0DyHs"
     }
   ]
 }
