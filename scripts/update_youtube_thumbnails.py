@@ -30,6 +30,7 @@ VIDEO_THUMBNAIL_MAP = [
     {"video_id": "VP7g6-VqNY4", "episode": 9, "title": "Base Storage Optimization + Inventory & Resource Sorting! | LDoE Survival #9"},
     {"video_id": "eYny9FafrjI", "episode": 10, "title": "Workshop & Smelting + Entering Home Base! | LDoE Survival #10"},
     {"video_id": "E_6ayR0DyHs", "episode": 11, "title": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #11"},
+    {"video_id": "wV_epRelsEg", "episode": 12, "title": "Entering Home Base & Home Base Operations! | LDoE Survival #12"},
 ]
 
 

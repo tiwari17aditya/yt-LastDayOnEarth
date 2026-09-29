@@ -218,6 +218,8 @@ class ThumbnailGenerator:
         episode_number: Optional[int] = None,
         badge_text: Optional[str] = None,
         branding_style: str = "grunge",
+        timestamp: Optional[float] = None,
+        hook_text: Optional[str] = None,
     ) -> Path:
         """Full orchestration: checks pre-generated episode art, or extracts 16:9 focus frame and applies branding."""
         import shutil
