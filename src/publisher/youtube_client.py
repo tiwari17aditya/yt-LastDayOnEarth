@@ -51,6 +51,7 @@ class BasePublisher(ABC):
 
 
 from src.publisher.metadata_generator import DynamicTagGenerator
+from src.publisher.playlist_manager import PlaylistManager
 
 
 class YouTubeClient(BasePublisher):
@@ -71,6 +72,7 @@ class YouTubeClient(BasePublisher):
         self.privacy_status = privacy_status
         self.playlist_title = playlist_title
         self.title_manager = title_manager or TitleManager()
+        self.playlist_manager = PlaylistManager(series_playlist_title=self.playlist_title)
         self.tag_generator = DynamicTagGenerator(
             gemini_api_key=gemini_api_key,
             gemini_model=gemini_model,
@@ -281,39 +283,15 @@ class YouTubeClient(BasePublisher):
         youtube: Any,
         video_id: str,
         playlist_id: str,
+        episode_number: Optional[int] = None,
     ) -> bool:
-        """Adds a video to a YouTube playlist if not already present."""
-        try:
-            # Check items in playlist to avoid duplicates
-            req = youtube.playlistItems().list(
-                part="snippet",
-                playlistId=playlist_id,
-                maxResults=50,
-            )
-            while req:
-                resp = req.execute()
-                for item in resp.get("items", []):
-                    if item.get("snippet", {}).get("resourceId", {}).get("videoId") == video_id:
-                        logger.info(f"Video {video_id} is already in playlist {playlist_id}")
-                        return True
-                req = youtube.playlistItems().list_next(req, resp)
-
-            body = {
-                "snippet": {
-                    "playlistId": playlist_id,
-                    "resourceId": {
-                        "kind": "youtube#video",
-                        "videoId": video_id,
-                    },
-                }
-            }
-            youtube.playlistItems().insert(part="snippet", body=body).execute()
-            logger.info(f"Video {video_id} added to YouTube playlist {playlist_id} successfully")
-            return True
-
-        except Exception as e:
-            logger.warning(f"Could not add video {video_id} to playlist {playlist_id}: {e}")
-            return False
+        """Adds a video to a YouTube playlist sequentially preserving chronological order."""
+        return self.playlist_manager.add_video_sequentially(
+            youtube=youtube,
+            video_id=video_id,
+            playlist_id=playlist_id,
+            episode_number=episode_number,
+        )
 
     def post_engagement_comment(
         self,
@@ -536,7 +514,12 @@ class YouTubeClient(BasePublisher):
                     privacy_status=metadata.privacy_status,
                 )
                 if playlist_id:
-                    self.add_video_to_playlist(youtube, video_id=video_id, playlist_id=playlist_id)
+                    self.add_video_to_playlist(
+                        youtube=youtube,
+                        video_id=video_id,
+                        playlist_id=playlist_id,
+                        episode_number=metadata.episode_number,
+                    )
             except Exception as pe:
                 logger.warning(f"Playlist auto-assignment skipped: {pe}")
 

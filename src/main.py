@@ -9,7 +9,17 @@ from typing import Optional
 
 from src.config import get_settings
 from src.logging_config import get_logger
-from src.exceptions import PipelineError, IngestionError, PublishingError
+from src.exceptions import (
+    PipelineError,
+    ConfigurationError,
+    IngestionError,
+    PrivacyRedactionError,
+    SubtitleGenerationError,
+    AudioProcessingError,
+    VideoProcessingError,
+    PublishingError,
+    NotificationError,
+)
 
 def calculate_file_md5(file_path: Path) -> str:
     """Calculates MD5 hash for a local file to ensure reliable duplicate detection."""
@@ -111,46 +121,112 @@ def run_pipeline(
 
     try:
         # Step 1: Privacy Protection (Redacting sensitive popups, preserving username & chat)
-        logger.info("Step 1/6: Scanning for sensitive personal data")
-        bboxes = privacy_guard.scan_video(input_video_path)
-        blur_filter = privacy_guard.generate_ffmpeg_blur_filter(bboxes)
-        logger.info(f"Generated privacy filter: {blur_filter}")
+        blur_filter = None
+        try:
+            logger.info("Step 1/6: Scanning for sensitive personal data")
+            bboxes = privacy_guard.scan_video(input_video_path)
+            blur_filter = privacy_guard.generate_ffmpeg_blur_filter(bboxes)
+            logger.info(f"Generated privacy filter: {blur_filter}")
+        except Exception as pe:
+            logger.warning(
+                f"Privacy scan degraded: {pe}. Proceeding without frame blur.",
+                extra_data={
+                    "operation": "privacy_scan",
+                    "component": "PrivacyDetector",
+                    "file": str(input_video_path),
+                    "root_cause": str(pe),
+                    "recovery_action": "Check easyocr dependencies; continuing execution without redaction.",
+                    "status": "DEGRADED",
+                },
+            )
+            blur_filter = None
 
         # Step 2: Gameplay Context & Subtitle Generation (Sleek 1-sec action cues)
-        logger.info("Step 2/6: Analyzing gameplay events and generating styled action cues")
-        events = subtitle_engine.analyze_events(input_video_path)
-        settings.processing.temp_dir.mkdir(parents=True, exist_ok=True)
-        sub_path = settings.processing.temp_dir / f"{input_video_path.stem}.ass"
-        subtitle_engine.generate_subtitles(events, sub_path)
-        logger.info(f"Subtitles generated at: {sub_path}")
+        sub_path = None
+        events = []
+        try:
+            logger.info("Step 2/6: Analyzing gameplay events and generating styled action cues")
+            events = subtitle_engine.analyze_events(input_video_path)
+            settings.processing.temp_dir.mkdir(parents=True, exist_ok=True)
+            sub_path = settings.processing.temp_dir / f"{input_video_path.stem}.ass"
+            subtitle_engine.generate_subtitles(events, sub_path)
+            logger.info(f"Subtitles generated at: {sub_path}")
+        except Exception as se:
+            logger.warning(
+                f"Subtitle generation degraded: {se}. Using fallback event markers.",
+                extra_data={
+                    "operation": "subtitle_generation",
+                    "component": "SubtitleEngine",
+                    "file": str(input_video_path),
+                    "root_cause": str(se),
+                    "recovery_action": "Check Gemini API quota or network connection. Using default events.",
+                    "status": "DEGRADED",
+                },
+            )
+            from src.subtitles.event_analyzer import GameplayEvent
+            events = [
+                GameplayEvent(0.0, 5.0, "nav", "Entering Wasteland Base"),
+                GameplayEvent(30.0, 35.0, "craft", "Workshop & Inventory Management"),
+                GameplayEvent(90.0, 95.0, "defense", "Perimeter Defense & Survival Run"),
+            ]
+            sub_path = None
 
         # Step 3: Soothing Royalty-Free Music Looping (Random tracks until video ends)
-        logger.info("Step 3/6: Generating randomized soothing royalty-free background audio loop")
         video_duration = processor.get_video_duration(input_video_path)
-        stitched_audio_path = settings.processing.temp_dir / f"{input_video_path.stem}_bgm_loop.m4a"
-        music_file, track_sequence = audio_mixer.create_random_loop_sequence(
-            target_duration=video_duration,
-            output_path=stitched_audio_path,
-        )
-        logger.info(
-            f"Sequenced {len(track_sequence)} random soothing tracks covering {video_duration:.1f}s loop",
-            extra_data={"track_titles": [t["title"] for t in track_sequence]},
-        )
+        music_file = None
+        track_sequence = []
+        try:
+            logger.info("Step 3/6: Generating randomized soothing royalty-free background audio loop")
+            stitched_audio_path = settings.processing.temp_dir / f"{input_video_path.stem}_bgm_loop.m4a"
+            music_file, track_sequence = audio_mixer.create_random_loop_sequence(
+                target_duration=video_duration,
+                output_path=stitched_audio_path,
+            )
+            logger.info(
+                f"Sequenced {len(track_sequence)} random soothing tracks covering {video_duration:.1f}s loop",
+                extra_data={"track_titles": [t["title"] for t in track_sequence]},
+            )
+        except Exception as ae:
+            logger.warning(
+                f"Audio loop synthesis failed: {ae}. Falling back to default ambient track.",
+                extra_data={
+                    "operation": "audio_loop_sequence",
+                    "component": "AudioMixer",
+                    "file": str(input_video_path),
+                    "root_cause": str(ae),
+                    "recovery_action": "Check config/music_library.json and audio directory. Falling back to default track.",
+                    "status": "DEGRADED",
+                },
+            )
+            default_ambient = Path("config/audio/wasteland_horizon.mp3")
+            if default_ambient.exists():
+                music_file = default_ambient
+                track_sequence = [{"title": "Wasteland Horizon", "attribution_text": "Original CC0 Ambient Theme"}]
 
         # Step 4: Video Composite Rendering via FFmpeg
         logger.info("Step 4/6: Executing FFmpeg composite video render")
         output_path = processor.get_output_path(input_video_path.name)
         logger.info(f"Target processed video: {output_path}")
 
-        processor.render(
-            input_video=input_video_path,
-            output_video=output_path,
-            subtitle_file=sub_path,
-            music_file=music_file,
-            privacy_filter=blur_filter,
-            ducking_db=settings.processing.audio_ducking_db,
-            preset=settings.processing.video_preset,
-        )
+        try:
+            processor.render(
+                input_video=input_video_path,
+                output_video=output_path,
+                subtitle_file=sub_path,
+                music_file=music_file,
+                privacy_filter=blur_filter,
+                ducking_db=settings.processing.audio_ducking_db,
+                preset=settings.processing.video_preset,
+            )
+        except Exception as ve:
+            raise VideoProcessingError(
+                operation="composite_render",
+                root_cause=str(ve),
+                recovery_action="Check FFmpeg filters, codecs, input video corruption, and disk space.",
+                file_path=str(input_video_path),
+                status="FAILED",
+                details={"sub_path": str(sub_path), "music_file": str(music_file)},
+            )
 
         # Step 5: Custom HD Thumbnail & YouTube Publishing Metadata Generation
         logger.info("Step 5/6: Generating custom HD thumbnail and YouTube publishing metadata")
@@ -170,44 +246,84 @@ def run_pipeline(
                 )
                 logger.info(f"Custom YouTube thumbnail saved at: {thumbnail_path}")
             except Exception as te:
-                logger.warning(f"Could not generate custom thumbnail: {te}")
+                logger.warning(
+                    f"Could not generate custom thumbnail: {te}. Proceeding without custom thumbnail.",
+                    extra_data={
+                        "operation": "generate_thumbnail",
+                        "component": "ThumbnailGenerator",
+                        "file": str(thumbnail_path),
+                        "root_cause": str(te),
+                        "recovery_action": "Check Pillow font dependencies or pre-rendered thumbnail assets.",
+                        "status": "DEGRADED",
+                    },
+                )
                 thumbnail_path = None
 
-        metadata = publisher.generate_metadata(
-            video_title=input_video_path.stem,
-            events=events,
-            music_track=track_sequence,
-            thumbnail_path=thumbnail_path,
-            episode_number=ep_num_for_publishing,
-        )
-        metadata_json_path = output_path.with_name(f"{output_path.stem}_metadata.json")
-        publisher.export_metadata_json(metadata, metadata_json_path)
+        try:
+            metadata = publisher.generate_metadata(
+                video_title=input_video_path.stem,
+                events=events,
+                music_track=track_sequence,
+                thumbnail_path=thumbnail_path,
+                episode_number=ep_num_for_publishing,
+            )
+            metadata_json_path = output_path.with_name(f"{output_path.stem}_metadata.json")
+            publisher.export_metadata_json(metadata, metadata_json_path)
+        except Exception as me:
+            raise PublishingError(
+                operation="generate_metadata",
+                root_cause=str(me),
+                recovery_action="Review title templates and Gemini API configuration.",
+                file_path=str(output_path),
+                status="FAILED",
+            )
 
         youtube_url = "N/A (Local execution)"
         uploaded_to_youtube = False
         video_id = ""
         if not local_only:
-            logger.info("Uploading video to YouTube")
-            youtube_url = publisher.upload_video(output_path, metadata)
-            if youtube_url and "youtu" in youtube_url:
-                cleaned = youtube_url.rstrip("/").split("/")[-1].split("?v=")[-1]
-                if cleaned and cleaned not in ("N/A (Local execution)", "mock_ldoe_video"):
-                    video_id = cleaned
-                    uploaded_to_youtube = True
+            try:
+                logger.info("Uploading video to YouTube")
+                youtube_url = publisher.upload_video(output_path, metadata)
+                if youtube_url and "youtu" in youtube_url:
+                    cleaned = youtube_url.rstrip("/").split("/")[-1].split("?v=")[-1]
+                    if cleaned and cleaned not in ("N/A (Local execution)", "mock_ldoe_video"):
+                        video_id = cleaned
+                        uploaded_to_youtube = True
 
-            if not uploaded_to_youtube:
+                if not uploaded_to_youtube:
+                    raise PublishingError(
+                        operation="upload_video",
+                        root_cause=f"YouTube upload failed to return a verified published video ID (URL: {youtube_url}).",
+                        recovery_action="Verify YouTube credentials, channel verification status, and API quota.",
+                        file_path=str(output_path),
+                        status="FAILED",
+                    )
+            except Exception as ue:
+                if isinstance(ue, PublishingError):
+                    raise ue
                 raise PublishingError(
                     operation="upload_video",
-                    root_cause=f"YouTube upload failed to return a verified published video ID (URL: {youtube_url}).",
-                    recovery_action="Verify YouTube credentials, channel verification status, and API quota.",
+                    root_cause=str(ue),
+                    recovery_action="Check YouTube API quota, channel status, or re-run scripts/setup_google_auth.py.",
                     file_path=str(output_path),
+                    status="FAILED",
                 )
         else:
             logger.info("Local execution: Output generated in project output/ folder without upload.")
             try:
                 title_mgr.advance_episode(title=metadata.title, job_id="local_execution")
             except Exception as se:
-                logger.warning(f"Could not advance episode counter in local mode: {se}")
+                logger.warning(
+                    f"Could not advance episode counter in local mode: {se}",
+                    extra_data={
+                        "operation": "advance_episode",
+                        "component": "TitleManager",
+                        "root_cause": str(se),
+                        "recovery_action": "Check series_tracker.json permissions.",
+                        "status": "DEGRADED",
+                    },
+                )
 
         # Step 6: History Logging & Notifications
         logger.info("Step 6/6: Recording job execution to history")
@@ -216,37 +332,61 @@ def run_pipeline(
             if cleaned and cleaned != "N/A (Local execution)":
                 video_id = cleaned
 
-        tracker.record_job(
-            job_id=f"job_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-            input_filename=input_video_path.name,
-            output_filename=output_path.name,
-            status="SUCCESS",
-            youtube_url=youtube_url,
-            video_id=video_id,
-            md5_checksum=file_md5,
-            details={
-                "video_id": video_id,
-                "youtube_url": youtube_url,
-                "video_output": str(output_path),
-                "metadata_output": str(metadata_json_path),
-                "thumbnail_output": str(thumbnail_path) if thumbnail_path else None,
-                "title_candidates": metadata.title_candidates,
-                "duration_seconds": video_duration,
-                "soundtrack_tracks": [t["title"] for t in track_sequence],
-                "subtitles_burned": True,
-                "privacy_redacted": True,
-            },
-        )
+        try:
+            tracker.record_job(
+                job_id=f"job_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                input_filename=input_video_path.name,
+                output_filename=output_path.name,
+                status="SUCCESS",
+                youtube_url=youtube_url,
+                video_id=video_id,
+                md5_checksum=file_md5,
+                details={
+                    "video_id": video_id,
+                    "youtube_url": youtube_url,
+                    "video_output": str(output_path),
+                    "metadata_output": str(metadata_json_path),
+                    "thumbnail_output": str(thumbnail_path) if thumbnail_path else None,
+                    "title_candidates": metadata.title_candidates,
+                    "duration_seconds": video_duration,
+                    "soundtrack_tracks": [t["title"] for t in track_sequence],
+                    "subtitles_burned": sub_path is not None,
+                    "privacy_redacted": blur_filter is not None,
+                },
+            )
+        except Exception as he:
+            logger.warning(
+                f"Failed to record job to history tracker: {he}",
+                extra_data={
+                    "operation": "record_job",
+                    "component": "HistoryTracker",
+                    "root_cause": str(he),
+                    "recovery_action": "Inspect history file permissions.",
+                    "status": "DEGRADED",
+                },
+            )
 
-        notifier.send_video_published_notification(
-            video_title=metadata.title,
-            youtube_url=youtube_url,
-            processing_date=datetime.now().strftime("%d/%m/%Y"),
-            details={
-                "duration_seconds": video_duration,
-                "soundtrack_tracks": [t["title"] for t in track_sequence],
-            },
-        )
+        try:
+            notifier.send_video_published_notification(
+                video_title=metadata.title,
+                youtube_url=youtube_url,
+                processing_date=datetime.now().strftime("%d/%m/%Y"),
+                details={
+                    "duration_seconds": video_duration,
+                    "soundtrack_tracks": [t["title"] for t in track_sequence],
+                },
+            )
+        except Exception as ne:
+            logger.warning(
+                f"Failed to send email notification: {ne}",
+                extra_data={
+                    "operation": "send_notification",
+                    "component": "Notifier",
+                    "root_cause": str(ne),
+                    "recovery_action": "Check recipient list or Gmail credentials.",
+                    "status": "DEGRADED",
+                },
+            )
 
         logger.info("Workflow execution completed successfully!")
 
@@ -257,7 +397,17 @@ def run_pipeline(
                     input_video_path.unlink()
                     logger.info(f"Successfully deleted processed input video: {input_video_path}")
                 except Exception as de:
-                    logger.warning(f"Could not delete input video {input_video_path}: {de}")
+                    logger.warning(
+                        f"Could not delete input video {input_video_path}: {de}",
+                        extra_data={
+                            "operation": "delete_input_video",
+                            "component": "PipelineOrchestrator",
+                            "file": str(input_video_path),
+                            "root_cause": str(de),
+                            "recovery_action": "Check file system permissions.",
+                            "status": "DEGRADED",
+                        },
+                    )
 
         result = RenderResult(output_path)
         result.youtube_url = youtube_url
@@ -370,10 +520,24 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                     logger.info(f"Cleaned temporary downloaded file: {local_download_path}")
 
             except Exception as pe:
+                err_dict = pe.to_dict() if isinstance(pe, PipelineError) else {
+                    "operation": "process_drive_video",
+                    "component": "CronRunner",
+                    "file_path": str(local_download_path),
+                    "root_cause": str(pe),
+                    "recovery_action": "Investigate runner logs. Raw video is safely preserved in Drive Input.",
+                    "status": "FAILED",
+                }
                 logger.error(
                     f"Failed to process video '{file_name}' ({file_id}): {pe}. "
-                    f"Raw video will NOT be deleted from Google Drive Input."
+                    f"Raw video will NOT be deleted from Google Drive Input.",
+                    extra_data=err_dict,
                 )
+                try:
+                    notifier.send_failure_notification(video_title=file_name, error_details=err_dict)
+                except Exception as n_err:
+                    logger.warning(f"Could not dispatch failure notification: {n_err}")
+
                 if local_download_path.exists():
                     local_download_path.unlink()
                 return 1

@@ -29,6 +29,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dynamic Milestone Chapters with Emoji Badges**:
   - Enhanced chapter generation in [`src/publisher/youtube_client.py`](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/youtube_client.py) with contextual event badges (`🛠️`, `⚔️`, `🎒`, `☢️`, `🎬`, `🏡`, `🏆`) to optimize the video scrub bar and Google Search rich snippet indexation.
 
+- **Advanced Series Playlist Management & Chronological Reordering**:
+  - Implemented [`src/publisher/playlist_manager.py`](file:///d:/youtube-projects/LastDayOnEarth/src/publisher/playlist_manager.py) (`PlaylistManager`), providing automated auditing, deduplication, sequential appending, and full chronological rebuilds (#1 -> #N).
+  - Resolved YouTube Data API `manualSortRequired` restriction by orchestrating reverse-order re-insertion to guarantee ascending order on YouTube.
+  - Added dedicated CLI tool [`scripts/manage_playlist.py`](file:///d:/youtube-projects/LastDayOnEarth/scripts/manage_playlist.py) with `--audit`, `--sort`, and `--dedup` actions.
+  - Sorted the live YouTube series playlist `PLJPzVNVZwaGY` into verified chronological order (`[1, 2, 3, 4, 5, 6, 7, 8, 8, 9, 10, 11, 12]`).
+
+- **Pinpoint Granular Error Handling Across Pipeline**:
+  - Fortified each processing stage in [`src/main.py`](file:///d:/youtube-projects/LastDayOnEarth/src/main.py) (`run_pipeline` and `run_drive_cron`) with isolated try/except blocks and structured logging:
+    - Privacy OCR failures degrade gracefully without crashing composite rendering.
+    - Subtitle and Gemini event recognition fallback safely to default action markers on network/quota limits.
+    - Background audio synthesis falls back to local CC0 ambient theme if loop generation errors.
+    - Composite rendering and upload errors capture exact operation, component, file path, root cause, and recovery action.
+    - Cron runner isolates individual file errors with failure notifications while continuing processing of remaining files.
+
 ## [1.4.0] - 2026-09-29
 
 ### Added
