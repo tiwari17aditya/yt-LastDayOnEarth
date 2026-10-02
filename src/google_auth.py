@@ -56,11 +56,9 @@ def get_google_credentials(
             creds.refresh(Request())
             return creds
         except Exception as e:
-            logger.error(f"Failed to refresh OAuth token: {e}")
-            raise IngestionError(
-                operation="auth_refresh",
-                root_cause=str(e),
-                recovery_action="Verify GCP_CLIENT_ID, GCP_CLIENT_SECRET, and GCP_REFRESH_TOKEN in .env or secrets.",
+            logger.warning(
+                f"Direct OAuth2 Refresh Token failed ({e}). Checking local token file and service account fallbacks...",
+                extra_data={"error": str(e)},
             )
 
     # 2. Check local token file (config/token.json)

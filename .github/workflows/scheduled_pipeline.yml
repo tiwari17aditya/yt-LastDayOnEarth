@@ -1,9 +1,9 @@
 name: Scheduled Last Day on Earth Video Pipeline
 
 on:
-  # Run 8 times daily at every 3-hour interval
+  # Run automatically every 30 minutes
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '*/30 * * * *'
 
   # Allow manual trigger anytime via GitHub UI
   workflow_dispatch:
@@ -53,9 +53,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Ensure Soothing Music Library is Present
+      - name: Ensure CC0 Soundtrack Library is Present
         run: |
-          python scripts/download_soothing_tracks.py
+          python -c "from pathlib import Path; files = list(Path('config/audio').glob('*.mp3')); assert len(files) >= 5, f'Found {len(files)} files'" || python scripts/generate_safe_ambient_theme.py
 
       - name: Run Pipeline Scheduled Task
         env:

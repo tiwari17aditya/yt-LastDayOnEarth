@@ -228,6 +228,8 @@ def test_cleanup_old_output_videos(mock_drive_service):
     # Call 6: scan output_folder_id root
     old_time = (datetime.now(timezone.utc) - timedelta(days=10)).isoformat().replace("+00:00", "Z")
     new_time = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat().replace("+00:00", "Z")
+    old_name = f"video_{(datetime.now(timezone.utc) - timedelta(days=10)).strftime('%d%m%Y')}.mp4"
+    new_name = f"video_{(datetime.now(timezone.utc) - timedelta(days=2)).strftime('%d%m%Y')}.mp4"
 
     mock_drive_service.files().list().execute.side_effect = [
         # _find_single_folder("videos")
@@ -238,8 +240,8 @@ def test_cleanup_old_output_videos(mock_drive_service):
         {"files": [{"id": "month_09", "name": "09"}]},
         # Files in month folder: 1 old, 1 new
         {"files": [
-            {"id": "old_vid_1", "name": "video_10092026.mp4", "mimeType": "video/mp4", "createdTime": old_time},
-            {"id": "new_vid_2", "name": "video_25092026.mp4", "mimeType": "video/mp4", "createdTime": new_time},
+            {"id": "old_vid_1", "name": old_name, "mimeType": "video/mp4", "createdTime": old_time},
+            {"id": "new_vid_2", "name": new_name, "mimeType": "video/mp4", "createdTime": new_time},
         ]},
         # Scan vid_root_id directly
         {"files": []},

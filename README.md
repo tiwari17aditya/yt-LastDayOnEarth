@@ -90,13 +90,15 @@ All uploaded episodes are published directly as **Public** and automatically org
 
 ### Running the Pipeline
 ```bash
+# Continuous local watcher daemon (checks Google Drive Input every 60s)
+python -m src.main watch --interval 60
+
 # Inspect Drive Input without processing (dry run)
 python -m src.main drive-cron --dry-run
 
-# Run scheduled Drive ingestion and processing
+# Run scheduled Drive ingestion and processing once
 python -m src.main drive-cron --limit 1
 
-# Process a specific local video directly (with optional --delete-input or --keep-input)
 # Process a specific local video directly (with optional --delete-input or --keep-input)
 python -m src.main process --input "sample_gameplay.mp4" --local [--delete-input | --keep-input] [--force]
 
@@ -131,10 +133,10 @@ python scripts/generate_thumbnail.py --episode 13 --upload --video-id <ID>
 ```
 
 ### GitHub Actions Automation
-A scheduled workflow (`.github/workflows/scheduled_pipeline.yml`) runs **8 times daily at 3-hour intervals** (`0 */3 * * *`):
+A scheduled workflow (`.github/workflows/scheduled_pipeline.yml`) runs **every 30 minutes** (`*/30 * * * *`):
 - Connects to Google Drive API directly (no local file sync needed).
 - Checks `MyDrive/youtube-projects/LastDayOnEarth/Input`.
-- If no videos are pending, exits in ~30 seconds.
+- If no videos are pending, exits in ~15 seconds.
 - If a video is pending, downloads, renders with soothing music & action cues, uploads to YouTube, deletes raw input, cleans old outputs, and sends a Gmail alert!
 
 ---

@@ -559,6 +559,35 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
         return 1
 
 
+def run_watcher(interval: int = 60, limit: int = 1, upload: bool = True, force: bool = False) -> None:
+    """Continuous polling daemon: watches Google Drive Input folder and triggers automated processing."""
+    import time
+
+    logger.info("=" * 65)
+    logger.info("Starting Last Day on Earth Continuous Background Watcher Daemon")
+    logger.info(f"Polling Interval: {interval}s | Auto-Upload to YouTube: {upload}")
+    logger.info("Press Ctrl+C to terminate the watcher daemon.")
+    logger.info("=" * 65)
+
+    cycle = 1
+    while True:
+        try:
+            logger.info(f"--- Watcher Cycle #{cycle}: Polling Google Drive Input ---")
+            run_drive_cron(dry_run=False, limit=limit, upload=upload, force=force)
+        except KeyboardInterrupt:
+            logger.info("Watcher daemon stopped by user (Ctrl+C). Exiting cleanly.")
+            break
+        except Exception as e:
+            logger.error(f"Watcher cycle #{cycle} encountered error: {e}. Retrying in {interval}s...")
+
+        cycle += 1
+        try:
+            time.sleep(interval)
+        except KeyboardInterrupt:
+            logger.info("Watcher daemon stopped by user during sleep. Exiting cleanly.")
+            break
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Last Day on Earth Automated Video Pipeline")
     subparsers = parser.add_subparsers(dest="command")
@@ -579,6 +608,13 @@ def main() -> None:
     cron_parser.add_argument("--no-upload", action="store_true", help="Do not upload to YouTube")
     cron_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
 
+    # Continuous Watcher Daemon command
+    watch_parser = subparsers.add_parser("watch", help="Run continuous background daemon watching Drive Input")
+    watch_parser.add_argument("--interval", type=int, default=60, help="Polling interval in seconds (default: 60)")
+    watch_parser.add_argument("--limit", type=int, default=1, help="Max videos to process per cycle")
+    watch_parser.add_argument("--no-upload", action="store_true", help="Do not upload to YouTube")
+    watch_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
+
     args = parser.parse_args()
 
     if args.command == "process":
@@ -588,6 +624,9 @@ def main() -> None:
         upload_flag = not args.no_upload
         exit_code = run_drive_cron(dry_run=args.dry_run, limit=args.limit, upload=upload_flag, force=args.force)
         sys.exit(exit_code)
+    elif args.command == "watch":
+        upload_flag = not args.no_upload
+        run_watcher(interval=args.interval, limit=args.limit, upload=upload_flag, force=args.force)
     else:
         parser.print_help()
 

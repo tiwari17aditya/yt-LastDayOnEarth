@@ -60,7 +60,7 @@ downloads/
 *.webm
 *.wav
 *.mp3
-*.aac
+!config/audio/*.mp3
 !config/audio_samples/*.mp3
 
 # Testing & Coverage

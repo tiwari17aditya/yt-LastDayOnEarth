@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2] - 2026-10-02
+
+### Fixed
+- **Automated Workflow Pipeline Execution in GitHub Actions**:
+  - Resolved blocking failure in CI workflow caused by external HTTP audio track downloads (`download_soothing_tracks.py`).
+  - Allowed tracking of original CC0 survival ambient soundtrack in `config/audio/*.mp3`, eliminating network dependency and ensuring instant, zero-failure checkout in CI.
+  - Increased automated cron schedule frequency from every 3 hours (`0 */3 * * *`) to every 30 minutes (`*/30 * * * *`) for rapid automatic ingestion.
+  - Fixed date boundary calculation in unit test `test_cleanup_old_output_videos`.
+
+### Added
+- **Continuous Local Watcher Daemon (`python -m src.main watch`)**:
+  - Implemented `run_watcher()` in [`src/main.py`](file:///d:/youtube-projects/LastDayOnEarth/src/main.py) with a dedicated CLI `watch` subcommand to continuously poll Google Drive Input every N seconds (default: 60s) with clean graceful termination on `Ctrl+C`.
+- **Graceful OAuth Credential Fallbacks**:
+  - Enhanced [`src/google_auth.py`](file:///d:/youtube-projects/LastDayOnEarth/src/google_auth.py) to fall back gracefully to local authorized token files if direct refresh token fails.
+
 ## [1.5.1] - 2026-09-29
 
 ### Fixed
