@@ -17,8 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Continuous Local Watcher Daemon (`python -m src.main watch`)**:
   - Implemented `run_watcher()` in [`src/main.py`](file:///d:/youtube-projects/LastDayOnEarth/src/main.py) with a dedicated CLI `watch` subcommand to continuously poll Google Drive Input every N seconds (default: 60s) with clean graceful termination on `Ctrl+C`.
-- **Graceful OAuth Credential Fallbacks**:
-  - Enhanced [`src/google_auth.py`](file:///d:/youtube-projects/LastDayOnEarth/src/google_auth.py) to fall back gracefully to local authorized token files if direct refresh token fails.
+- **Compliance & Production Google OAuth Publishing**:
+  - Published [`PRIVACY_POLICY.md`](file:///d:/youtube-projects/LastDayOnEarth/PRIVACY_POLICY.md) defining strict personal automation data protection and Limited Use compliance.
+  - Completed Google Cloud Console OAuth consent screen branding configuration, enabling permanent **In production** status with non-expiring refresh tokens.
+  - Automated synchronization of renewed production secrets (`GCP_CLIENT_ID`, `GCP_CLIENT_SECRET`, `GCP_REFRESH_TOKEN`, `NOTIFICATION_RECIPIENTS`) directly to GitHub Actions.
 
 ## [1.5.1] - 2026-09-29
 
