@@ -191,5 +191,36 @@
       "privacy_redacted": true,
       "md5_checksum": "967e098e371a19a68344ed2d057490a5"
     }
+  },
+  {
+    "job_id": "job_20261002_101449",
+    "timestamp": "2026-10-02T10:14:49.218152+00:00",
+    "input_filename": "ScreenRecording_10-01-2026 00-32-36_1.mp4",
+    "output_filename": "ScreenRecording_10-01-2026_00-32-36_1_Processed_02102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "YgWsGxcCP-M",
+    "youtube_url": "https://youtu.be/YgWsGxcCP-M",
+    "details": {
+      "video_id": "YgWsGxcCP-M",
+      "youtube_url": "https://youtu.be/YgWsGxcCP-M",
+      "video_output": "output/ScreenRecording_10-01-2026_00-32-36_1_Processed_02102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-01-2026_00-32-36_1_Processed_02102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-01-2026_00-32-36_1_Processed_02102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #14",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #14",
+        "walkthrough": "Surviving Day 14: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #14"
+      },
+      "duration_seconds": 691.110544,
+      "soundtrack_tracks": [
+        "Workshop Craft",
+        "Survival Night",
+        "Camp Hearth",
+        "Survival Night"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "08862d4a82a99539f67f7ab56c374883"
+    }
   }
 ]
