@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 15,
+  "current_episode": 16,
   "completed_episodes": [
     {
       "episode": 1,
@@ -89,6 +89,13 @@
       "video_id": "YgWsGxcCP-M",
       "youtube_url": "https://youtu.be/YgWsGxcCP-M",
       "job_id": "YgWsGxcCP-M"
+    },
+    {
+      "episode": 15,
+      "title": "Entering Home Base & Blueprint Upgrades! | LDoE Survival #15",
+      "video_id": "KGkGoyhUVwA",
+      "youtube_url": "https://youtu.be/KGkGoyhUVwA",
+      "job_id": "KGkGoyhUVwA"
     }
   ]
 }

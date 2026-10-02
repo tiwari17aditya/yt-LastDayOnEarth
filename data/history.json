@@ -222,5 +222,37 @@
       "privacy_redacted": true,
       "md5_checksum": "08862d4a82a99539f67f7ab56c374883"
     }
+  },
+  {
+    "job_id": "job_20261002_162903",
+    "timestamp": "2026-10-02T16:29:03.403283+00:00",
+    "input_filename": "ScreenRecording_10-01-2026 00-18-43_1.mp4",
+    "output_filename": "ScreenRecording_10-01-2026_00-18-43_1_Processed_02102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "KGkGoyhUVwA",
+    "youtube_url": "https://youtu.be/KGkGoyhUVwA",
+    "details": {
+      "video_id": "KGkGoyhUVwA",
+      "youtube_url": "https://youtu.be/KGkGoyhUVwA",
+      "video_output": "output/ScreenRecording_10-01-2026_00-18-43_1_Processed_02102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-01-2026_00-18-43_1_Processed_02102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-01-2026_00-18-43_1_Processed_02102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Blueprint Upgrades! | LDoE Survival #15",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Workbench & Blueprints Plus Crafting... #15",
+        "walkthrough": "Surviving Day 15: Entering Home Base And Workbench & Blueprints Plus Crafting Planks &... #15"
+      },
+      "duration_seconds": 799.458503,
+      "soundtrack_tracks": [
+        "Workshop Craft",
+        "Forest Forage",
+        "Survival Night",
+        "Forest Forage",
+        "Workshop Craft"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "6594e93c10968c0ee403f313b15acab1"
+    }
   }
 ]
