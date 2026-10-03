@@ -320,5 +320,41 @@
       "privacy_redacted": true,
       "md5_checksum": "58164facfcd0cee6ffc027315acac2c8"
     }
+  },
+  {
+    "job_id": "job_20261003_154449",
+    "timestamp": "2026-10-03T15:44:49.892500+00:00",
+    "input_filename": "ScreenRecording_10-03-2026 18-46-46_1.mp4",
+    "output_filename": "ScreenRecording_10-03-2026_18-46-46_1_Processed_03102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "JzrkHYCYhEE",
+    "youtube_url": "https://youtu.be/JzrkHYCYhEE",
+    "details": {
+      "video_id": "JzrkHYCYhEE",
+      "youtube_url": "https://youtu.be/JzrkHYCYhEE",
+      "video_output": "output/ScreenRecording_10-03-2026_18-46-46_1_Processed_03102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-03-2026_18-46-46_1_Processed_03102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-03-2026_18-46-46_1_Processed_03102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Home Base Operations! | LDoE Survival #18",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Home Base Operations Plus Base... #18",
+        "walkthrough": "Surviving Day 18: Organizing Storage & Chests And Home Base Operations Plus Base Defense &... #18"
+      },
+      "duration_seconds": 1473.406712,
+      "soundtrack_tracks": [
+        "Camp Hearth",
+        "Survival Night",
+        "Workshop Craft",
+        "Camp Hearth",
+        "Forest Forage",
+        "Workshop Craft",
+        "Bunker Descent",
+        "Workshop Craft",
+        "Wasteland Horizon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "838266860b55b282ad515df3ac70da93"
+    }
   }
 ]
