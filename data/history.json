@@ -286,5 +286,39 @@
       "privacy_redacted": true,
       "md5_checksum": "02f790b8ac88b956674ca5c584c34cdb"
     }
+  },
+  {
+    "job_id": "job_20261003_003737",
+    "timestamp": "2026-10-03T00:37:37.460117+00:00",
+    "input_filename": "ScreenRecording_09-30-2026 23-46-35_1.mp4",
+    "output_filename": "ScreenRecording_09-30-2026_23-46-35_1_Processed_03102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "AMyR1xR4fbs",
+    "youtube_url": "https://youtu.be/AMyR1xR4fbs",
+    "details": {
+      "video_id": "AMyR1xR4fbs",
+      "youtube_url": "https://youtu.be/AMyR1xR4fbs",
+      "video_output": "output/ScreenRecording_09-30-2026_23-46-35_1_Processed_03102026.mp4",
+      "metadata_output": "output/ScreenRecording_09-30-2026_23-46-35_1_Processed_03102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_09-30-2026_23-46-35_1_Processed_03102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Entering Home Base! | LDoE Survival #17",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Entering Home Base Plus Entering Home... #17",
+        "walkthrough": "Surviving Day 17: Home Base Operations And Entering Home Base Plus Entering Home Base Part 2 | LDoE"
+      },
+      "duration_seconds": 1226.429252,
+      "soundtrack_tracks": [
+        "Camp Hearth",
+        "Wasteland Horizon",
+        "Bunker Descent",
+        "Survival Night",
+        "Workshop Craft",
+        "Forest Forage",
+        "Bunker Descent"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "58164facfcd0cee6ffc027315acac2c8"
+    }
   }
 ]
