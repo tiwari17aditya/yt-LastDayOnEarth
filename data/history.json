@@ -392,5 +392,44 @@
       "privacy_redacted": true,
       "md5_checksum": "8add65b4a4c52cf54a494fe5b665b907"
     }
+  },
+  {
+    "job_id": "job_20261003_224846",
+    "timestamp": "2026-10-03T22:48:46.509637+00:00",
+    "input_filename": "ScreenRecording_10-02-2026 23-35-00_1.mp4",
+    "output_filename": "ScreenRecording_10-02-2026_23-35-00_1_Processed_03102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "dYQ6wY0AEJ8",
+    "youtube_url": "https://youtu.be/dYQ6wY0AEJ8",
+    "details": {
+      "video_id": "dYQ6wY0AEJ8",
+      "youtube_url": "https://youtu.be/dYQ6wY0AEJ8",
+      "video_output": "output/ScreenRecording_10-02-2026_23-35-00_1_Processed_03102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-02-2026_23-35-00_1_Processed_03102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-02-2026_23-35-00_1_Processed_03102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #20",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #20",
+        "walkthrough": "Surviving Day 20: Workbench & Blueprints And Crafting Planks & Upgrades Plus Organizing... #20"
+      },
+      "duration_seconds": 2150.8622,
+      "soundtrack_tracks": [
+        "Forest Forage",
+        "Wasteland Horizon",
+        "Bunker Descent",
+        "Survival Night",
+        "Camp Hearth",
+        "Bunker Descent",
+        "Camp Hearth",
+        "Forest Forage",
+        "Wasteland Horizon",
+        "Forest Forage",
+        "Camp Hearth",
+        "Workshop Craft"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "2fb0ee3107ef3232ac4a4e6a2d7c62ee"
+    }
   }
 ]
