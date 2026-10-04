@@ -431,5 +431,38 @@
       "privacy_redacted": true,
       "md5_checksum": "2fb0ee3107ef3232ac4a4e6a2d7c62ee"
     }
+  },
+  {
+    "job_id": "job_20261004_204344",
+    "timestamp": "2026-10-04T20:43:44.047781+00:00",
+    "input_filename": "ScreenRecording_10-03-2026 23-39-43_1.mp4",
+    "output_filename": "ScreenRecording_10-03-2026_23-39-43_1_Processed_04102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "Szb8M-TT7vo",
+    "youtube_url": "https://youtu.be/Szb8M-TT7vo",
+    "details": {
+      "video_id": "Szb8M-TT7vo",
+      "youtube_url": "https://youtu.be/Szb8M-TT7vo",
+      "video_output": "output/ScreenRecording_10-03-2026_23-39-43_1_Processed_04102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-03-2026_23-39-43_1_Processed_04102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-03-2026_23-39-43_1_Processed_04102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #21",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Base Defense & Maintenance | LDoE #21",
+        "walkthrough": "Surviving Day 21: Home Base Operations And Base Defense & Maintenance | LDoE"
+      },
+      "duration_seconds": 967.523878,
+      "soundtrack_tracks": [
+        "Forest Forage",
+        "Bunker Descent",
+        "Forest Forage",
+        "Survival Night",
+        "Wasteland Horizon",
+        "Forest Forage"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "98224ef129f0a543df51f7bb548d6794"
+    }
   }
 ]
