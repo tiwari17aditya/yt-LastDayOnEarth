@@ -529,5 +529,41 @@
       "privacy_redacted": true,
       "md5_checksum": "a7139b5ebb574e166d1038cb83ac7cc6"
     }
+  },
+  {
+    "job_id": "job_20261007_231943",
+    "timestamp": "2026-10-07T23:19:43.521371+00:00",
+    "input_filename": "ScreenRecording_10-07-2026 11-51-24_1.mp4",
+    "output_filename": "ScreenRecording_10-07-2026_11-51-24_1_Processed_07102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "h-3JzVUsZG4",
+    "youtube_url": "https://youtu.be/h-3JzVUsZG4",
+    "details": {
+      "video_id": "h-3JzVUsZG4",
+      "youtube_url": "https://youtu.be/h-3JzVUsZG4",
+      "video_output": "output/ScreenRecording_10-07-2026_11-51-24_1_Processed_07102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-07-2026_11-51-24_1_Processed_07102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-07-2026_11-51-24_1_Processed_07102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Entering Home Base! | LDoE Survival #24",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Entering Home Base Plus Organizing... #24",
+        "walkthrough": "Surviving Day 24: Workbench & Blueprints And Entering Home Base Plus Organizing Storage &... #24"
+      },
+      "duration_seconds": 1475.045533,
+      "soundtrack_tracks": [
+        "Workshop Craft",
+        "Wasteland Horizon",
+        "Survival Night",
+        "Workshop Craft",
+        "Bunker Descent",
+        "Wasteland Horizon",
+        "Bunker Descent",
+        "Workshop Craft",
+        "Wasteland Horizon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "dd18127eb811a3e6e6554bf79f03cc16"
+    }
   }
 ]
