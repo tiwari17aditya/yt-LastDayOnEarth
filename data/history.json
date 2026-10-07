@@ -499,5 +499,35 @@
       "privacy_redacted": true,
       "md5_checksum": "409c4f86172058531a5d46d2d0d713db"
     }
+  },
+  {
+    "job_id": "job_20261007_180522",
+    "timestamp": "2026-10-07T18:05:22.231100+00:00",
+    "input_filename": "ScreenRecording_10-07-2026 12-21-01_1.mp4",
+    "output_filename": "ScreenRecording_10-07-2026_12-21-01_1_Processed_07102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "da6_RC8CRY0",
+    "youtube_url": "https://youtu.be/da6_RC8CRY0",
+    "details": {
+      "video_id": "da6_RC8CRY0",
+      "youtube_url": "https://youtu.be/da6_RC8CRY0",
+      "video_output": "output/ScreenRecording_10-07-2026_12-21-01_1_Processed_07102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-07-2026_12-21-01_1_Processed_07102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-07-2026_12-21-01_1_Processed_07102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization + Inventory & Resource Sorting! | LDoE Survival #23",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Inventory & Resource Sorting Plus... #23",
+        "walkthrough": "Surviving Day 23: Organizing Storage & Chests And Inventory & Resource Sorting Plus... #23"
+      },
+      "duration_seconds": 450.811383,
+      "soundtrack_tracks": [
+        "Wasteland Horizon",
+        "Camp Hearth",
+        "Survival Night"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "a7139b5ebb574e166d1038cb83ac7cc6"
+    }
   }
 ]
