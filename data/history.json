@@ -565,5 +565,45 @@
       "privacy_redacted": true,
       "md5_checksum": "dd18127eb811a3e6e6554bf79f03cc16"
     }
+  },
+  {
+    "job_id": "job_20261008_102149",
+    "timestamp": "2026-10-08T10:21:49.128808+00:00",
+    "input_filename": "ScreenRecording_10-08-2026 12-42-32_1.mp4",
+    "output_filename": "ScreenRecording_10-08-2026_12-42-32_1_Processed_08102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "S8K9_0oe-ok",
+    "youtube_url": "https://youtu.be/S8K9_0oe-ok",
+    "details": {
+      "video_id": "S8K9_0oe-ok",
+      "youtube_url": "https://youtu.be/S8K9_0oe-ok",
+      "video_output": "output/ScreenRecording_10-08-2026_12-42-32_1_Processed_08102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-08-2026_12-42-32_1_Processed_08102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-08-2026_12-42-32_1_Processed_08102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Woodcraft & Planks! | LDoE Survival #25",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Crafting Planks & Upgrades Plus... #25",
+        "walkthrough": "Surviving Day 25: Workshop & Smelting Furnaces And Crafting Planks & Upgrades Plus Entering... #25"
+      },
+      "duration_seconds": 2245.971338,
+      "soundtrack_tracks": [
+        "Forest Forage",
+        "Survival Night",
+        "Bunker Descent",
+        "Survival Night",
+        "Wasteland Horizon",
+        "Camp Hearth",
+        "Wasteland Horizon",
+        "Workshop Craft",
+        "Survival Night",
+        "Forest Forage",
+        "Camp Hearth",
+        "Workshop Craft",
+        "Wasteland Horizon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "7ef99f55846b5f43ddc292f9855340b2"
+    }
   }
 ]

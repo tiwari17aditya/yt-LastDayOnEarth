@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 25,
+  "current_episode": 26,
   "completed_episodes": [
     {
       "episode": 1,
@@ -159,6 +159,13 @@
       "video_id": "h-3JzVUsZG4",
       "youtube_url": "https://youtu.be/h-3JzVUsZG4",
       "job_id": "h-3JzVUsZG4"
+    },
+    {
+      "episode": 25,
+      "title": "Workshop & Smelting + Woodcraft & Planks! | LDoE Survival #25",
+      "video_id": "S8K9_0oe-ok",
+      "youtube_url": "https://youtu.be/S8K9_0oe-ok",
+      "job_id": "S8K9_0oe-ok"
     }
   ]
 }
