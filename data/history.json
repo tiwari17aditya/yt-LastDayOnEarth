@@ -605,5 +605,34 @@
       "privacy_redacted": true,
       "md5_checksum": "7ef99f55846b5f43ddc292f9855340b2"
     }
+  },
+  {
+    "job_id": "job_20261009_083153",
+    "timestamp": "2026-10-09T08:31:53.569257+00:00",
+    "input_filename": "ScreenRecording_10-09-2026 12-44-44_1.mp4",
+    "output_filename": "ScreenRecording_10-09-2026_12-44-44_1_Processed_09102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "t0qDpr3p_M4",
+    "youtube_url": "https://youtu.be/t0qDpr3p_M4",
+    "details": {
+      "video_id": "t0qDpr3p_M4",
+      "youtube_url": "https://youtu.be/t0qDpr3p_M4",
+      "video_output": "output/ScreenRecording_10-09-2026_12-44-44_1_Processed_09102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-09-2026_12-44-44_1_Processed_09102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-09-2026_12-44-44_1_Processed_09102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations + Workshop & Smelting! | LDoE Survival #26",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Workshop & Smelting Furnaces Plus... #26",
+        "walkthrough": "Surviving Day 26: Home Base Operations And Workshop & Smelting Furnaces Plus Crafting... #26"
+      },
+      "duration_seconds": 250.871972,
+      "soundtrack_tracks": [
+        "Workshop Craft",
+        "Forest Forage"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "61647e3de6d33f3bf2c5edd7d7b0351c"
+    }
   }
 ]
