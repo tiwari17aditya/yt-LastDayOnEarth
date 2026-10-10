@@ -730,5 +730,39 @@
       "privacy_redacted": true,
       "md5_checksum": "8a7ed6cbd3aa277594607de504f519fa"
     }
+  },
+  {
+    "job_id": "job_20261010_181426",
+    "timestamp": "2026-10-10T18:14:26.984700+00:00",
+    "input_filename": "ScreenRecording_10-09-2026 22-47-30_1.mp4",
+    "output_filename": "ScreenRecording_10-09-2026_22-47-30_1_Processed_10102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "6fLSC4d34tg",
+    "youtube_url": "https://youtu.be/6fLSC4d34tg",
+    "details": {
+      "video_id": "6fLSC4d34tg",
+      "youtube_url": "https://youtu.be/6fLSC4d34tg",
+      "video_output": "output/ScreenRecording_10-09-2026_22-47-30_1_Processed_10102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-09-2026_22-47-30_1_Processed_10102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-09-2026_22-47-30_1_Processed_10102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Entering Home Base! | LDoE Survival #30",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Entering Home Base Plus Organizing... #30",
+        "walkthrough": "Surviving Day 30: Home Base Operations And Entering Home Base Plus Organizing Storage &... #30"
+      },
+      "duration_seconds": 1107.896735,
+      "soundtrack_tracks": [
+        "Survival Night",
+        "Workshop Craft",
+        "Wasteland Horizon",
+        "Bunker Descent",
+        "Camp Hearth",
+        "Workshop Craft",
+        "Bunker Descent"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "80b8bd13048644a532d71c27dce11553"
+    }
   }
 ]
