@@ -670,5 +670,33 @@
       "privacy_redacted": true,
       "md5_checksum": "4bee92b74b6f03ae21e6b69f5a535d30"
     }
+  },
+  {
+    "job_id": "job_20261010_061428",
+    "timestamp": "2026-10-10T06:14:28.850944+00:00",
+    "input_filename": "ScreenRecording_10-09-2026 23-20-37_1.mp4",
+    "output_filename": "ScreenRecording_10-09-2026_23-20-37_1_Processed_10102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "8xxktvZUF2k",
+    "youtube_url": "https://youtu.be/8xxktvZUF2k",
+    "details": {
+      "video_id": "8xxktvZUF2k",
+      "youtube_url": "https://youtu.be/8xxktvZUF2k",
+      "video_output": "output/ScreenRecording_10-09-2026_23-20-37_1_Processed_10102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-09-2026_23-20-37_1_Processed_10102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-09-2026_23-20-37_1_Processed_10102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base + Workshop & Smelting! | LDoE Survival #28",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Workshop & Smelting Furnaces Plus Crafting... #28",
+        "walkthrough": "Surviving Day 28: Entering Home Base And Workshop & Smelting Furnaces Plus Crafting Planks... #28"
+      },
+      "duration_seconds": 63.72474,
+      "soundtrack_tracks": [
+        "Forest Forage"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "dd423edc0bc8ae6a717b1a5ca6fe644f"
+    }
   }
 ]
