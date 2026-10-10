@@ -764,5 +764,35 @@
       "privacy_redacted": true,
       "md5_checksum": "80b8bd13048644a532d71c27dce11553"
     }
+  },
+  {
+    "job_id": "job_20261010_211351",
+    "timestamp": "2026-10-10T21:13:51.575915+00:00",
+    "input_filename": "ScreenRecording_10-10-2026 17-31-14_1.mp4",
+    "output_filename": "ScreenRecording_10-10-2026_17-31-14_1_Processed_10102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "DKKL71MMnbk",
+    "youtube_url": "https://youtu.be/DKKL71MMnbk",
+    "details": {
+      "video_id": "DKKL71MMnbk",
+      "youtube_url": "https://youtu.be/DKKL71MMnbk",
+      "video_output": "output/ScreenRecording_10-10-2026_17-31-14_1_Processed_10102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-10-2026_17-31-14_1_Processed_10102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-10-2026_17-31-14_1_Processed_10102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #31",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #31",
+        "walkthrough": "Surviving Day 31: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #31"
+      },
+      "duration_seconds": 414.600793,
+      "soundtrack_tracks": [
+        "Bunker Descent",
+        "Forest Forage",
+        "Workshop Craft"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "d420ccdb9a5d832f6f422f7bd5082fdd"
+    }
   }
 ]
