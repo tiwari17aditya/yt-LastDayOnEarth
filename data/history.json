@@ -827,5 +827,34 @@
       "privacy_redacted": true,
       "md5_checksum": "55efb4460eb608166487cee3e86feaff"
     }
+  },
+  {
+    "job_id": "job_20261011_132524",
+    "timestamp": "2026-10-11T13:25:24.159521+00:00",
+    "input_filename": "ScreenRecording_10-11-2026 14-54-30_1.mp4",
+    "output_filename": "ScreenRecording_10-11-2026_14-54-30_1_Processed_11102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "ZtX7F34jpIs",
+    "youtube_url": "https://youtu.be/ZtX7F34jpIs",
+    "details": {
+      "video_id": "ZtX7F34jpIs",
+      "youtube_url": "https://youtu.be/ZtX7F34jpIs",
+      "video_output": "output/ScreenRecording_10-11-2026_14-54-30_1_Processed_11102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-11-2026_14-54-30_1_Processed_11102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-11-2026_14-54-30_1_Processed_11102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Base Storage Optimization! | LDoE Survival #33",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Organizing Storage & Chests Plus... #33",
+        "walkthrough": "Surviving Day 33: Workshop & Smelting Furnaces And Organizing Storage & Chests Plus... #33"
+      },
+      "duration_seconds": 310.26966,
+      "soundtrack_tracks": [
+        "Workshop Craft",
+        "Bunker Descent"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "5628e5439929891219e9e859e3cf8b05"
+    }
   }
 ]
