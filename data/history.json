@@ -794,5 +794,38 @@
       "privacy_redacted": true,
       "md5_checksum": "d420ccdb9a5d832f6f422f7bd5082fdd"
     }
+  },
+  {
+    "job_id": "job_20261011_004808",
+    "timestamp": "2026-10-11T00:48:08.406052+00:00",
+    "input_filename": "ScreenRecording_10-10-2026 17-40-22_1.mp4",
+    "output_filename": "ScreenRecording_10-10-2026_17-40-22_1_Processed_11102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "iR-hd2XIx0U",
+    "youtube_url": "https://youtu.be/iR-hd2XIx0U",
+    "details": {
+      "video_id": "iR-hd2XIx0U",
+      "youtube_url": "https://youtu.be/iR-hd2XIx0U",
+      "video_output": "output/ScreenRecording_10-10-2026_17-40-22_1_Processed_11102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-10-2026_17-40-22_1_Processed_11102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-10-2026_17-40-22_1_Processed_11102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Base Storage Optimization! | LDoE Survival #32",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Organizing Storage & Chests Plus Home Base... #32",
+        "walkthrough": "Surviving Day 32: Entering Home Base And Organizing Storage & Chests Plus Home Base... #32"
+      },
+      "duration_seconds": 1076.903742,
+      "soundtrack_tracks": [
+        "Wasteland Horizon",
+        "Forest Forage",
+        "Workshop Craft",
+        "Bunker Descent",
+        "Wasteland Horizon",
+        "Workshop Craft"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "55efb4460eb608166487cee3e86feaff"
+    }
   }
 ]
