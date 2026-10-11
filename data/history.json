@@ -856,5 +856,35 @@
       "privacy_redacted": true,
       "md5_checksum": "5628e5439929891219e9e859e3cf8b05"
     }
+  },
+  {
+    "job_id": "job_20261011_182957",
+    "timestamp": "2026-10-11T18:29:57.288653+00:00",
+    "input_filename": "ScreenRecording_10-11-2026 15-00-42_1.mp4",
+    "output_filename": "ScreenRecording_10-11-2026_15-00-42_1_Processed_11102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "m9cofbmxXTs",
+    "youtube_url": "https://youtu.be/m9cofbmxXTs",
+    "details": {
+      "video_id": "m9cofbmxXTs",
+      "youtube_url": "https://youtu.be/m9cofbmxXTs",
+      "video_output": "output/ScreenRecording_10-11-2026_15-00-42_1_Processed_11102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-11-2026_15-00-42_1_Processed_11102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-11-2026_15-00-42_1_Processed_11102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Home Base Operations! | LDoE Survival #34",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Home Base Operations | LDoE #34",
+        "walkthrough": "Surviving Day 34: Entering Home Base And Home Base Operations | LDoE"
+      },
+      "duration_seconds": 485.489025,
+      "soundtrack_tracks": [
+        "Workshop Craft",
+        "Camp Hearth",
+        "Wasteland Horizon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "ca3edf8468cb5e405c88b9d7179da64f"
+    }
   }
 ]

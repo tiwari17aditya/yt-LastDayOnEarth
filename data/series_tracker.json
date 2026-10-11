@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 34,
+  "current_episode": 35,
   "completed_episodes": [
     {
       "episode": 1,
@@ -222,6 +222,13 @@
       "video_id": "ZtX7F34jpIs",
       "youtube_url": "https://youtu.be/ZtX7F34jpIs",
       "job_id": "ZtX7F34jpIs"
+    },
+    {
+      "episode": 34,
+      "title": "Entering Home Base & Home Base Operations! | LDoE Survival #34",
+      "video_id": "m9cofbmxXTs",
+      "youtube_url": "https://youtu.be/m9cofbmxXTs",
+      "job_id": "m9cofbmxXTs"
     }
   ]
 }
