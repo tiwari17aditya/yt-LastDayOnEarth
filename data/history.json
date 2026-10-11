@@ -886,5 +886,36 @@
       "privacy_redacted": true,
       "md5_checksum": "ca3edf8468cb5e405c88b9d7179da64f"
     }
+  },
+  {
+    "job_id": "job_20261011_223040",
+    "timestamp": "2026-10-11T22:30:40.083400+00:00",
+    "input_filename": "ScreenRecording_10-11-2026 04-29-32_1.mp4",
+    "output_filename": "ScreenRecording_10-11-2026_04-29-32_1_Processed_11102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "iHsJC8FD5g8",
+    "youtube_url": "https://youtu.be/iHsJC8FD5g8",
+    "details": {
+      "video_id": "iHsJC8FD5g8",
+      "youtube_url": "https://youtu.be/iHsJC8FD5g8",
+      "video_output": "output/ScreenRecording_10-11-2026_04-29-32_1_Processed_11102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-11-2026_04-29-32_1_Processed_11102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-11-2026_04-29-32_1_Processed_11102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #35",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #35",
+        "walkthrough": "Surviving Day 35: Workbench & Blueprints And Crafting Planks & Upgrades Plus Entering Home... #35"
+      },
+      "duration_seconds": 713.178435,
+      "soundtrack_tracks": [
+        "Survival Night",
+        "Workshop Craft",
+        "Forest Forage",
+        "Wasteland Horizon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "261de9d12d9ca420f22e0e0d5616c090"
+    }
   }
 ]
