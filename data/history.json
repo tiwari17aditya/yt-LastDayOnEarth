@@ -950,5 +950,42 @@
       "privacy_redacted": true,
       "md5_checksum": "b907b343ef1ad4ff9da93d47c1b64d99"
     }
+  },
+  {
+    "job_id": "job_20261012_090228",
+    "timestamp": "2026-10-12T09:02:28.027457+00:00",
+    "input_filename": "ScreenRecording_10-11-2026 14-25-45_1.mp4",
+    "output_filename": "ScreenRecording_10-11-2026_14-25-45_1_Processed_12102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "HBoSZhKI-68",
+    "youtube_url": "https://youtu.be/HBoSZhKI-68",
+    "details": {
+      "video_id": "HBoSZhKI-68",
+      "youtube_url": "https://youtu.be/HBoSZhKI-68",
+      "video_output": "output/ScreenRecording_10-11-2026_14-25-45_1_Processed_12102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-11-2026_14-25-45_1_Processed_12102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-11-2026_14-25-45_1_Processed_12102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Entering Home Base! | LDoE Survival #37",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Entering Home Base Plus Crafting... #37",
+        "walkthrough": "Surviving Day 37: Workbench & Blueprints And Entering Home Base Plus Crafting Planks &... #37"
+      },
+      "duration_seconds": 1659.213809,
+      "soundtrack_tracks": [
+        "Workshop Craft",
+        "Bunker Descent",
+        "Wasteland Horizon",
+        "Forest Forage",
+        "Survival Night",
+        "Wasteland Horizon",
+        "Forest Forage",
+        "Survival Night",
+        "Workshop Craft",
+        "Forest Forage"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "e523edd3ca6b24c7e1d464d54de4c8f0"
+    }
   }
 ]

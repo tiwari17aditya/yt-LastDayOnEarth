@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 37,
+  "current_episode": 38,
   "completed_episodes": [
     {
       "episode": 1,
@@ -243,6 +243,13 @@
       "video_id": "8mwkddL7Qx4",
       "youtube_url": "https://youtu.be/8mwkddL7Qx4",
       "job_id": "8mwkddL7Qx4"
+    },
+    {
+      "episode": 37,
+      "title": "Blueprint Upgrades & Entering Home Base! | LDoE Survival #37",
+      "video_id": "HBoSZhKI-68",
+      "youtube_url": "https://youtu.be/HBoSZhKI-68",
+      "job_id": "HBoSZhKI-68"
     }
   ]
 }
