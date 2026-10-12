@@ -987,5 +987,38 @@
       "privacy_redacted": true,
       "md5_checksum": "e523edd3ca6b24c7e1d464d54de4c8f0"
     }
+  },
+  {
+    "job_id": "job_20261012_185800",
+    "timestamp": "2026-10-12T18:58:00.541952+00:00",
+    "input_filename": "ScreenRecording_10-11-2026 21-57-24_1.mp4",
+    "output_filename": "ScreenRecording_10-11-2026_21-57-24_1_Processed_12102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "j9_0xif_IS0",
+    "youtube_url": "https://youtu.be/j9_0xif_IS0",
+    "details": {
+      "video_id": "j9_0xif_IS0",
+      "youtube_url": "https://youtu.be/j9_0xif_IS0",
+      "video_output": "output/ScreenRecording_10-11-2026_21-57-24_1_Processed_12102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-11-2026_21-57-24_1_Processed_12102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-11-2026_21-57-24_1_Processed_12102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Blueprint Upgrades! | LDoE Survival #38",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Workbench & Blueprints Plus Workshop &... #38",
+        "walkthrough": "Surviving Day 38: Entering Home Base And Workbench & Blueprints Plus Workshop & Smelting... #38"
+      },
+      "duration_seconds": 914.650839,
+      "soundtrack_tracks": [
+        "Wasteland Horizon",
+        "Survival Night",
+        "Workshop Craft",
+        "Camp Hearth",
+        "Survival Night",
+        "Wasteland Horizon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "bafe88961c6b6d29dcc5da1fd58dc683"
+    }
   }
 ]
