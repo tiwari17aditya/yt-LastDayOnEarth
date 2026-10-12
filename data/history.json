@@ -917,5 +917,38 @@
       "privacy_redacted": true,
       "md5_checksum": "261de9d12d9ca420f22e0e0d5616c090"
     }
+  },
+  {
+    "job_id": "job_20261012_015159",
+    "timestamp": "2026-10-12T01:51:59.286552+00:00",
+    "input_filename": "ScreenRecording_10-11-2026 03-44-34_1.mp4",
+    "output_filename": "ScreenRecording_10-11-2026_03-44-34_1_Processed_12102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "8mwkddL7Qx4",
+    "youtube_url": "https://youtu.be/8mwkddL7Qx4",
+    "details": {
+      "video_id": "8mwkddL7Qx4",
+      "youtube_url": "https://youtu.be/8mwkddL7Qx4",
+      "video_output": "output/ScreenRecording_10-11-2026_03-44-34_1_Processed_12102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-11-2026_03-44-34_1_Processed_12102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-11-2026_03-44-34_1_Processed_12102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Home Base Operations! | LDoE Survival #36",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Home Base Operations Plus Base... #36",
+        "walkthrough": "Surviving Day 36: Workshop & Smelting Furnaces And Home Base Operations Plus Base Defense &... #36"
+      },
+      "duration_seconds": 1035.3483,
+      "soundtrack_tracks": [
+        "Wasteland Horizon",
+        "Workshop Craft",
+        "Survival Night",
+        "Forest Forage",
+        "Camp Hearth",
+        "Wasteland Horizon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "b907b343ef1ad4ff9da93d47c1b64d99"
+    }
   }
 ]
