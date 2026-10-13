@@ -1051,5 +1051,38 @@
       "privacy_redacted": true,
       "md5_checksum": "359138d7a8e05785d689f3da31c96e3f"
     }
+  },
+  {
+    "job_id": "job_20261013_082549",
+    "timestamp": "2026-10-13T08:25:49.761527+00:00",
+    "input_filename": "ScreenRecording_10-12-2026 01-00-53_1.mp4",
+    "output_filename": "ScreenRecording_10-12-2026_01-00-53_1_Processed_13102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "8QMUzXpLZpI",
+    "youtube_url": "https://youtu.be/8QMUzXpLZpI",
+    "details": {
+      "video_id": "8QMUzXpLZpI",
+      "youtube_url": "https://youtu.be/8QMUzXpLZpI",
+      "video_output": "output/ScreenRecording_10-12-2026_01-00-53_1_Processed_13102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-12-2026_01-00-53_1_Processed_13102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-12-2026_01-00-53_1_Processed_13102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #40",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Entering... #40",
+        "walkthrough": "Surviving Day 40: Workbench & Blueprints And Home Base Operations Plus Entering Home Base | LDoE"
+      },
+      "duration_seconds": 915.091247,
+      "soundtrack_tracks": [
+        "Camp Hearth",
+        "Survival Night",
+        "Bunker Descent",
+        "Camp Hearth",
+        "Survival Night",
+        "Wasteland Horizon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "bb22b2eadb9cfa95001d81d032a6bafb"
+    }
   }
 ]
