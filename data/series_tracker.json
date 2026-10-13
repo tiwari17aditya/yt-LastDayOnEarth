@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 42,
+  "current_episode": 43,
   "completed_episodes": [
     {
       "episode": 1,
@@ -278,6 +278,13 @@
       "video_id": "qgJhFNqu3MA",
       "youtube_url": "https://youtu.be/qgJhFNqu3MA",
       "job_id": "qgJhFNqu3MA"
+    },
+    {
+      "episode": 42,
+      "title": "Base Storage Optimization + Inventory & Resource Sorting! | LDoE Survival #42",
+      "video_id": "ZQR3pxK1H60",
+      "youtube_url": "https://youtu.be/ZQR3pxK1H60",
+      "job_id": "ZQR3pxK1H60"
     }
   ]
 }

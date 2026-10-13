@@ -1124,5 +1124,41 @@
       "privacy_redacted": true,
       "md5_checksum": "180dad07300674897ba043938d926fc1"
     }
+  },
+  {
+    "job_id": "job_20261013_220123",
+    "timestamp": "2026-10-13T22:01:23.191002+00:00",
+    "input_filename": "ScreenRecording_10-12-2026 23-50-36_1.mp4",
+    "output_filename": "ScreenRecording_10-12-2026_23-50-36_1_Processed_13102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "ZQR3pxK1H60",
+    "youtube_url": "https://youtu.be/ZQR3pxK1H60",
+    "details": {
+      "video_id": "ZQR3pxK1H60",
+      "youtube_url": "https://youtu.be/ZQR3pxK1H60",
+      "video_output": "output/ScreenRecording_10-12-2026_23-50-36_1_Processed_13102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-12-2026_23-50-36_1_Processed_13102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-12-2026_23-50-36_1_Processed_13102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization + Inventory & Resource Sorting! | LDoE Survival #42",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Inventory & Resource Sorting Plus... #42",
+        "walkthrough": "Surviving Day 42: Organizing Storage & Chests And Inventory & Resource Sorting Plus Home... #42"
+      },
+      "duration_seconds": 1543.904785,
+      "soundtrack_tracks": [
+        "Bunker Descent",
+        "Survival Night",
+        "Wasteland Horizon",
+        "Workshop Craft",
+        "Survival Night",
+        "Workshop Craft",
+        "Wasteland Horizon",
+        "Forest Forage",
+        "Camp Hearth"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "773fe3758dbdfea28cdba7e783c35989"
+    }
   }
 ]
