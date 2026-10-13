@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 41,
+  "current_episode": 42,
   "completed_episodes": [
     {
       "episode": 1,
@@ -271,6 +271,13 @@
       "video_id": "8QMUzXpLZpI",
       "youtube_url": "https://youtu.be/8QMUzXpLZpI",
       "job_id": "8QMUzXpLZpI"
+    },
+    {
+      "episode": 41,
+      "title": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #41",
+      "video_id": "qgJhFNqu3MA",
+      "youtube_url": "https://youtu.be/qgJhFNqu3MA",
+      "job_id": "qgJhFNqu3MA"
     }
   ]
 }
