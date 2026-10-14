@@ -1160,5 +1160,43 @@
       "privacy_redacted": true,
       "md5_checksum": "773fe3758dbdfea28cdba7e783c35989"
     }
+  },
+  {
+    "job_id": "job_20261014_011854",
+    "timestamp": "2026-10-14T01:18:54.970022+00:00",
+    "input_filename": "ScreenRecording_10-12-2026 23-11-31_1.mp4",
+    "output_filename": "ScreenRecording_10-12-2026_23-11-31_1_Processed_14102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "f19_oMxA-QY",
+    "youtube_url": "https://youtu.be/f19_oMxA-QY",
+    "details": {
+      "video_id": "f19_oMxA-QY",
+      "youtube_url": "https://youtu.be/f19_oMxA-QY",
+      "video_output": "output/ScreenRecording_10-12-2026_23-11-31_1_Processed_14102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-12-2026_23-11-31_1_Processed_14102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-12-2026_23-11-31_1_Processed_14102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Entering Home Base! | LDoE Survival #43",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Entering Home Base Plus Entering... #43",
+        "walkthrough": "Surviving Day 43: Organizing Storage & Chests And Entering Home Base Plus Entering Home... #43"
+      },
+      "duration_seconds": 1917.208594,
+      "soundtrack_tracks": [
+        "Forest Forage",
+        "Bunker Descent",
+        "Workshop Craft",
+        "Wasteland Horizon",
+        "Workshop Craft",
+        "Wasteland Horizon",
+        "Workshop Craft",
+        "Camp Hearth",
+        "Wasteland Horizon",
+        "Bunker Descent",
+        "Workshop Craft"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "f31bdbf1551ed32b3f8d487d986f7578"
+    }
   }
 ]
