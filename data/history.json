@@ -1227,5 +1227,40 @@
       "privacy_redacted": true,
       "md5_checksum": "5915c6dcfc550672865f28a7bd615261"
     }
+  },
+  {
+    "job_id": "job_20261014_104815",
+    "timestamp": "2026-10-14T10:48:15.348606+00:00",
+    "input_filename": "ScreenRecording_10-13-2026 13-02-05_1.mp4",
+    "output_filename": "ScreenRecording_10-13-2026_13-02-05_1_Processed_14102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "c8uTpFfD-ew",
+    "youtube_url": "https://youtu.be/c8uTpFfD-ew",
+    "details": {
+      "video_id": "c8uTpFfD-ew",
+      "youtube_url": "https://youtu.be/c8uTpFfD-ew",
+      "video_output": "output/ScreenRecording_10-13-2026_13-02-05_1_Processed_14102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-13-2026_13-02-05_1_Processed_14102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-13-2026_13-02-05_1_Processed_14102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #45",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Base Defense & Maintenance Plus Workshop... #45",
+        "walkthrough": "Surviving Day 45: Home Base Operations And Base Defense & Maintenance Plus Workshop &... #45"
+      },
+      "duration_seconds": 1420.887891,
+      "soundtrack_tracks": [
+        "Wasteland Horizon",
+        "Survival Night",
+        "Bunker Descent",
+        "Workshop Craft",
+        "Bunker Descent",
+        "Camp Hearth",
+        "Workshop Craft",
+        "Survival Night"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "16daa4d5417fe4ff0c2cb851a19841ce"
+    }
   }
 ]
