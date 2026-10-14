@@ -1198,5 +1198,34 @@
       "privacy_redacted": true,
       "md5_checksum": "f31bdbf1551ed32b3f8d487d986f7578"
     }
+  },
+  {
+    "job_id": "job_20261014_052439",
+    "timestamp": "2026-10-14T05:24:39.870432+00:00",
+    "input_filename": "ScreenRecording_10-13-2026 13-29-29_1.mp4",
+    "output_filename": "ScreenRecording_10-13-2026_13-29-29_1_Processed_14102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "HZw-hd4Fj5I",
+    "youtube_url": "https://youtu.be/HZw-hd4Fj5I",
+    "details": {
+      "video_id": "HZw-hd4Fj5I",
+      "youtube_url": "https://youtu.be/HZw-hd4Fj5I",
+      "video_output": "output/ScreenRecording_10-13-2026_13-29-29_1_Processed_14102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-13-2026_13-29-29_1_Processed_14102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-13-2026_13-29-29_1_Processed_14102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Blueprint Upgrades! | LDoE Survival #44",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Workbench & Blueprints Plus... #44",
+        "walkthrough": "Surviving Day 44: Organizing Storage & Chests And Workbench & Blueprints Plus Crafting... #44"
+      },
+      "duration_seconds": 323.081701,
+      "soundtrack_tracks": [
+        "Bunker Descent",
+        "Camp Hearth"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "5915c6dcfc550672865f28a7bd615261"
+    }
   }
 ]

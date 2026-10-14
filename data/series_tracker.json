@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 44,
+  "current_episode": 45,
   "completed_episodes": [
     {
       "episode": 1,
@@ -292,6 +292,13 @@
       "video_id": "f19_oMxA-QY",
       "youtube_url": "https://youtu.be/f19_oMxA-QY",
       "job_id": "f19_oMxA-QY"
+    },
+    {
+      "episode": 44,
+      "title": "Base Storage Optimization & Blueprint Upgrades! | LDoE Survival #44",
+      "video_id": "HZw-hd4Fj5I",
+      "youtube_url": "https://youtu.be/HZw-hd4Fj5I",
+      "job_id": "HZw-hd4Fj5I"
     }
   ]
 }
