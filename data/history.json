@@ -1262,5 +1262,36 @@
       "privacy_redacted": true,
       "md5_checksum": "16daa4d5417fe4ff0c2cb851a19841ce"
     }
+  },
+  {
+    "job_id": "job_20261022_221922",
+    "timestamp": "2026-10-22T22:19:22.647301+00:00",
+    "input_filename": "ScreenRecording_10-22-2026 23-58-27_1.mp4",
+    "output_filename": "ScreenRecording_10-22-2026_23-58-27_1_Processed_22102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "v01NH7z-wtE",
+    "youtube_url": "https://youtu.be/v01NH7z-wtE",
+    "details": {
+      "video_id": "v01NH7z-wtE",
+      "youtube_url": "https://youtu.be/v01NH7z-wtE",
+      "video_output": "output/ScreenRecording_10-22-2026_23-58-27_1_Processed_22102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-22-2026_23-58-27_1_Processed_22102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-22-2026_23-58-27_1_Processed_22102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #46",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Base Defense & Maintenance Plus Entering... #46",
+        "walkthrough": "Surviving Day 46: Home Base Operations And Base Defense & Maintenance Plus Entering Home Base | LDoE"
+      },
+      "duration_seconds": 581.802449,
+      "soundtrack_tracks": [
+        "Forest Forage",
+        "Camp Hearth",
+        "Bunker Descent",
+        "Forest Forage"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "67fa78effa2ff134398a2eb90564533c"
+    }
   }
 ]
