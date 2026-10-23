@@ -1328,5 +1328,38 @@
       "privacy_redacted": true,
       "md5_checksum": "99364a4e6895c9e9bcff92b6b9cd6dc8"
     }
+  },
+  {
+    "job_id": "job_20261023_112111",
+    "timestamp": "2026-10-23T11:21:11.014813+00:00",
+    "input_filename": "ScreenRecording_10-23-2026 14-37-01_1.mp4",
+    "output_filename": "ScreenRecording_10-23-2026_14-37-01_1_Processed_23102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "SQaSHYvFuSg",
+    "youtube_url": "https://youtu.be/SQaSHYvFuSg",
+    "details": {
+      "video_id": "SQaSHYvFuSg",
+      "youtube_url": "https://youtu.be/SQaSHYvFuSg",
+      "video_output": "output/ScreenRecording_10-23-2026_14-37-01_1_Processed_23102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-23-2026_14-37-01_1_Processed_23102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-23-2026_14-37-01_1_Processed_23102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Blueprint Upgrades! | LDoE Survival #48",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Workbench & Blueprints Plus Entering... #48",
+        "walkthrough": "Surviving Day 48: Home Base Operations And Workbench & Blueprints Plus Entering Home Base | LDoE"
+      },
+      "duration_seconds": 944.995056,
+      "soundtrack_tracks": [
+        "Camp Hearth",
+        "Bunker Descent",
+        "Forest Forage",
+        "Camp Hearth",
+        "Bunker Descent",
+        "Camp Hearth"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "413ba795d0d5aca3517c2783dc52beef"
+    }
   }
 ]
