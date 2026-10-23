@@ -7,11 +7,26 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from src.logging_config import get_logger
-from src.exceptions import PublishingError
+from src.exceptions import PublishingError, QuotaExceededError
 
 from src.publisher.title_manager import TitleManager, TitlePackage
 
 logger = get_logger(component="YouTubePublisher")
+
+
+def is_quota_exceeded_error(e: Exception) -> bool:
+    """Checks whether an exception indicates YouTube API daily quota exhaustion."""
+    err_str = str(e).lower()
+    quota_keywords = [
+        "quotaexceeded",
+        "dailylimitexceeded",
+        "ratelimitexceeded",
+        "userratelimitexceeded",
+        "quota limit reached",
+        "exceeded your quota",
+        "quota exceeded",
+    ]
+    return any(k in err_str for k in quota_keywords)
 
 
 @dataclass
@@ -151,37 +166,7 @@ class YouTubeClient(BasePublisher):
             date_str=date_str,
         )
 
-        # Build Music Attribution & Copyright Fair Use Clearances block (100% CC0 / Content-ID Safe)
-        licensing_lines = [
-            "────────────────────────────────────────",
-            "🎵 MUSIC & LICENSING ATTRIBUTION:",
-            "Background music in this video is CC0 Public Domain / Royalty-Free and cleared for YouTube broadcast:",
-        ]
-        if music_track:
-            tracks_list = music_track if isinstance(music_track, list) else [music_track]
-            seen_attributions = set()
-            for t in tracks_list:
-                if isinstance(t, dict):
-                    attr = t.get("attribution_text") or f"Music: '{t.get('title', 'Survival Ambient')}' (CC0 Public Domain - No Copyright)"
-                    if attr not in seen_attributions:
-                        seen_attributions.add(attr)
-                        licensing_lines.append(f"• {attr}")
-                elif isinstance(t, str):
-                    licensing_lines.append(f"• Music: '{t}' (CC0 Public Domain - No Copyright)")
-        else:
-            licensing_lines.append("• Original Ambient Soundtrack (CC0 Public Domain - Content ID Immune)")
-
-        licensing_lines.extend([
-            "https://creativecommons.org/publicdomain/zero/1.0/",
-            "",
-            "⚖️ COPYRIGHT & FAIR USE DISCLAIMER:",
-            "Last Day on Earth: Survival is developed and published by Kefir Games.",
-            "All gameplay footage, graphics, and in-game audio belong to Kefir Games.",
-            "This video is transformative gameplay walkthrough and commentary created for entertainment and guide purposes protected under Fair Use (Section 107 of the US Copyright Act 1976).",
-        ])
-
         description_lines.extend(formatted_chapters)
-        description_lines.extend(licensing_lines)
         description_lines.extend([
             "────────────────────────────────────────",
             "",
@@ -475,25 +460,31 @@ class YouTubeClient(BasePublisher):
             youtube_url = f"https://youtu.be/{video_id}"
             logger.info(f"Video uploaded successfully to YouTube: {youtube_url}")
 
-            # Upload custom thumbnail if generated
+            # Upload custom thumbnail if generated (Strict Compliance)
             if metadata.thumbnail_path and Path(metadata.thumbnail_path).exists():
-                try:
-                    logger.info(f"Setting custom thumbnail for video {video_id}: {metadata.thumbnail_path}")
-                    thumb_media = MediaFileUpload(
-                        str(metadata.thumbnail_path),
-                        mimetype="image/jpeg",
-                        resumable=False,
-                    )
-                    youtube.thumbnails().set(
-                        videoId=video_id,
-                        media_body=thumb_media,
-                    ).execute()
-                    logger.info(f"Custom thumbnail uploaded successfully for video {video_id}")
-                except Exception as te:
-                    logger.warning(
-                        f"Could not set custom thumbnail on YouTube (requires phone-verified channel or quota): {te}",
-                        extra_data={"thumbnail_path": metadata.thumbnail_path},
-                    )
+                thumb_uploaded = False
+                for attempt in range(1, 3):
+                    try:
+                        logger.info(f"Setting custom thumbnail for video {video_id} (Attempt {attempt}): {metadata.thumbnail_path}")
+                        thumb_media = MediaFileUpload(
+                            str(metadata.thumbnail_path),
+                            mimetype="image/jpeg",
+                            resumable=False,
+                        )
+                        youtube.thumbnails().set(
+                            videoId=video_id,
+                            media_body=thumb_media,
+                        ).execute()
+                        logger.info(f"Custom thumbnail uploaded successfully for video {video_id}")
+                        thumb_uploaded = True
+                        break
+                    except Exception as te:
+                        logger.warning(
+                            f"Thumbnail upload attempt {attempt} failed for video {video_id}: {te}",
+                            extra_data={"thumbnail_path": metadata.thumbnail_path, "attempt": attempt},
+                        )
+                if not thumb_uploaded:
+                    logger.error(f"STRICT COMPLIANCE WARNING: Could not set custom thumbnail for video {video_id}")
 
             # Advance series episode tracker upon successful publish
             try:
@@ -506,7 +497,7 @@ class YouTubeClient(BasePublisher):
             except Exception as se:
                 logger.warning(f"Could not advance episode counter in series tracker: {se}")
 
-            # Automatically ensure dedicated playlist exists and add video to it
+            # Automatically ensure dedicated playlist exists and strictly add video to it
             playlist_id = None
             try:
                 playlist_id = self.get_or_create_playlist(
@@ -514,14 +505,26 @@ class YouTubeClient(BasePublisher):
                     privacy_status=metadata.privacy_status,
                 )
                 if playlist_id:
-                    self.add_video_to_playlist(
+                    added_to_pl = self.add_video_to_playlist(
                         youtube=youtube,
                         video_id=video_id,
                         playlist_id=playlist_id,
                         episode_number=metadata.episode_number,
                     )
+                    if not added_to_pl:
+                        logger.warning(f"Initial playlist addition returned False. Retrying for video {video_id}...")
+                        added_to_pl = self.add_video_to_playlist(
+                            youtube=youtube,
+                            video_id=video_id,
+                            playlist_id=playlist_id,
+                            episode_number=metadata.episode_number,
+                        )
+                    if added_to_pl:
+                        logger.info(f"Confirmed: Video {video_id} is included in playlist {playlist_id}")
+                    else:
+                        logger.error(f"STRICT COMPLIANCE ALERT: Video {video_id} could not be confirmed in playlist {playlist_id}")
             except Exception as pe:
-                logger.warning(f"Playlist auto-assignment skipped: {pe}")
+                logger.error(f"STRICT COMPLIANCE ALERT: Playlist auto-assignment encountered error: {pe}")
 
             # Post automated creator first comment with playlist link & discussion prompt
             try:
@@ -539,9 +542,38 @@ class YouTubeClient(BasePublisher):
 
         except Exception as e:
             logger.error(f"Failed to upload video to YouTube: {e}")
+            if is_quota_exceeded_error(e):
+                raise QuotaExceededError(
+                    operation="youtube_upload",
+                    root_cause=str(e),
+                    recovery_action="Wait for daily YouTube Data API quota to reset at midnight PST (07:00 UTC).",
+                    file_path=str(video_path),
+                )
             raise PublishingError(
                 operation="youtube_upload",
                 root_cause=str(e),
                 recovery_action="Check YouTube API quota, channel status, or re-run scripts/setup_google_auth.py.",
                 file_path=str(video_path),
             )
+
+    def check_quota_available(self) -> bool:
+        """Pre-flight check: calls lightweight channels.list (costs only 1 quota unit).
+
+        Returns True if quota is available, False if quota is exceeded.
+        """
+        try:
+            youtube = self.get_service()
+            if not youtube:
+                return True
+            youtube.channels().list(mine=True, part="id").execute()
+            return True
+        except Exception as e:
+            if is_quota_exceeded_error(e):
+                logger.warning(
+                    "YouTube API daily quota is currently exhausted (pre-flight check). "
+                    "Skipping video processing until quota resets."
+                )
+                return False
+            # For non-quota errors (e.g. mock or transient network), don't block
+            return True
+

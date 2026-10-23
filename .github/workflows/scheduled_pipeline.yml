@@ -22,7 +22,10 @@ on:
         description: 'Maximum videos to process in this run'
         required: false
         type: number
-        default: 1
+  # Prevent concurrent execution: jobs never overlap, and in-progress processing is strictly preserved
+concurrency:
+  group: ldoe-video-processing-pipeline
+  cancel-in-progress: false
 
 jobs:
   check-and-process:

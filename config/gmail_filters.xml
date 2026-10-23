@@ -15,7 +15,7 @@
 		<content></content>
 		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
 		<apps:property name='label' value='lastDayOnEarth-yt'/>
-		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldArchive' value='false'/>
 		<apps:property name='shouldNeverSpam' value='true'/>
 	</entry>
 	<entry>
@@ -27,7 +27,7 @@
 		<apps:property name='subject' value='[SUCCESS] OR &quot;Published to YouTube&quot;'/>
 		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
 		<apps:property name='label' value='lastDayOnEarth-yt/Success'/>
-		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldArchive' value='false'/>
 		<apps:property name='shouldNeverSpam' value='true'/>
 	</entry>
 	<entry>
@@ -39,7 +39,7 @@
 		<apps:property name='subject' value='&quot;Weekly Report&quot; OR &quot;[WEEKLY REPORT]&quot;'/>
 		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
 		<apps:property name='label' value='lastDayOnEarth-yt/Weekly Reports'/>
-		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldArchive' value='false'/>
 		<apps:property name='shouldNeverSpam' value='true'/>
 	</entry>
 	<entry>
@@ -51,7 +51,7 @@
 		<apps:property name='subject' value='&quot;Monthly Report&quot; OR &quot;[MONTHLY REPORT]&quot;'/>
 		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
 		<apps:property name='label' value='lastDayOnEarth-yt/Monthly Reports'/>
-		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldArchive' value='false'/>
 		<apps:property name='shouldNeverSpam' value='true'/>
 	</entry>
 	<entry>
@@ -63,7 +63,7 @@
 		<apps:property name='subject' value='[ALERT] OR [FAILED] OR &quot;Pipeline Failed&quot;'/>
 		<apps:property name='hasTheWord' value='&quot;Last Day on Earth&quot; OR LastDayOnEarth'/>
 		<apps:property name='label' value='lastDayOnEarth-yt/Alerts'/>
-		<apps:property name='shouldArchive' value='true'/>
+		<apps:property name='shouldArchive' value='false'/>
 		<apps:property name='shouldNeverSpam' value='true'/>
 		<apps:property name='shouldAlwaysMarkAsImportant' value='true'/>
 	</entry>

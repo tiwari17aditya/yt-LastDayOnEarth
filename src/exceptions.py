@@ -235,3 +235,25 @@ class NotificationError(PipelineError):
             status=status,
             details=details,
         )
+
+
+class QuotaExceededError(PublishingError):
+    """Raised specifically when YouTube or Google Cloud API quota has been exhausted."""
+
+    def __init__(
+        self,
+        operation: str = "check_quota_or_publish",
+        root_cause: str = "YouTube Data API daily quota (10,000 units) exhausted.",
+        recovery_action: str = "Wait for daily quota to reset at midnight PST (07:00 UTC). Pending videos are safely held in Drive Input.",
+        file_path: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            operation=operation,
+            root_cause=root_cause,
+            recovery_action=recovery_action,
+            file_path=file_path,
+            status="QUOTA_EXCEEDED",
+            details=details,
+        )
+

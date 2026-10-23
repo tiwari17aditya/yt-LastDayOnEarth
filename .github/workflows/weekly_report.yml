@@ -1,0 +1,79 @@
+name: Weekly Pipeline & Performance Report
+
+on:
+  # Run automatically every Sunday at 09:00 UTC
+  schedule:
+    - cron: '0 9 * * 0'
+
+  # Allow manual trigger anytime via GitHub UI
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Number of past days to aggregate (default: 7)'
+        required: false
+        type: number
+        default: 7
+      email:
+        description: 'Send HTML summary via Email'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  weekly-report:
+    name: Generate & Dispatch Weekly Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate & Email Weekly Report
+        env:
+          GCP_CLIENT_ID: ${{ secrets.GCP_CLIENT_ID }}
+          GCP_CLIENT_SECRET: ${{ secrets.GCP_CLIENT_SECRET }}
+          GCP_REFRESH_TOKEN: ${{ secrets.GCP_REFRESH_TOKEN }}
+          NOTIFICATION_RECIPIENTS: ${{ secrets.NOTIFICATION_RECIPIENTS }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ENVIRONMENT: "production"
+          LOG_LEVEL: "INFO"
+        run: |
+          EXTRA_ARGS="--email"
+          if [ "${{ github.event.inputs.email }}" = "false" ]; then
+            EXTRA_ARGS=""
+          fi
+          DAYS="${{ github.event.inputs.days }}"
+          if [ -z "$DAYS" ]; then
+            DAYS="7"
+          fi
+
+          echo "Generating weekly report for last $DAYS days (email=$EXTRA_ARGS)..."
+          python scripts/generate_weekly_report.py --days $DAYS $EXTRA_ARGS
+
+      - name: Persist Generated Weekly Reports
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add reports/weekly/ reports/analytics/ || true
+          if ! git diff --staged --quiet; then
+            git commit -m "docs: archive weekly pipeline & performance digest [skip ci]"
+            git pull --rebase origin main || true
+            git push origin HEAD || true
+          fi

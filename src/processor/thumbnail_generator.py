@@ -138,16 +138,49 @@ class ThumbnailGenerator:
 
                 # Load fonts with high-impact fallbacks
                 def load_font(names: List[str], size: int) -> ImageFont.ImageFont:
-                    font_dirs = [Path("C:/Windows/Fonts"), Path("/usr/share/fonts")]
-                    for name in names:
-                        for fdir in font_dirs:
-                            fpath = fdir / name
-                            if fpath.exists():
+                    bundled_dirs = [
+                        Path("config/fonts"),
+                        Path(__file__).resolve().parent.parent.parent / "config" / "fonts",
+                        Path("assets/fonts"),
+                    ]
+                    extended_names = list(names)
+                    for linux_alt in [
+                        "DejaVuSans-Bold.ttf",
+                        "LiberationSans-Bold.ttf",
+                        "FreeSansBold.ttf",
+                        "DejaVuSans.ttf",
+                    ]:
+                        if linux_alt not in extended_names:
+                            extended_names.append(linux_alt)
+
+                    for bdir in bundled_dirs:
+                        if bdir.exists():
+                            for name in extended_names:
+                                fpath = bdir / name
+                                if fpath.exists():
+                                    try:
+                                        return ImageFont.truetype(str(fpath), size)
+                                    except Exception:
+                                        pass
+
+                    sys_dirs = [Path("C:/Windows/Fonts"), Path("/usr/share/fonts"), Path("/usr/local/share/fonts")]
+                    for sdir in sys_dirs:
+                        if sdir.exists():
+                            for name in extended_names:
+                                fpath = sdir / name
+                                if fpath.exists():
+                                    try:
+                                        return ImageFont.truetype(str(fpath), size)
+                                    except Exception:
+                                        pass
                                 try:
-                                    return ImageFont.truetype(str(fpath), size)
+                                    matches = list(sdir.rglob(name))
+                                    if matches:
+                                        return ImageFont.truetype(str(matches[0]), size)
                                 except Exception:
                                     pass
                     return ImageFont.load_default()
+
 
                 font_brand = load_font(["segoeuib.ttf", "arialbd.ttf"], int(height * 0.030))
                 font_ep = load_font(["impact.ttf", "arialbd.ttf"], int(height * 0.052))
@@ -239,9 +272,60 @@ class ThumbnailGenerator:
                     shutil.copy2(curated_file, output_path)
                     return output_path
 
-        # 2. Extract enhanced 16:9 frame from video
-        ts = timestamp if timestamp is not None else self.select_best_timestamp(events=events, duration=duration)
-        self.extract_enhanced_frame(video_path, output_path, ts)
+        # 2. Check for curated thematic scenario template background
+        template_applied = False
+        template_dirs = [
+            Path("data/thumbnails/templates"),
+            Path("assets/thumbnails/templates"),
+            Path(__file__).resolve().parent.parent.parent / "data" / "thumbnails" / "templates",
+        ]
+        chosen_template = None
+        event_text = " ".join([getattr(ev, "description", "") for ev in (events or [])]).lower()
+        
+        for tdir in template_dirs:
+            if not tdir.exists():
+                continue
+            if any(k in event_text for k in ["craft", "workbench", "smelt", "furnace", "blueprint", "workshop"]):
+                cand = tdir / "workshop_template.jpg"
+                if cand.exists():
+                    chosen_template = cand
+                    break
+            elif any(k in event_text for k in ["defense", "zombie", "horde", "attack", "kill", "swarm"]):
+                cand = tdir / "defense_template.jpg"
+                if cand.exists():
+                    chosen_template = cand
+                    break
+            elif any(k in event_text for k in ["storage", "chest", "inventory", "sort", "crate", "loot"]):
+                cand = tdir / "storage_template.jpg"
+                if cand.exists():
+                    chosen_template = cand
+                    break
+            elif any(k in event_text for k in ["bunker", "alfa", "bravo", "raid"]):
+                cand = tdir / "bunker_template.jpg"
+                if cand.exists():
+                    chosen_template = cand
+                    break
+            elif any(k in event_text for k in ["chopper", "bike", "highway"]):
+                cand = tdir / "chopper_template.jpg"
+                if cand.exists():
+                    chosen_template = cand
+                    break
+            else:
+                cand = tdir / "base_template.jpg"
+                if cand.exists():
+                    chosen_template = cand
+                    break
+
+        if chosen_template and chosen_template.exists():
+            logger.info(f"Applying thematic scenario background template: {chosen_template.name}")
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(chosen_template, output_path)
+            template_applied = True
+        else:
+            # Fallback to extracting enhanced 16:9 focus frame from video
+            ts = timestamp if timestamp is not None else self.select_best_timestamp(events=events, duration=duration)
+            self.extract_enhanced_frame(video_path, output_path, ts)
+
 
         # 3. Apply branding overlay
         label = badge_text

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-10-23
+
+### Changed
+- **20-Track Royalty-Free Gaming Music Catalog**:
+  - Downloaded curated 20-track open-source, royalty-free gaming/survival soundtrack library to `config/audio/`.
+  - Updated `config/music_library.json` with metadata, licensing, and mood mappings for all 20 tracks.
+  - Updated `src/main.py` default fallback track to `decisions.mp3`.
+
+### Removed
+- **Test Suite & Cache Cleanup**:
+  - Removed legacy test files from `tests/` and scratch scripts to prepare for a fresh test suite.
+  - Cleared `.pytest_cache/`, `.pytest_temp/`, and compiled Python bytecode caches.
+
 ## [1.5.2] - 2026-10-02
 
 ### Fixed

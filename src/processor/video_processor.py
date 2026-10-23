@@ -51,7 +51,7 @@ class VideoProcessor:
             str(video_path),
         ]
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            res = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=30)
             return float(res.stdout.strip())
         except Exception as e:
             logger.warning("Could not probe video duration, defaulting to 180.0s", extra_data={"error": str(e)})
@@ -68,7 +68,7 @@ class VideoProcessor:
         preset: str = "veryfast",
     ) -> List[str]:
         """Assembles robust FFmpeg command for composite rendering."""
-        cmd = ["ffmpeg", "-y", "-i", str(input_video)]
+        cmd = ["ffmpeg", "-y", "-nostdin", "-i", str(input_video)]
 
         has_music = music_file is not None and Path(music_file).exists()
         if has_music:
@@ -149,6 +149,7 @@ class VideoProcessor:
                 capture_output=True,
                 text=True,
                 check=False,
+                stdin=subprocess.DEVNULL,
             )
             if result.returncode != 0:
                 raise VideoProcessingError(
@@ -156,6 +157,13 @@ class VideoProcessor:
                     root_cause=f"FFmpeg failed with exit code {result.returncode}: {result.stderr[-400:]}",
                     recovery_action="Check FFmpeg filters and input stream codecs.",
                     file_path=str(input_video),
+                )
+            if not output_video.exists() or output_video.stat().st_size == 0:
+                raise VideoProcessingError(
+                    operation="render",
+                    root_cause="FFmpeg completed but output video file is missing or 0 bytes.",
+                    recovery_action="Check disk space and FFmpeg encoder settings.",
+                    file_path=str(output_video),
                 )
             logger.info("FFmpeg video rendering completed successfully", extra_data={"output": str(output_video)})
             return output_video

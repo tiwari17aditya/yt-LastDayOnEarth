@@ -83,8 +83,9 @@ class AudioMixer(BaseAudioMixer):
                 "-of", "default=noprint_wrappers=1:nokey=1",
                 str(file_path),
             ]
-            res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            return round(float(res.stdout.strip()), 2)
+            res = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=30, stdin=subprocess.DEVNULL)
+            val = round(float(res.stdout.strip()), 2)
+            return val if val > 0 else 90.0
         except Exception:
             return 90.0
 
@@ -137,6 +138,9 @@ class AudioMixer(BaseAudioMixer):
                 recovery_action="Ensure tracks exist in config/audio and match library.",
             )
 
+        if target_duration <= 0:
+            target_duration = 30.0
+
         playlist_tracks: List[Dict[str, Any]] = []
         accumulated_duration = 0.0
         last_track_id = None
@@ -150,6 +154,8 @@ class AudioMixer(BaseAudioMixer):
             track_info = dict(chosen)
             track_info["start_time"] = round(accumulated_duration, 2)
             duration = float(chosen.get("duration", 30.0))
+            if duration <= 0:
+                duration = 30.0
             accumulated_duration += duration
             track_info["end_time"] = round(accumulated_duration, 2)
             playlist_tracks.append(track_info)
@@ -163,25 +169,40 @@ class AudioMixer(BaseAudioMixer):
             lines.append(f"file '{posix_path}'")
         concat_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-        # Concatenate audio using FFmpeg
-        cmd = [
-            "ffmpeg",
-            "-y",
-            "-f", "concat",
-            "-safe", "0",
-            "-i", str(concat_file),
-            "-c:a", "aac",
-            "-b:a", "192k",
-            str(output_path),
-        ]
-        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        if result.returncode != 0:
-            raise AudioProcessingError(
-                operation="create_random_loop_sequence",
-                root_cause=f"FFmpeg audio concat failed: {result.stderr[-300:]}",
-                recovery_action="Check audio file formats and concat file paths.",
-                file_path=str(concat_file),
-            )
+        try:
+            # Concatenate audio using FFmpeg
+            cmd = [
+                "ffmpeg",
+                "-y",
+                "-nostdin",
+                "-f", "concat",
+                "-safe", "0",
+                "-i", str(concat_file),
+                "-c:a", "aac",
+                "-b:a", "192k",
+                str(output_path),
+            ]
+            result = subprocess.run(cmd, capture_output=True, text=True, check=False, timeout=300, stdin=subprocess.DEVNULL)
+            if result.returncode != 0:
+                raise AudioProcessingError(
+                    operation="create_random_loop_sequence",
+                    root_cause=f"FFmpeg audio concat failed: {result.stderr[-300:]}",
+                    recovery_action="Check audio file formats and concat file paths.",
+                    file_path=str(concat_file),
+                )
+            if not output_path.exists() or output_path.stat().st_size == 0:
+                raise AudioProcessingError(
+                    operation="create_random_loop_sequence",
+                    root_cause="FFmpeg audio concat completed but output audio file is empty or missing.",
+                    recovery_action="Verify audio inputs and free disk space.",
+                    file_path=str(output_path),
+                )
+        finally:
+            if concat_file.exists():
+                try:
+                    concat_file.unlink()
+                except Exception:
+                    pass
 
         logger.info(
             "Created random background music sequence",

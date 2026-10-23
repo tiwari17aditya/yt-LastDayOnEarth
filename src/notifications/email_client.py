@@ -3,6 +3,7 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from src.logging_config import get_logger
@@ -40,7 +41,7 @@ class EmailNotifier:
             logger.warning("SMTP credentials or recipients not configured; skipping email dispatch.")
             return
 
-        subject = f"[SUCCESS] Published: {video_title}"
+        subject = f"🚀 [SUCCESS] Published: {video_title}"
         body_html = f"""
         <html>
           <body>
@@ -65,7 +66,7 @@ class EmailNotifier:
             logger.warning("SMTP credentials or recipients not configured; skipping email dispatch.")
             return
 
-        subject = f"[FAILED] Pipeline Error: {video_title}"
+        subject = f"⚠️ [ALERT] Pipeline Error: {video_title}"
         body_html = f"""
         <html>
           <body>
@@ -82,15 +83,43 @@ class EmailNotifier:
         """
         self._send_email(subject, body_html)
 
+    def send_digest_email(
+        self,
+        subject: str,
+        html_body: str,
+        recipients: Optional[List[str]] = None,
+    ) -> bool:
+        """Dispatches HTML report via SMTP."""
+        target_recipients = recipients or self.recipients
+        if not target_recipients or not self.user or not self.password:
+            logger.warning("SMTP credentials or recipients not configured; skipping digest email dispatch.")
+            return False
+
+        orig_recipients = self.recipients
+        self.recipients = target_recipients
+        try:
+            self._send_email(subject, html_body)
+            return True
+        except Exception as e:
+            logger.warning(f"Could not dispatch digest email via SMTP: {e}")
+            return False
+        finally:
+            self.recipients = orig_recipients
+
     def _send_email(self, subject: str, html_content: str) -> None:
         try:
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
-            msg["From"] = self.user
+            from_addr = self.user or "pipeline@lastdayonearth.local"
+            msg["From"] = f"Last Day on Earth Pipeline <{from_addr}>"
             msg["To"] = ", ".join(self.recipients)
+            msg["Date"] = formatdate(localtime=True)
+            msg["Message-ID"] = make_msgid()
+            msg["Auto-Submitted"] = "auto-generated"
+            msg["X-Auto-Response-Suppress"] = "All"
             msg.attach(MIMEText(html_content, "html"))
 
-            with smtplib.SMTP(self.host, self.port) as server:
+            with smtplib.SMTP(self.host, self.port, timeout=30) as server:
                 server.starttls()
                 server.login(self.user, self.password)
                 server.sendmail(self.user, self.recipients, msg.as_string())
@@ -102,3 +131,4 @@ class EmailNotifier:
                 root_cause=str(e),
                 recovery_action="Check SMTP host, port, Gmail App Password, and recipient addresses.",
             )
+
