@@ -66,17 +66,12 @@ Fill in the credentials for Google Drive, Gemini API, YouTube OAuth, and SMTP.
 
 ---
 
-## 3. Running Tests
+## 3. Code Quality & Formatting
 
-Run the full test suite with coverage:
+Check code formatting and linting:
 ```bash
-python -m pytest tests/ -v
-```
-
-Run specific test modules:
-```bash
-python -m pytest tests/test_config.py
-python -m pytest tests/test_exceptions.py
+flake8 src/ scripts/
+black --check src/ scripts/
 ```
 
 ---
@@ -85,8 +80,7 @@ python -m pytest tests/test_exceptions.py
 
 Before committing:
 1. Verify `git status` to ensure no sensitive files (`.env`, `credentials.json`, `token.json`) are staged.
-2. Run test suite: `pytest tests/`.
-3. Check code formatting: `black --check src/ tests/`.
+2. Check code formatting: `black --check src/ scripts/`.
 4. Commit using conventional commit format:
    - `feat: add OCR bounding box detection`
    - `fix: correct audio ducking volume levels`

@@ -15,9 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Set `decisions.mp3` as clean fallback in `src/main.py`.
 
 ### Removed
-- **Test Suite & Cache Cleanup**:
-  - Removed legacy test files from `tests/` and scratch scripts to prepare for a fresh test suite.
-  - Cleared `.pytest_cache/`, `.pytest_temp/`, and compiled Python bytecode caches.
+- **Test Suite & Associated Artifacts**:
+  - Removed `tests/` directory, unit test modules, and `pytest.ini`.
+  - Removed `pytest` and `pytest-mock` dependencies from `requirements.txt`.
+  - Cleared `.pytest_cache/` and temporary test render files from `temp/` and `output/`.
+  - Updated `docs/DEVELOPMENT.md` to remove test instructions and emphasize code quality & formatting.
+
+### Fixed
+- **Engagement Comments Script**:
+  - Added missing `json` import in `scripts/post_engagement_comments.py`.
 
 ## [1.5.2] - 2026-10-02
 

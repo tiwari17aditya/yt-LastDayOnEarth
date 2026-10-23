@@ -21,8 +21,6 @@ numpy>=1.26.4
 # Subtitles & Media Metadata
 pysubs2>=1.7.1
 
-# Testing & Quality
-pytest>=8.2.0
-pytest-mock>=3.14.0
+# Code Quality & Formatting
 flake8>=7.0.0
 black>=24.4.2
