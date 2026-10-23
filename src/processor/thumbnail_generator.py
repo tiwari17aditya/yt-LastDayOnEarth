@@ -342,6 +342,11 @@ class ThumbnailGenerator:
                     output_path=output_path,
                 )
                 logger.info(f"Applied cinematic grunge branding to {output_path.name}")
+                if episode_number is not None:
+                    archive_path = Path("data/thumbnails") / f"episode_{episode_number:02d}.jpg"
+                    archive_path.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(output_path, archive_path)
+                    logger.info(f"Archived episode thumbnail to {archive_path}")
                 return output_path
             except Exception as ge:
                 logger.warning(f"Could not apply grunge branding, falling back to studio badge: {ge}")
@@ -360,6 +365,12 @@ class ThumbnailGenerator:
 
         if label:
             self.apply_badge_overlay(output_path, badge_text=label, hook_text=hook_text)
+
+        if episode_number is not None:
+            archive_path = Path("data/thumbnails") / f"episode_{episode_number:02d}.jpg"
+            archive_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(output_path, archive_path)
+            logger.info(f"Archived episode thumbnail to {archive_path}")
 
         logger.info(f"Custom 16:9 YouTube thumbnail generated successfully at: {output_path}")
         return output_path
