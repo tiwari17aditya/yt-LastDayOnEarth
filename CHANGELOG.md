@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Curated moods include `synth_gameplay`, `lofi_chill`, `cheerful`, `happy_adventure`, `island_chill`, `funk_groove`, `electro_energy`, and `playful_stealth`.
   - Updated `config/music_library.json` and synchronized `config/audio/` with accurate probed durations.
   - Set `decisions.mp3` as clean fallback in `src/main.py`.
+- **Reporting & Channel Analytics**:
+  - Generated continuous weekly pipeline execution and channel performance reports for all past periods through today (`weekly_report_2026-10-09.md`, `weekly_report_2026-10-16.md`, `weekly_report_2026-10-23.md`).
+  - Compiled and saved latest real-time YouTube channel performance and engagement digest (`channel_digest_2026-10-23.md`).
 
 ### Removed
 - **Test Suite & Associated Artifacts**:
