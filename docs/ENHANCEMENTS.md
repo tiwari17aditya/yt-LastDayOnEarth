@@ -64,14 +64,23 @@ This document outlines prioritized enhancements designed to maximize YouTube alg
 ## 🔮 Phase 2 & 3 Roadmap: Further Enhancements
 
 ### Priority 6: Automated AI Image Pre-Generation for Future Episode Thumbnails
-* **Goal**: Pre-generate and stage high-CTR cinematic artwork for Episodes 14–50 matching the validated distressed grunge template.
+* **Goal**: Pre-generate and stage high-CTR cinematic artwork matching the validated distressed grunge template.
 * **Mechanism**:
-  - Script integrating with Gemini 2.0 / Imagen 3 API using predefined scenario blueprints (Bunker Bravo, Sewer, Chopper race, Port submarine, Infected forest).
-  - Automatically renders the organic paint splatter badge with corresponding episode number and distressed `LAST DAY ON EARTH` stencil typography.
-  - Saves high-res 1280x720 JPEG into `data/thumbnails/episode_<NN>.jpg` so scheduled GitHub Actions pipeline runs immediately find ready-to-publish assets.
-* **Impact**: Zero degraded fallback thumbnails; ensures uniform 100% brand consistency across all upcoming uploads.
+  - Pre-generate organic paint splatter badge with corresponding episode number and distressed `LAST DAY ON EARTH` stencil typography.
+  - Saves high-res 1280x720 JPEG into `data/thumbnails/episode_<NN>.jpg` so scheduled pipeline runs immediately find ready-to-publish assets.
+* **Status**: ✅ Completed up to Episode #120 in `data/thumbnails/`.
 
-### Priority 7: YouTube Shorts Automated Scheduling & Pipeline Hook
+### Priority 7: Animated Funky "Like, Share & Subscribe" Outro Tail (5–8s)
+* **Goal**: Drive maximum conversion into subscribers and likes at video conclusion with a high-energy signature brand outro.
+* **Mechanism**:
+  - **Asset Creation**: Create a 5–8 second dynamic, funky animated video clip depicting animated Like, Share, and Subscribe buttons, active notification bell ringing, and an upbeat audio sting.
+  - **Automated Video Stitching**:
+    - Implement an automated concat step in [`src/processor/video_processor.py`](file:///d:/youtube-projects/LastDayOnEarth/src/processor/video_processor.py) to append the animated outro as the video tail.
+    - Standardize parameters (1920x1080, matching framerate & AAC audio) to guarantee seamless, artifact-free concatenation.
+    - Configure via `config/settings.yaml` (`outro_tail_enabled: true`, `outro_tail_path: "assets/animations/like_share_subscribe.mp4"`).
+* **Impact**: +35% subscriber conversion from viewers reaching end-of-video; strong brand recall.
+
+### Priority 8: YouTube Shorts Automated Scheduling & Pipeline Hook
 * **Goal**: Automatically extract and schedule 1–2 Shorts from every processed long-form video during the main pipeline run.
 * **Mechanism**:
   - Main pipeline triggers [`ShortsGenerator`](file:///d:/youtube-projects/LastDayOnEarth/src/processor/shorts_generator.py) on high-energy segments (combat, crafting, or blueprint unlocking).
@@ -79,34 +88,35 @@ This document outlines prioritized enhancements designed to maximize YouTube alg
   - Adds links in the Short description and pinned comment back to the full long-form episode.
 * **Impact**: Doubles channel view volume and funnels mobile discovery traffic directly into the long-form series playlist.
 
-### Priority 8: Automated Community Tab Posts & Polls
+### Priority 9: Automated Community Tab Posts & Polls
 * **Goal**: Deepen audience retention and algorithm recommendation loops between video uploads.
 * **Mechanism**:
   - Automatically posts a YouTube Community Tab update when an episode goes live or midway between upload schedules.
   - Includes a teaser screenshot or thumbnail clip and an interactive poll (e.g., *"What should we build next in the base: Recycler or Gunsmith Bench?"*).
 * **Impact**: Re-engages non-active subscribers in the YouTube Home Feed.
 
-### Priority 9: Advanced SFX Dynamic Ducking
+### Priority 10: Advanced SFX Dynamic Ducking
 * **Goal**: Preserve auditory clarity during loud in-game combat without sacrificing background music flow.
 * **Mechanism**:
   - Detect high RMS volume spikes from in-game gunshot and zombie horde audio.
   - Dynamically duck background soothing music by an additional -6dB during combat peaks, returning smoothly to -15dB during quiet base-building and sorting phases.
 * **Impact**: Professional studio broadcast sound quality; enhances viewer retention by eliminating audio fatigue.
 
-### Priority 10: YouTube Premiere Mode & Countdown Slate
+### Priority 11: YouTube Premiere Mode & Countdown Slate
 * **Goal**: Maximize concurrent viewer count and live chat interaction for milestone episodes (e.g., Episode #25, #50, #100).
 * **Mechanism**:
   - CLI flag `--premiere` in publisher that schedules videos with a custom 2-minute countdown slate and live chat window.
   - Automatically notifies email subscribers 30 minutes ahead of premiere launch.
 * **Impact**: Creates appointment viewing and ignites day-one YouTube algorithmic promotion.
 
-| Upcoming Module | Target Phase | Complexity | Expected CTR / Retention Impact | Priority |
-|:---|:---:|:---:|:---:|:---:|
-| **6. AI Thumbnail Pre-Generation (Ep 14–50)** | Phase 2 | Medium | +30% CTR Consistency | 🔥 High |
-| **7. Automated Shorts Pipeline & Scheduling** | Phase 2 | Medium | +50% Reach & Funnel | 🔥 High |
-| **8. Automated Community Posts & Polls** | Phase 3 | Low | +15% Return Viewers | ⚡ Medium |
-| **9. Dynamic Combat SFX Audio Ducking** | Phase 3 | Medium | +10% Watch Time | ⚡ Medium |
-| **10. YouTube Premiere Milestone Automation** | Phase 3 | Low | +25% Day-1 Velocity | 💡 Strategic |
+| Upcoming Module | Target Phase | Complexity | Expected CTR / Retention Impact | Priority | Status |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **6. Episode Thumbnails (#1 to #120)** | Phase 2 | Medium | +30% CTR Consistency | 🔥 High | ✅ Completed |
+| **7. Animated Like/Share/Sub Outro Tail (5–8s)** | Phase 2 | Low/Med | +35% Subscriber Conversion | 🔥 High | 📋 Planned |
+| **8. Automated Shorts Pipeline & Scheduling** | Phase 2 | Medium | +50% Reach & Funnel | 🔥 High | 📋 Planned |
+| **9. Automated Community Posts & Polls** | Phase 3 | Low | +15% Return Viewers | ⚡ Medium | 📋 Planned |
+| **10. Dynamic Combat SFX Audio Ducking** | Phase 3 | Medium | +10% Watch Time | ⚡ Medium | 📋 Planned |
+| **11. YouTube Premiere Milestone Automation** | Phase 3 | Low | +25% Day-1 Velocity | 💡 Strategic | 📋 Planned |
 
 
 ---
