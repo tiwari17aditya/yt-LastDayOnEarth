@@ -1293,5 +1293,40 @@
       "privacy_redacted": true,
       "md5_checksum": "67fa78effa2ff134398a2eb90564533c"
     }
+  },
+  {
+    "job_id": "job_20261023_011926",
+    "timestamp": "2026-10-23T01:19:26.292416+00:00",
+    "input_filename": "ScreenRecording_10-22-2026 23-34-48_1.mp4",
+    "output_filename": "ScreenRecording_10-22-2026_23-34-48_1_Processed_23102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "dSjHB-t4D-Y",
+    "youtube_url": "https://youtu.be/dSjHB-t4D-Y",
+    "details": {
+      "video_id": "dSjHB-t4D-Y",
+      "youtube_url": "https://youtu.be/dSjHB-t4D-Y",
+      "video_output": "output/ScreenRecording_10-22-2026_23-34-48_1_Processed_23102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-22-2026_23-34-48_1_Processed_23102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-22-2026_23-34-48_1_Processed_23102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Base Storage Optimization! | LDoE Survival #47",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Organizing Storage & Chests Plus... #47",
+        "walkthrough": "Surviving Day 47: Workbench & Blueprints And Organizing Storage & Chests Plus Inventory &... #47"
+      },
+      "duration_seconds": 1291.845034,
+      "soundtrack_tracks": [
+        "Forest Forage",
+        "Wasteland Horizon",
+        "Camp Hearth",
+        "Survival Night",
+        "Workshop Craft",
+        "Forest Forage",
+        "Camp Hearth",
+        "Forest Forage"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "99364a4e6895c9e9bcff92b6b9cd6dc8"
+    }
   }
 ]
