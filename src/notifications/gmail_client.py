@@ -2,6 +2,7 @@
 
 import base64
 from email.message import EmailMessage
+from email.utils import formatdate, make_msgid
 from typing import List, Dict, Any, Optional
 
 from googleapiclient.discovery import build
@@ -52,6 +53,22 @@ class GmailNotifier:
                 root_cause=str(e),
                 recovery_action="Ensure Gmail API is enabled and 'gmail.send' scope is authorized.",
             )
+
+    def _get_resolved_sender(self) -> str:
+        """Resolves RFC 5322 compliant From address to avoid MTA delivery delays and spam quarantine."""
+        if self.sender and self.sender != "me" and "@" in self.sender:
+            return f"Last Day on Earth Pipeline <{self.sender}>"
+
+        try:
+            if self.service:
+                profile = self.service.users().getProfile(userId="me").execute()
+                email_addr = profile.get("emailAddress")
+                if email_addr:
+                    return f"Last Day on Earth Pipeline <{email_addr}>"
+        except Exception as e:
+            logger.debug(f"Could not resolve authenticated email address via profile: {e}")
+
+        return self.sender or "me"
 
     def send_video_published_notification(
         self,
@@ -189,13 +206,18 @@ class GmailNotifier:
             return False
 
     def _dispatch(self, subject: str, html_body: str) -> None:
-        """Encodes and sends message via Gmail API."""
+        """Encodes and sends message via Gmail API with mandatory RFC 5322 headers."""
         try:
+            from_header = self._get_resolved_sender()
             for recipient in self.recipients:
                 msg = EmailMessage()
                 msg["Subject"] = subject
-                msg["From"] = self.sender
+                msg["From"] = from_header
                 msg["To"] = recipient
+                msg["Date"] = formatdate(localtime=True)
+                msg["Message-ID"] = make_msgid()
+                msg["Auto-Submitted"] = "auto-generated"
+                msg["X-Auto-Response-Suppress"] = "All"
                 msg.set_content("Please enable HTML viewing to see this notification.")
                 msg.add_alternative(html_body, subtype="html")
 
@@ -216,3 +238,4 @@ class GmailNotifier:
                 root_cause=str(e),
                 recovery_action="Check Gmail API quota, 'gmail.send' scope, or recipient address.",
             )
+

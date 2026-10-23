@@ -27,20 +27,63 @@ def _get_badge_color(episode: int) -> Tuple[int, int, int]:
 
 
 def _load_font(names: List[str], size: int) -> ImageFont.ImageFont:
-    font_dirs = [
+    # 1. Project bundled fonts directory (guaranteed cross-platform reliability)
+    bundled_dirs = [
+        Path("config/fonts"),
+        Path(__file__).resolve().parent.parent.parent / "config" / "fonts",
+        Path("assets/fonts"),
+        Path(__file__).resolve().parent.parent.parent / "assets" / "fonts",
+    ]
+
+    # Include Linux equivalents for high-impact bold typography
+    extended_names = list(names)
+    for linux_alt in [
+        "DejaVuSans-Bold.ttf",
+        "LiberationSans-Bold.ttf",
+        "FreeSansBold.ttf",
+        "DejaVuSans.ttf",
+        "LiberationSans-Regular.ttf",
+    ]:
+        if linux_alt not in extended_names:
+            extended_names.append(linux_alt)
+
+    # Check bundled directories first
+    for bdir in bundled_dirs:
+        if bdir.exists():
+            for name in extended_names:
+                fpath = bdir / name
+                if fpath.exists():
+                    try:
+                        return ImageFont.truetype(str(fpath), size)
+                    except Exception:
+                        pass
+
+    # Check system font directories
+    sys_font_dirs = [
         Path("C:/Windows/Fonts"),
         Path("/usr/share/fonts"),
         Path("/usr/local/share/fonts"),
+        Path.home() / ".fonts",
     ]
-    for name in names:
-        for fdir in font_dirs:
-            fpath = fdir / name
-            if fpath.exists():
+    for sdir in sys_font_dirs:
+        if sdir.exists():
+            for name in extended_names:
+                fpath = sdir / name
+                if fpath.exists():
+                    try:
+                        return ImageFont.truetype(str(fpath), size)
+                    except Exception:
+                        pass
+                # Recursive search in system subdirectories (e.g. /usr/share/fonts/truetype/...)
                 try:
-                    return ImageFont.truetype(str(fpath), size)
+                    matches = list(sdir.rglob(name))
+                    if matches:
+                        return ImageFont.truetype(str(matches[0]), size)
                 except Exception:
                     pass
+
     return ImageFont.load_default()
+
 
 
 def draw_paint_splatter_badge(

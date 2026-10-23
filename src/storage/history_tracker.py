@@ -18,14 +18,29 @@ class HistoryTracker:
 
     def _ensure_file_exists(self) -> None:
         self.history_file.parent.mkdir(parents=True, exist_ok=True)
-        if not self.history_file.exists():
+        if not self.history_file.exists() or self.history_file.stat().st_size == 0:
             with open(self.history_file, "w", encoding="utf-8") as f:
                 json.dump([], f, indent=2)
 
     def load_records(self) -> List[Dict[str, Any]]:
         try:
+            if not self.history_file.exists() or self.history_file.stat().st_size == 0:
+                self._ensure_file_exists()
+                return []
             with open(self.history_file, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                return data if isinstance(data, list) else []
+        except (json.JSONDecodeError, ValueError) as je:
+            logger.error(f"Corrupted history file detected: {je}. Recovering safely.")
+            try:
+                backup = self.history_file.with_name(
+                    f"{self.history_file.stem}_corrupt_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
+                )
+                self.history_file.rename(backup)
+                self._ensure_file_exists()
+            except Exception:
+                pass
+            return []
         except Exception as e:
             logger.error("Failed to read history file", extra_data={"error": str(e)})
             return []
@@ -82,7 +97,16 @@ class HistoryTracker:
             "details": details,
         }
         records.append(new_record)
-        with open(self.history_file, "w", encoding="utf-8") as f:
-            json.dump(records, f, indent=2)
+        tmp_file = self.history_file.with_name(f"{self.history_file.name}.tmp")
+        try:
+            with open(tmp_file, "w", encoding="utf-8") as f:
+                json.dump(records, f, indent=2)
+            tmp_file.replace(self.history_file)
+        finally:
+            if tmp_file.exists():
+                try:
+                    tmp_file.unlink()
+                except Exception:
+                    pass
         logger.info("Recorded job execution to history", extra_data={"job_id": job_id, "video_id": video_id, "status": status})
 

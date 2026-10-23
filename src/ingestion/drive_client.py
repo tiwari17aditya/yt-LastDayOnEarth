@@ -226,6 +226,24 @@ class GoogleDriveClient(BaseIngestionClient):
                 md5 = f.get("md5Checksum")
 
                 if suffix in VIDEO_EXTENSIONS or mime.startswith("video/"):
+                    size_bytes = int(f.get("size", 0))
+
+                    # Edge Case 1: Empty or 0-byte placeholder files
+                    if size_bytes < 1024:
+                        logger.warning(
+                            f"Skipping file '{name}' ({file_id}) in Input: size is too small ({size_bytes} bytes). "
+                            f"Likely empty placeholder or incomplete creation."
+                        )
+                        continue
+
+                    # Edge Case 2: Upload in progress on Google Drive
+                    if "md5Checksum" in f and not md5 and size_bytes > 0:
+                        logger.info(
+                            f"Skipping file '{name}' ({file_id}) in Input: MD5 checksum not yet finalized by Drive (upload in progress). "
+                            f"Will automatically process once upload completes."
+                        )
+                        continue
+
                     # Check 1: Duplicate of an already processed recording
                     if md5 and md5 in processed_md5s:
                         logger.warning(
@@ -250,7 +268,7 @@ class GoogleDriveClient(BaseIngestionClient):
                     pending_videos.append({
                         "id": file_id,
                         "name": name,
-                        "size": int(f.get("size", 0)),
+                        "size": size_bytes,
                         "createdTime": f.get("createdTime"),
                         "md5Checksum": md5,
                     })
@@ -283,12 +301,24 @@ class GoogleDriveClient(BaseIngestionClient):
                     if status:
                         logger.info(f"Download progress: {int(status.progress() * 100)}%")
 
+            if not destination_path.exists() or destination_path.stat().st_size == 0:
+                if destination_path.exists():
+                    destination_path.unlink()
+                raise IngestionError(
+                    operation="download_video",
+                    root_cause="Downloaded video file is 0 bytes or empty.",
+                    recovery_action="Check source file on Google Drive and network connection.",
+                    file_path=str(destination_path),
+                )
+
             logger.info(f"Download complete: {destination_path} ({destination_path.stat().st_size} bytes)")
             return destination_path
 
         except Exception as e:
             if destination_path.exists():
                 destination_path.unlink()
+            if isinstance(e, IngestionError):
+                raise e
             raise IngestionError(
                 operation="download_video",
                 root_cause=str(e),

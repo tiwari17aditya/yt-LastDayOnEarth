@@ -2,6 +2,7 @@
 
 import argparse
 import hashlib
+import json
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -19,7 +20,54 @@ from src.exceptions import (
     VideoProcessingError,
     PublishingError,
     NotificationError,
+    QuotaExceededError,
 )
+
+def is_in_quota_cooldown(cooldown_file: Optional[Path] = None) -> bool:
+    """Checks whether the daily YouTube API quota is currently marked as exhausted."""
+    if cooldown_file is None:
+        try:
+            cooldown_file = get_settings().processing.temp_dir / "quota_cooldown.json"
+        except Exception:
+            cooldown_file = Path("temp/quota_cooldown.json")
+    if cooldown_file.exists():
+        try:
+            data = json.loads(cooldown_file.read_text(encoding="utf-8"))
+            today_str = datetime.now().strftime("%Y-%m-%d")
+            return data.get("date") == today_str
+        except Exception:
+            pass
+    return False
+
+
+def set_quota_cooldown(cooldown_file: Optional[Path] = None) -> None:
+    """Persists quota exhaustion cooldown marker for today."""
+    if cooldown_file is None:
+        try:
+            cooldown_file = get_settings().processing.temp_dir / "quota_cooldown.json"
+        except Exception:
+            cooldown_file = Path("temp/quota_cooldown.json")
+    cooldown_file.parent.mkdir(parents=True, exist_ok=True)
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    try:
+        cooldown_file.write_text(json.dumps({"date": today_str, "marked_at": datetime.now().isoformat()}, indent=2), encoding="utf-8")
+    except Exception as e:
+        logger.warning(f"Could not persist quota cooldown marker: {e}")
+
+
+def clear_quota_cooldown(cooldown_file: Optional[Path] = None) -> None:
+    """Clears the quota exhaustion cooldown marker."""
+    if cooldown_file is None:
+        try:
+            cooldown_file = get_settings().processing.temp_dir / "quota_cooldown.json"
+        except Exception:
+            cooldown_file = Path("temp/quota_cooldown.json")
+    if cooldown_file.exists():
+        try:
+            cooldown_file.unlink()
+        except Exception:
+            pass
+
 
 def calculate_file_md5(file_path: Path) -> str:
     """Calculates MD5 hash for a local file to ensure reliable duplicate detection."""
@@ -33,11 +81,13 @@ from src.subtitles.event_analyzer import SubtitleGenerator
 from src.audio.selector import AudioMixer
 from src.processor.video_processor import VideoProcessor
 from src.processor.thumbnail_generator import ThumbnailGenerator
-from src.publisher.youtube_client import YouTubeClient
+from src.publisher.youtube_client import YouTubeClient, is_quota_exceeded_error
 from src.publisher.title_manager import TitleManager
 from src.notifications.email_client import EmailNotifier
 from src.notifications.gmail_client import GmailNotifier
+from src.notifications.report_generator import WeeklyReportGenerator
 from src.storage.history_tracker import HistoryTracker
+from src.storage.processing_lock import ProcessingLock
 from src.ingestion.drive_client import GoogleDriveClient
 
 logger = get_logger(component="PipelineOrchestrator")
@@ -81,7 +131,21 @@ def run_pipeline(
 
     if not input_video_path.exists():
         logger.error(f"Input file not found: {input_video_path}")
-        sys.exit(1)
+        raise IngestionError(
+            operation="validate_input",
+            root_cause=f"Input video file does not exist: {input_video_path}",
+            recovery_action="Ensure the specified video path exists before execution.",
+            file_path=str(input_video_path),
+        )
+
+    if not input_video_path.is_file() or input_video_path.stat().st_size == 0:
+        logger.error(f"Input file is empty or invalid: {input_video_path}")
+        raise IngestionError(
+            operation="validate_input",
+            root_cause=f"Input video file is 0 bytes or not a regular file: {input_video_path}",
+            recovery_action="Verify video recording was completed successfully.",
+            file_path=str(input_video_path),
+        )
 
     # Initialize subsystems
     privacy_guard = PrivacyDetector()
@@ -106,6 +170,17 @@ def run_pipeline(
         gemini_api_key=settings.gemini.api_key,
         gemini_model=settings.gemini.model,
     )
+
+    # Pre-flight quota check when publishing to YouTube
+    if not local_only and not publisher.check_quota_available():
+        set_quota_cooldown()
+        raise QuotaExceededError(
+            operation="preflight_quota_check",
+            root_cause="YouTube Data API daily quota limit (10,000 units) currently exhausted.",
+            recovery_action="Wait for quota reset at midnight PST (07:00 UTC). Video preserved in Drive.",
+            file_path=str(input_video_path),
+        )
+
     notifier = get_notifier(settings)
     tracker = HistoryTracker(history_file=settings.processing.history_file)
 
@@ -198,10 +273,13 @@ def run_pipeline(
                     "status": "DEGRADED",
                 },
             )
-            default_ambient = Path("config/audio/wasteland_horizon.mp3")
+            default_ambient = Path("config/audio/decisions.mp3")
             if default_ambient.exists():
                 music_file = default_ambient
-                track_sequence = [{"title": "Wasteland Horizon", "attribution_text": "Original CC0 Ambient Theme"}]
+                track_sequence = [{
+                    "title": "Decisions",
+                    "attribution_text": "Music: 'Decisions' by Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 License",
+                }]
 
         # Step 4: Video Composite Rendering via FFmpeg
         logger.info("Step 4/6: Executing FFmpeg composite video render")
@@ -301,7 +379,17 @@ def run_pipeline(
                     )
             except Exception as ue:
                 if isinstance(ue, PublishingError):
+                    if isinstance(ue, QuotaExceededError):
+                        set_quota_cooldown()
                     raise ue
+                if is_quota_exceeded_error(ue):
+                    set_quota_cooldown()
+                    raise QuotaExceededError(
+                        operation="upload_video",
+                        root_cause=str(ue),
+                        recovery_action="Wait for daily YouTube Data API quota to reset at midnight PST (07:00 UTC).",
+                        file_path=str(output_path),
+                    )
                 raise PublishingError(
                     operation="upload_video",
                     root_cause=str(ue),
@@ -431,132 +519,165 @@ def run_pipeline(
 def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, force: bool = False) -> int:
     """Scheduled task runner: checks Drive Input, downloads, processes, uploads, and archives."""
     settings = get_settings()
-    logger.info("=" * 60)
-    logger.info("Starting Google Drive scheduled scan for new gameplay recordings")
-    logger.info(f"Target path: MyDrive -> {settings.drive.parent_folder_name} -> {settings.drive.project_folder_name}")
-    logger.info("=" * 60)
+    notifier = get_notifier(settings)
 
-    drive_client = GoogleDriveClient(
-        input_folder_name=settings.drive.input_folder_name,
-        processed_folder_name=settings.drive.processed_folder_name,
-    )
-
-    try:
-        drive_client.connect()
-
-        # Step A: Daily cleanup of Drive Processed folder
-        try:
-            drive_client.cleanup_processed_folder()
-        except Exception as ce:
-            logger.warning(f"Drive Processed folder cleanup skipped: {ce}")
-
-        # Step B: 7-day retention cleanup of Drive Output videos
-        try:
-            drive_client.cleanup_old_output_videos(retention_days=settings.drive.output_retention_days)
-        except Exception as oe:
-            logger.warning(f"Drive Output video retention cleanup skipped: {oe}")
-
-        pending_videos = drive_client.list_pending_videos()
-
-        if not pending_videos:
-            logger.info("✅ No pending videos found in Drive Input folder. Pipeline check complete.")
-            return 0
-
-        logger.info(f"Found {len(pending_videos)} pending video(s) ready for processing.")
-
-        if dry_run:
-            logger.info("[DRY RUN] Inspection only; no files will be downloaded or modified:")
-            for v in pending_videos:
-                logger.info(f" - File: {v['name']} (Size: {v['size'] / (1024 * 1024):.1f} MB, ID: {v['id']})")
-            return 0
-
-        # Process up to limit
-        to_process = pending_videos[:limit]
-        for video in to_process:
-            file_id = video["id"]
-            file_name = video["name"]
-            logger.info(f"Processing remote file: {file_name} ({file_id})")
-
-            # Download chunk-by-chunk to temp directory
-            local_download_path = settings.processing.temp_dir / file_name
-            drive_client.download_video(file_id=file_id, destination_path=local_download_path)
-
-            try:
-                # Run full video pipeline (delete_input=False because temp file cleanup is managed explicitly below)
-                rendered_output = run_pipeline(local_download_path, local_only=not upload, force=force, delete_input=False)
-
-                # STRICT CONFIRMATION: NEVER delete raw video from Google Drive Input until confirmed uploaded to YouTube
-                is_uploaded = upload and getattr(rendered_output, "uploaded_to_youtube", False)
-                if is_uploaded:
-                    logger.info(
-                        f"Video confirmed uploaded to YouTube ({getattr(rendered_output, 'youtube_url', '')}). "
-                        f"Deleting raw video '{file_name}' ({file_id}) from Google Drive Input..."
-                    )
-                    try:
-                        drive_client.delete_video(file_id)
-                        logger.info(f"Confirmed: raw video '{file_name}' ({file_id}) deleted from Google Drive Input after verified YouTube upload.")
-                    except Exception as de:
-                        logger.error(f"Failed to delete video from Drive Input: {de}", extra_data={"file_id": file_id})
-                else:
-                    logger.warning(
-                        f"SAFETY LOCK: Preserving raw video '{file_name}' ({file_id}) in Google Drive Input. "
-                        f"Video will NOT be deleted from Drive Input until successfully uploaded to YouTube (upload={upload}, is_uploaded={is_uploaded})."
-                    )
-
-                # Upload processed video & metadata to Google Drive Output (Year -> Month -> video_ddmmyyyy)
-                try:
-                    meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
-                    logger.info("Uploading processed video to Google Drive Output organized by Year/Month...")
-                    drive_client.upload_processed_video(
-                        local_video_path=rendered_output,
-                        metadata_path=meta_json if meta_json.exists() else None,
-                    )
-                except Exception as ue:
-                    logger.error(f"Google Drive Output upload failed: {ue}. (YouTube upload was already completed successfully).")
-
-                # Clean up local raw download to save runner disk space
-                if local_download_path.exists():
-                    local_download_path.unlink()
-                    logger.info(f"Cleaned temporary downloaded file: {local_download_path}")
-
-            except Exception as pe:
-                err_dict = pe.to_dict() if isinstance(pe, PipelineError) else {
-                    "operation": "process_drive_video",
-                    "component": "CronRunner",
-                    "file_path": str(local_download_path),
-                    "root_cause": str(pe),
-                    "recovery_action": "Investigate runner logs. Raw video is safely preserved in Drive Input.",
-                    "status": "FAILED",
-                }
-                logger.error(
-                    f"Failed to process video '{file_name}' ({file_id}): {pe}. "
-                    f"Raw video will NOT be deleted from Google Drive Input.",
-                    extra_data=err_dict,
-                )
-                try:
-                    notifier.send_failure_notification(video_title=file_name, error_details=err_dict)
-                except Exception as n_err:
-                    logger.warning(f"Could not dispatch failure notification: {n_err}")
-
-                if local_download_path.exists():
-                    local_download_path.unlink()
-                return 1
-
-        # Post-processing routine: ensure Processed folder is empty
-        try:
-            drive_client.cleanup_processed_folder()
-        except Exception as ce:
-            logger.warning(f"Post-processing Processed folder cleanup skipped: {ce}")
-
-        logger.info("All pending jobs processed successfully.")
+    # Concurrency Lock: Ensure scheduled checks never overlap with active video processing jobs
+    lock = ProcessingLock()
+    if not lock.acquire(job_id=f"cron_{datetime.now().strftime('%Y%m%d_%H%M%S')}"):
+        logger.warning(
+            "⚠️ Video processing job is currently running. Skipping this scheduled check "
+            "to prevent overlap while strictly maintaining designated scheduled timing for new runs."
+        )
         return 0
 
-    except IngestionError as ie:
-        logger.error(f"Google Drive Ingestion Error: {ie}")
-        return 1
-    except Exception as e:
-        logger.critical(f"Fatal error during drive-cron execution: {e}", exc_info=True)
-        return 1
+    try:
+        if upload and not force and is_in_quota_cooldown():
+            logger.info(
+                "⏸️ YouTube API daily quota limit is exhausted for today. "
+                "Safely holding pending recordings in Google Drive Input until quota resets at midnight PST (07:00 UTC)."
+            )
+            return 0
+
+        logger.info("=" * 60)
+        logger.info("Starting Google Drive scheduled scan for new gameplay recordings")
+        logger.info(f"Target path: MyDrive -> {settings.drive.parent_folder_name} -> {settings.drive.project_folder_name}")
+        logger.info("=" * 60)
+
+        drive_client = GoogleDriveClient(
+            input_folder_name=settings.drive.input_folder_name,
+            processed_folder_name=settings.drive.processed_folder_name,
+        )
+
+        try:
+            drive_client.connect()
+
+            # Step A: Daily cleanup of Drive Processed folder
+            try:
+                drive_client.cleanup_processed_folder()
+            except Exception as ce:
+                logger.warning(f"Drive Processed folder cleanup skipped: {ce}")
+
+            # Step B: 7-day retention cleanup of Drive Output videos
+            try:
+                drive_client.cleanup_old_output_videos(retention_days=settings.drive.output_retention_days)
+            except Exception as oe:
+                logger.warning(f"Drive Output video retention cleanup skipped: {oe}")
+
+            pending_videos = drive_client.list_pending_videos()
+
+            if not pending_videos:
+                logger.info("✅ No pending videos found in Drive Input folder. Pipeline check complete.")
+                return 0
+
+            logger.info(f"Found {len(pending_videos)} pending video(s) ready for processing.")
+
+            if dry_run:
+                logger.info("[DRY RUN] Inspection only; no files will be downloaded or modified:")
+                for v in pending_videos:
+                    logger.info(f" - File: {v['name']} (Size: {v['size'] / (1024 * 1024):.1f} MB, ID: {v['id']})")
+                return 0
+
+            # Process up to limit
+            to_process = pending_videos[:limit]
+            for video in to_process:
+                file_id = video["id"]
+                file_name = video["name"]
+                logger.info(f"Processing remote file: {file_name} ({file_id})")
+
+                # Download chunk-by-chunk to temp directory
+                local_download_path = settings.processing.temp_dir / file_name
+                drive_client.download_video(file_id=file_id, destination_path=local_download_path)
+
+                try:
+                    # Run full video pipeline (delete_input=False because temp file cleanup is managed explicitly below)
+                    rendered_output = run_pipeline(local_download_path, local_only=not upload, force=force, delete_input=False)
+
+                    # STRICT CONFIRMATION: NEVER delete raw video from Google Drive Input until confirmed uploaded to YouTube
+                    is_uploaded = upload and getattr(rendered_output, "uploaded_to_youtube", False)
+                    if is_uploaded:
+                        logger.info(
+                            f"Video confirmed uploaded to YouTube ({getattr(rendered_output, 'youtube_url', '')}). "
+                            f"Deleting raw video '{file_name}' ({file_id}) from Google Drive Input..."
+                        )
+                        try:
+                            drive_client.delete_video(file_id)
+                            logger.info(f"Confirmed: raw video '{file_name}' ({file_id}) deleted from Google Drive Input after verified YouTube upload.")
+                        except Exception as de:
+                            logger.error(f"Failed to delete video from Drive Input: {de}", extra_data={"file_id": file_id})
+                    else:
+                        logger.warning(
+                            f"SAFETY LOCK: Preserving raw video '{file_name}' ({file_id}) in Google Drive Input. "
+                            f"Video will NOT be deleted from Drive Input until successfully uploaded to YouTube (upload={upload}, is_uploaded={is_uploaded})."
+                        )
+
+                    # Upload processed video & metadata to Google Drive Output (Year -> Month -> video_ddmmyyyy)
+                    try:
+                        meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
+                        logger.info("Uploading processed video to Google Drive Output organized by Year/Month...")
+                        drive_client.upload_processed_video(
+                            local_video_path=rendered_output,
+                            metadata_path=meta_json if meta_json.exists() else None,
+                        )
+                    except Exception as ue:
+                        logger.error(f"Google Drive Output upload failed: {ue}. (YouTube upload was already completed successfully).")
+
+                    # Clean up local raw download to save runner disk space
+                    if local_download_path.exists():
+                        local_download_path.unlink()
+                        logger.info(f"Cleaned temporary downloaded file: {local_download_path}")
+
+                except Exception as pe:
+                    if isinstance(pe, QuotaExceededError) or is_quota_exceeded_error(pe):
+                        set_quota_cooldown()
+                        logger.warning(
+                            "YouTube API daily quota exhaustion detected. Activated quota cooldown for today. "
+                            "Raw video preserved in Drive Input. Scheduled runs will pause upload attempts until quota resets."
+                        )
+
+                    err_dict = pe.to_dict() if isinstance(pe, PipelineError) else {
+                        "operation": "process_drive_video",
+                        "component": "CronRunner",
+                        "file_path": str(local_download_path),
+                        "root_cause": str(pe),
+                        "recovery_action": "Investigate runner logs. Raw video is safely preserved in Drive Input.",
+                        "status": "FAILED",
+                    }
+                    logger.error(
+                        f"Failed to process video '{file_name}' ({file_id}): {pe}. "
+                        f"Raw video will NOT be deleted from Google Drive Input.",
+                        extra_data=err_dict,
+                    )
+                    # Only dispatch notification if run_pipeline did NOT already send it (avoid duplicate email alerts)
+                    if not isinstance(pe, PipelineError):
+                        try:
+                            notifier.send_failure_notification(video_title=file_name, error_details=err_dict)
+                        except Exception as n_err:
+                            logger.warning(f"Could not dispatch failure notification: {n_err}")
+
+                    if local_download_path.exists():
+                        try:
+                            local_download_path.unlink()
+                        except Exception:
+                            pass
+                    return 1
+
+            # Post-processing routine: ensure Processed folder is empty
+            try:
+                drive_client.cleanup_processed_folder()
+            except Exception as ce:
+                logger.warning(f"Post-processing Processed folder cleanup skipped: {ce}")
+
+            logger.info("All pending jobs processed successfully.")
+            return 0
+
+        except IngestionError as ie:
+            logger.error(f"Google Drive Ingestion Error: {ie}")
+            return 1
+        except Exception as e:
+            logger.critical(f"Fatal error during drive-cron execution: {e}", exc_info=True)
+            return 1
+    finally:
+        lock.release()
 
 
 def run_watcher(interval: int = 60, limit: int = 1, upload: bool = True, force: bool = False) -> None:
@@ -615,6 +736,13 @@ def main() -> None:
     watch_parser.add_argument("--no-upload", action="store_true", help="Do not upload to YouTube")
     watch_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
 
+    # Weekly & Periodic Reporting command
+    report_parser = subparsers.add_parser("report", help="Generate pipeline execution and channel growth reports")
+    report_parser.add_argument("--weekly", action="store_true", default=True, help="Generate weekly report (default)")
+    report_parser.add_argument("--days", type=int, default=7, help="Number of past days to aggregate (default: 7)")
+    report_parser.add_argument("--email", action="store_true", help="Send formatted HTML report via Gmail/SMTP")
+    report_parser.add_argument("--output", type=str, help="Destination markdown path for report")
+
     args = parser.parse_args()
 
     if args.command == "process":
@@ -627,6 +755,14 @@ def main() -> None:
     elif args.command == "watch":
         upload_flag = not args.no_upload
         run_watcher(interval=args.interval, limit=args.limit, upload=upload_flag, force=args.force)
+    elif args.command == "report":
+        gen = WeeklyReportGenerator()
+        summary = gen.compile_weekly_summary(days=args.days)
+        out_file = gen.generate_markdown_report(summary=summary, output_path=Path(args.output) if args.output else None)
+        print(f"Weekly report generated: {out_file}")
+        if args.email:
+            sent = gen.send_weekly_report(summary)
+            print("Weekly report email dispatched successfully." if sent else "Failed to send weekly report email.")
     else:
         parser.print_help()
 

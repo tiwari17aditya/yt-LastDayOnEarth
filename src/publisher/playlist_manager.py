@@ -187,8 +187,8 @@ class PlaylistManager:
             except Exception as de:
                 logger.warning(f"Failed deleting playlist item {it['item_id']}: {de}")
 
-        logger.info(f"Re-inserting {len(unique_ordered_items)} items in reverse order so YouTube prepending yields #1 -> #N...")
-        for it in reversed(unique_ordered_items):
+        logger.info(f"Re-inserting {len(unique_ordered_items)} items sequentially in chronological order (#1 -> #N)...")
+        for it in unique_ordered_items:
             try:
                 body = {
                     "snippet": {
@@ -200,9 +200,10 @@ class PlaylistManager:
                     }
                 }
                 youtube.playlistItems().insert(part="snippet", body=body).execute()
-                logger.info(f"Prepended Video {it['video_id']} (Ep #{it['episode_number']}) - {it['title'][:40]}")
+                logger.info(f"Appended Video {it['video_id']} (Ep #{it['episode_number']}) - {it['title'][:40]}")
             except Exception as ie:
                 logger.error(f"Failed to insert video {it['video_id']} into playlist: {ie}")
+
 
         logger.info("Successfully rebuilt playlist chronologically!")
         return True
@@ -255,11 +256,41 @@ class PlaylistManager:
                     "position": target_pos,
                 }
             }
-            youtube.playlistItems().insert(part="snippet", body=body).execute()
-            logger.info(
-                f"Video {video_id} appended to playlist {playlist_id} at sequential position {target_pos} successfully"
-            )
-            return True
+            try:
+                youtube.playlistItems().insert(part="snippet", body=body).execute()
+                logger.info(
+                    f"Video {video_id} appended to playlist {playlist_id} at sequential position {target_pos} successfully"
+                )
+                return True
+            except Exception as pos_err:
+                err_str = str(pos_err)
+                content_bytes = getattr(pos_err, "content", b"")
+                content_str = content_bytes.decode("utf-8", errors="ignore") if isinstance(content_bytes, bytes) else str(content_bytes)
+                details_str = str(getattr(pos_err, "error_details", ""))
+                combined_err = f"{err_str} {content_str} {details_str}".lower()
+                if "manualsortrequired" in combined_err or "manual" in combined_err or "position" in combined_err:
+                    logger.warning(
+                        f"Playlist {playlist_id} does not support manual position indexing ({pos_err}). "
+                        f"Retrying playlist insertion without position property..."
+                    )
+
+                    fallback_body = {
+                        "snippet": {
+                            "playlistId": playlist_id,
+                            "resourceId": {
+                                "kind": "youtube#video",
+                                "videoId": video_id,
+                            },
+                        }
+                    }
+                    youtube.playlistItems().insert(part="snippet", body=fallback_body).execute()
+                    logger.info(
+                        f"Video {video_id} appended to playlist {playlist_id} successfully (without position property)"
+                    )
+                    return True
+                else:
+                    raise pos_err
         except Exception as e:
             logger.warning(f"Could not add video {video_id} to playlist {playlist_id}: {e}")
             return False
+

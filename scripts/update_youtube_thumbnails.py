@@ -70,16 +70,31 @@ def main():
         sys.exit(1)
 
     youtube = build("youtube", "v3", credentials=creds)
-    thumb_dir = Path("data/thumbnails")
+    # Dynamically load from series_tracker.json if available
+    video_map = list(VIDEO_THUMBNAIL_MAP)
+    tracker_file = Path("data/series_tracker.json")
+    if tracker_file.exists():
+        try:
+            import json
+            with open(tracker_file, "r", encoding="utf-8") as f:
+                tdata = json.load(f)
+            completed = tdata.get("completed_episodes", [])
+            if completed:
+                video_map = completed
+                logger.info(f"Loaded {len(video_map)} episodes dynamically from series_tracker.json")
+        except Exception as e:
+            logger.warning(f"Could not load series_tracker.json: {e}")
 
     success_count = 0
-    total = len(VIDEO_THUMBNAIL_MAP)
+    total = len(video_map)
 
-    for item in VIDEO_THUMBNAIL_MAP:
+    thumb_dir = Path("data/thumbnails")
+    for item in video_map:
         vid = item["video_id"]
         ep = item["episode"]
         title = item["title"]
         thumb_file = thumb_dir / f"episode_{ep:02d}.jpg"
+
 
         print(f"\nProcessing Episode #{ep:02d} ({vid}): {title}")
         if update_thumbnail(youtube, vid, thumb_file):

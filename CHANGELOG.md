@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-10-23
+
+### Changed
+- **20-Track Fresh & Upbeat Gaming Music Catalog**:
+  - Replaced all negative, dark, and gloomy tracks with 100% fresh, upbeat, energetic, and positive royalty-free gaming music (CC-BY 4.0 by Kevin MacLeod).
+  - Curated moods include `synth_gameplay`, `lofi_chill`, `cheerful`, `happy_adventure`, `island_chill`, `funk_groove`, `electro_energy`, and `playful_stealth`.
+  - Updated `config/music_library.json` and synchronized `config/audio/` with accurate probed durations.
+  - Set `decisions.mp3` as clean fallback in `src/main.py`.
+- **Reporting & Channel Analytics**:
+  - Generated continuous weekly pipeline execution and channel performance reports for all past periods through today (`weekly_report_2026-10-09.md`, `weekly_report_2026-10-16.md`, `weekly_report_2026-10-23.md`).
+  - Compiled and saved latest real-time YouTube channel performance and engagement digest (`channel_digest_2026-10-23.md`).
+
+### Removed
+- **Test Suite & Associated Artifacts**:
+  - Removed `tests/` directory, unit test modules, and `pytest.ini`.
+  - Removed `pytest` and `pytest-mock` dependencies from `requirements.txt`.
+  - Cleared `.pytest_cache/` and temporary test render files from `temp/` and `output/`.
+  - Updated `docs/DEVELOPMENT.md` to remove test instructions and emphasize code quality & formatting.
+
+### Fixed
+- **Engagement Comments Script**:
+  - Added missing `json` import in `scripts/post_engagement_comments.py`.
+
 ## [1.5.2] - 2026-10-02
 
 ### Fixed
