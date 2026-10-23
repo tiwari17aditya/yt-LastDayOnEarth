@@ -8,10 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.6.0] - 2026-10-23
 
 ### Changed
-- **20-Track Royalty-Free Gaming Music Catalog**:
-  - Downloaded curated 20-track open-source, royalty-free gaming/survival soundtrack library to `config/audio/`.
-  - Updated `config/music_library.json` with metadata, licensing, and mood mappings for all 20 tracks.
-  - Updated `src/main.py` default fallback track to `decisions.mp3`.
+- **20-Track Fresh & Upbeat Gaming Music Catalog**:
+  - Replaced all negative, dark, and gloomy tracks with 100% fresh, upbeat, energetic, and positive royalty-free gaming music (CC-BY 4.0 by Kevin MacLeod).
+  - Curated moods include `synth_gameplay`, `lofi_chill`, `cheerful`, `happy_adventure`, `island_chill`, `funk_groove`, `electro_energy`, and `playful_stealth`.
+  - Updated `config/music_library.json` and synchronized `config/audio/` with accurate probed durations.
+  - Set `decisions.mp3` as clean fallback in `src/main.py`.
 
 ### Removed
 - **Test Suite & Cache Cleanup**:
