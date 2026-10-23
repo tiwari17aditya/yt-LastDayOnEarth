@@ -1393,5 +1393,38 @@
       "privacy_redacted": true,
       "md5_checksum": "d4bdd2da67fe2deada6b22e9f67096f9"
     }
+  },
+  {
+    "job_id": "job_20261023_200521",
+    "timestamp": "2026-10-23T20:05:21.024119+00:00",
+    "input_filename": "ScreenRecording_10-23-2026 16-34-03_1.mp4",
+    "output_filename": "ScreenRecording_10-23-2026_16-34-03_1_Processed_23102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "40sH8RYaplI",
+    "youtube_url": "https://youtu.be/40sH8RYaplI",
+    "details": {
+      "video_id": "40sH8RYaplI",
+      "youtube_url": "https://youtu.be/40sH8RYaplI",
+      "video_output": "output/ScreenRecording_10-23-2026_16-34-03_1_Processed_23102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-23-2026_16-34-03_1_Processed_23102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-23-2026_16-34-03_1_Processed_23102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Entering Home Base Part 2! | LDoE Survival #50",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Entering Home Base Part 2 Plus Workbench &... #50",
+        "walkthrough": "Surviving Day 50: Entering Home Base And Entering Home Base Part 2 Plus Workbench &... #50"
+      },
+      "duration_seconds": 889.247007,
+      "soundtrack_tracks": [
+        "Somewhere Sunny",
+        "Bossa Antigua",
+        "Pamgaea",
+        "Constance",
+        "Carefree",
+        "Life of Riley"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "ed346b1996bfffd79849d538ff8596a1"
+    }
   }
 ]

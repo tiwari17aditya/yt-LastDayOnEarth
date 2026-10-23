@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 50,
+  "current_episode": 51,
   "completed_episodes": [
     {
       "episode": 1,
@@ -334,6 +334,13 @@
       "video_id": "5rpKbJW1t20",
       "youtube_url": "https://youtu.be/5rpKbJW1t20",
       "job_id": "5rpKbJW1t20"
+    },
+    {
+      "episode": 50,
+      "title": "Entering Home Base & Entering Home Base Part 2! | LDoE Survival #50",
+      "video_id": "40sH8RYaplI",
+      "youtube_url": "https://youtu.be/40sH8RYaplI",
+      "job_id": "40sH8RYaplI"
     }
   ]
 }
