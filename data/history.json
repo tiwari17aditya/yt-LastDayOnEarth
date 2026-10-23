@@ -1426,5 +1426,43 @@
       "privacy_redacted": true,
       "md5_checksum": "ed346b1996bfffd79849d538ff8596a1"
     }
+  },
+  {
+    "job_id": "job_20261023_233508",
+    "timestamp": "2026-10-23T23:35:08.019754+00:00",
+    "input_filename": "ScreenRecording_10-23-2026 15-42-30_1.mp4",
+    "output_filename": "ScreenRecording_10-23-2026_15-42-30_1_Processed_23102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "j4ZW7xtQ2iU",
+    "youtube_url": "https://youtu.be/j4ZW7xtQ2iU",
+    "details": {
+      "video_id": "j4ZW7xtQ2iU",
+      "youtube_url": "https://youtu.be/j4ZW7xtQ2iU",
+      "video_output": "output/ScreenRecording_10-23-2026_15-42-30_1_Processed_23102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-23-2026_15-42-30_1_Processed_23102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-23-2026_15-42-30_1_Processed_23102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Base Storage Optimization! | LDoE Survival #51",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Organizing Storage & Chests Plus... #51",
+        "walkthrough": "Surviving Day 51: Home Base Operations And Organizing Storage & Chests Plus Entering Home... #51"
+      },
+      "duration_seconds": 1868.305329,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Fretless",
+        "Volatile Reaction",
+        "Somewhere Sunny",
+        "Groove Grove",
+        "Clean Soul",
+        "Sneaky Snitch",
+        "Monkeys Spinning Monkeys",
+        "Sneaky Snitch",
+        "Volatile Reaction",
+        "Local Forecast"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "a222b59de80e59c568ec3b6187023d67"
+    }
   }
 ]
