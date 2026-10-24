@@ -1,7 +1,8 @@
 """Animated Funky 'Like, Share & Subscribe' Outro Tail Generator (7-10s).
 
-Provides multiple broadcast-quality animation styles (7.5s, 8.5s, 10.0s) with
-harmonious geometry, balanced margins, integrated bell notifications, and zero crowding.
+Features expressive creator fonts (Luckiest Guy, Bangers, Russo One), an oversized
+standalone bell icon with exaggerated cartoon wobble, comedic survival hooks,
+and synchronized sound effect chimes.
 """
 
 import math
@@ -18,30 +19,66 @@ logger = get_logger(component="OutroGenerator")
 
 
 class OutroTailGenerator:
-    """Generates broadcast-quality animated Like/Share/Subscribe outro tail clips."""
+    """Generates broadcast-quality animated Like/Share/Subscribe outro tail clips with comic creator aesthetics."""
 
     def __init__(
         self,
         assets_dir: Path = Path("assets/animations"),
         audio_library_dir: Path = Path("config/audio"),
+        fonts_dir: Path = Path("config/fonts"),
     ) -> None:
         self.assets_dir = assets_dir
         self.assets_dir.mkdir(parents=True, exist_ok=True)
         self.audio_library_dir = audio_library_dir
+        self.fonts_dir = fonts_dir
 
-    def _get_font(self, size: int, bold: bool = True) -> ImageFont.ImageFont:
-        """Resolves system true-type fonts with clean fallbacks."""
-        candidates = (
-            ["impact.ttf", "arialbd.ttf", "segoeuib.ttf", "trebucbd.ttf", "arial.ttf"]
-            if bold
-            else ["segoeui.ttf", "arial.ttf", "tahoma.ttf"]
-        )
-        for name in candidates:
+    def _get_font(self, size: int, style: str = "luckiest") -> ImageFont.ImageFont:
+        """Resolves expressive typography: Luckiest Guy, Bangers, or Russo One."""
+        font_files = {
+            "luckiest": self.fonts_dir / "LuckiestGuy.ttf",
+            "bangers": self.fonts_dir / "Bangers.ttf",
+            "russo": self.fonts_dir / "RussoOne.ttf",
+            "impact": self.fonts_dir / "impact.ttf",
+        }
+        target_path = font_files.get(style, font_files["luckiest"])
+        if target_path.exists():
+            try:
+                return ImageFont.truetype(str(target_path), size)
+            except Exception:
+                pass
+
+        # Fallback to system fonts
+        for name in ["impact.ttf", "arialbd.ttf", "segoeuib.ttf", "arial.ttf"]:
             try:
                 return ImageFont.truetype(name, size)
             except Exception:
                 continue
         return ImageFont.load_default()
+
+    def _draw_comic_text(
+        self,
+        draw: ImageDraw.ImageDraw,
+        pos: Tuple[int, int],
+        text: str,
+        font: ImageFont.ImageFont,
+        fill_color: Tuple[int, int, int, int] = (255, 255, 255, 255),
+        stroke_color: Tuple[int, int, int, int] = (0, 0, 0, 255),
+        stroke_width: int = 4,
+        shadow_offset: Tuple[int, int] = (4, 4),
+    ) -> Tuple[int, int]:
+        """Renders punchy comic-style typography with heavy outline and 3D shadow."""
+        x, y = pos
+        sx, sy = shadow_offset
+
+        # 3D shadow
+        if sx or sy:
+            draw.text((x + sx, y + sy), text, font=font, fill=(15, 23, 42, 220), stroke_width=stroke_width, stroke_fill=(0, 0, 0, 220))
+
+        # Outline & main text
+        draw.text((x, y), text, font=font, fill=fill_color, stroke_width=stroke_width, stroke_fill=stroke_color)
+
+        t_box = draw.textbbox((0, 0), text, font=font, stroke_width=stroke_width)
+        return t_box[2] - t_box[0], t_box[3] - t_box[1]
 
     def _draw_button(
         self,
@@ -52,257 +89,353 @@ class OutroTailGenerator:
         text: str,
         font: ImageFont.ImageFont,
         text_color: Tuple[int, int, int, int] = (255, 255, 255, 255),
-        radius: int = 16,
+        radius: int = 24,
         scale: float = 1.0,
-        subtext: Optional[str] = None,
-        subfont: Optional[ImageFont.ImageFont] = None,
+        badge_text: Optional[str] = None,
+        badge_font: Optional[ImageFont.ImageFont] = None,
     ) -> None:
-        """Draws a styled rounded button with pop/pulse scaling and optional subtext."""
+        """Draws a bold, punchy cartoon button with squash/stretch scaling and optional comic badge."""
         x1, y1, x2, y2 = box
         cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
         w, h = (x2 - x1) * scale, (y2 - y1) * scale
-
         scaled_box = [cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]
 
-        # Outer glow border
+        # Heavy 3D Drop Shadow
         draw.rounded_rectangle(
-            [scaled_box[0] - 3, scaled_box[1] - 3, scaled_box[2] + 3, scaled_box[3] + 3],
+            [scaled_box[0] + 4, scaled_box[1] + 6, scaled_box[2] + 4, scaled_box[3] + 6],
+            radius=int(radius * scale),
+            fill=(0, 0, 0, 180),
+        )
+
+        # Thick Comic Border
+        draw.rounded_rectangle(
+            [scaled_box[0] - 4, scaled_box[1] - 4, scaled_box[2] + 4, scaled_box[3] + 4],
+            radius=int(radius * scale),
+            fill=(0, 0, 0, 255),
+        )
+
+        # Inner Accent Border
+        draw.rounded_rectangle(
+            [scaled_box[0] - 1, scaled_box[1] - 1, scaled_box[2] + 1, scaled_box[3] + 1],
             radius=int(radius * scale),
             fill=border_color,
         )
-        # Inner button fill
+
+        # Button Face
         draw.rounded_rectangle(
             scaled_box,
             radius=int(radius * scale),
             fill=bg_color,
         )
 
-        # Center Text
-        t_box = draw.textbbox((0, 0), text, font=font)
+        # Center Text with Outline
+        t_box = draw.textbbox((0, 0), text, font=font, stroke_width=3)
         tw = t_box[2] - t_box[0]
         th = t_box[3] - t_box[1]
+        draw.text(
+            (cx - tw / 2, cy - th / 2 - 3),
+            text,
+            fill=text_color,
+            font=font,
+            stroke_width=3,
+            stroke_fill=(0, 0, 0, 255),
+        )
 
-        y_offset = -10 if subtext else -2
-        draw.text((cx - tw / 2, cy - th / 2 + y_offset), text, fill=text_color, font=font)
+        # Floating comic pill badge on top corner
+        if badge_text and badge_font:
+            bw_box = draw.textbbox((0, 0), badge_text, font=badge_font)
+            bw = bw_box[2] - bw_box[0]
+            bh = bw_box[3] - bw_box[1]
+            bx = scaled_box[2] - bw - 15
+            by = scaled_box[1] - 16
+            draw.rounded_rectangle([bx - 8, by - 4, bx + bw + 8, by + bh + 4], radius=8, fill=(245, 158, 11, 255), outline=(0, 0, 0, 255), width=2)
+            draw.text((bx, by), badge_text, fill=(0, 0, 0, 255), font=badge_font)
 
-        if subtext and subfont:
-            sb_box = draw.textbbox((0, 0), subtext, font=subfont)
-            sbw = sb_box[2] - sb_box[0]
-            draw.text((cx - sbw / 2, cy + th / 2 + 2), subtext, fill=(203, 213, 225, 230), font=subfont)
-
-    def _draw_bell(
+    def _draw_standalone_bell(
         self,
         draw: ImageDraw.ImageDraw,
         center: Tuple[int, int],
         angle_deg: float,
         ringing: bool,
-        size: int = 34,
-        color: Tuple[int, int, int, int] = (251, 191, 36, 255),
+        scale: float = 1.0,
+        size: int = 56,  # Significantly larger standalone bell
     ) -> None:
-        """Draws a clean notification bell icon with rotational wobble and soundwaves."""
+        """Draws an oversized, highly animated standalone golden bell with sound ripples."""
         cx, cy = center
         rad = math.radians(angle_deg)
         cos_a = math.cos(rad)
         sin_a = math.sin(rad)
+        eff_size = size * scale
 
         def rotate_pt(px: float, py: float) -> Tuple[float, float]:
             dx, dy = px - cx, py - cy
             return (cx + dx * cos_a - dy * sin_a, cy + dx * sin_a + dy * cos_a)
 
-        # Bell Dome
-        top = rotate_pt(cx, cy - size * 0.9)
-        bottom_left = rotate_pt(cx - size * 0.75, cy + size * 0.45)
-        bottom_right = rotate_pt(cx + size * 0.75, cy + size * 0.45)
+        # Giant Floating Pedestal / Glow Aura
+        glow_r = int(eff_size * 1.5)
+        glow_color = (251, 191, 36, 60) if ringing else (30, 41, 59, 100)
+        draw.ellipse([cx - glow_r, cy - glow_r, cx + glow_r, cy + glow_r], fill=glow_color)
 
-        draw.polygon([top, bottom_left, bottom_right], fill=color)
-        draw.ellipse([cx - size * 0.22, cy + size * 0.45, cx + size * 0.22, cy + size * 0.75], fill=(217, 119, 6, 255))
-        draw.ellipse([cx - size * 0.15, cy - size * 1.1, cx + size * 0.15, cy - size * 0.8], fill=color)
+        # Bell Clapper Dome
+        top = rotate_pt(cx, cy - eff_size * 0.95)
+        bottom_left = rotate_pt(cx - eff_size * 0.85, cy + eff_size * 0.5)
+        bottom_right = rotate_pt(cx + eff_size * 0.85, cy + eff_size * 0.5)
 
-        # Radiating soundwave rings if ringing
-        if ringing:
-            for ring_r in [size + 10, size + 22]:
-                draw.arc(
-                    [cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r],
-                    start=-65,
-                    end=65,
-                    fill=(251, 191, 36, 200),
-                    width=3,
-                )
-                draw.arc(
-                    [cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r],
-                    start=115,
-                    end=245,
-                    fill=(251, 191, 36, 200),
-                    width=3,
-                )
-
-    def _draw_cursor(self, draw: ImageDraw.ImageDraw, pos: Tuple[int, int]) -> None:
-        """Draws a smooth pointer arrow."""
-        cx, cy = pos
+        # Bell 3D shadow
         draw.polygon(
-            [
-                (cx, cy),
-                (cx + 20, cy + 20),
-                (cx + 9, cy + 20),
-                (cx + 14, cy + 30),
-                (cx + 7, cy + 32),
-                (cx + 2, cy + 22),
-                (cx, cy + 26),
-            ],
-            fill=(255, 255, 255, 255),
-            outline=(15, 23, 42, 255),
+            [(p[0] + 4, p[1] + 4) for p in [top, bottom_left, bottom_right]],
+            fill=(0, 0, 0, 160),
         )
 
+        # Bell Body (Vibrant Gold)
+        bell_gold = (251, 191, 36, 255) if not ringing else (253, 224, 71, 255)
+        draw.polygon([top, bottom_left, bottom_right], fill=bell_gold, outline=(0, 0, 0, 255))
+
+        # Bottom Rim
+        rim_y = cy + eff_size * 0.5
+        draw.ellipse(
+            [cx - eff_size * 0.85, rim_y - eff_size * 0.15, cx + eff_size * 0.85, rim_y + eff_size * 0.15],
+            fill=(245, 158, 11, 255),
+            outline=(0, 0, 0, 255),
+            width=2,
+        )
+
+        # Clapper Ball
+        clapper_pt = rotate_pt(cx, cy + eff_size * 0.65)
+        cr = eff_size * 0.22
+        draw.ellipse([clapper_pt[0] - cr, clapper_pt[1] - cr, clapper_pt[0] + cr, clapper_pt[1] + cr], fill=(180, 83, 9, 255), outline=(0, 0, 0, 255), width=2)
+
+        # Top Loop Ring
+        loop_pt = rotate_pt(cx, cy - eff_size * 1.1)
+        lr = eff_size * 0.18
+        draw.ellipse([loop_pt[0] - lr, loop_pt[1] - lr, loop_pt[0] + lr, loop_pt[1] + lr], outline=(0, 0, 0, 255), width=3)
+
+        # Exaggerated Radiating Comic Soundwave Arcs if ringing
+        if ringing:
+            for ring_r in [eff_size + 18, eff_size + 36, eff_size + 54]:
+                draw.arc(
+                    [cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r],
+                    start=-60,
+                    end=60,
+                    fill=(251, 191, 36, 230),
+                    width=4,
+                )
+                draw.arc(
+                    [cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r],
+                    start=120,
+                    end=240,
+                    fill=(251, 191, 36, 230),
+                    width=4,
+                )
+
+    def _draw_cartoon_hand(self, draw: ImageDraw.ImageDraw, pos: Tuple[int, int], clicking: bool = False) -> None:
+        """Draws a funny white cartoon glove pointing/clicking."""
+        cx, cy = pos
+        scale = 0.9 if clicking else 1.0
+
+        # Glove Body Points
+        points = [
+            (cx, cy),                           # Pointer tip
+            (cx + 24 * scale, cy + 24 * scale), # Index base
+            (cx + 12 * scale, cy + 24 * scale), # Inward notch
+            (cx + 22 * scale, cy + 44 * scale), # Palm right
+            (cx - 2 * scale, cy + 48 * scale),  # Wrist right
+            (cx - 16 * scale, cy + 44 * scale), # Wrist left
+            (cx - 14 * scale, cy + 28 * scale), # Thumb base
+            (cx - 6 * scale, cy + 22 * scale),  # Thumb tip
+            (cx - 2 * scale, cy + 18 * scale),  # Index inner
+        ]
+
+        # 3D shadow
+        shadow_pts = [(p[0] + 4, p[1] + 4) for p in points]
+        draw.polygon(shadow_pts, fill=(0, 0, 0, 160))
+
+        # Main Glove Fill
+        draw.polygon(points, fill=(255, 255, 255, 255), outline=(0, 0, 0, 255))
+        # Comic creases
+        draw.line([(cx + 4 * scale, cy + 32 * scale), (cx + 14 * scale, cy + 34 * scale)], fill=(203, 213, 225, 255), width=2)
+
     # -------------------------------------------------------------------------
-    # STYLE 1: Cyber-Survival Action Row (7.5s)
-    # Balanced horizontal row with integrated subscribe + bell container
+    # STYLE 1: Cartoon Comedy Show (8.0s)
+    # Features Luckiest Guy font, funny survival hooks, and giant elevated bell
     # -------------------------------------------------------------------------
-    def render_frames_cyber_row(
+    def render_frames_cartoon_comedy(
         self,
         temp_dir: Path,
-        duration: float = 7.5,
+        duration: float = 8.0,
         fps: int = 30,
         series_title: str = "LAST DAY ON EARTH: SURVIVAL",
     ) -> int:
-        """Renders 7.5s 'Cyber Row' style: perfectly balanced row with unified Subscribe+Bell pill."""
+        """Renders 8.0s Comedy Outro with big separated bell and funny gaming copy."""
         temp_dir.mkdir(parents=True, exist_ok=True)
         total_frames = int(duration * fps)
 
-        font_header = self._get_font(52, bold=True)
-        font_sub = self._get_font(26, bold=False)
-        font_btn = self._get_font(30, bold=True)
-        font_btn_lg = self._get_font(32, bold=True)
-        font_small = self._get_font(20, bold=True)
+        font_header = self._get_font(56, style="luckiest")
+        font_sub = self._get_font(28, style="bangers")
+        font_btn = self._get_font(34, style="luckiest")
+        font_btn_lg = self._get_font(38, style="luckiest")
+        font_badge = self._get_font(20, style="russo")
+        font_comic = self._get_font(30, style="bangers")
 
-        # Layout Geometry (Total width 1420px, centered from X=250 to X=1670)
-        # 1. LIKE: [250, 480, 590, 580] (width 340)
-        # 2. SHARE: [640, 480, 980, 580] (width 340)
-        # 3. SUBSCRIBE + BELL: [1030, 480, 1670, 580] (width 640 - unified spacious container)
+        # Layout Geometry:
+        # Left Side (Y=420): LIKE [180, 420, 600, 530] (width 420)
+        # Left Side (Y=570): SHARE [180, 570, 600, 680] (width 420)
+        # Center-Right: GIANT SUBSCRIBE [670, 570, 1370, 680] (width 700)
+        # UPPER-RIGHT SEPARATE STAGE: STANDALONE GIANT BELL [X=1560, Y=510] (Completely isolated!)
 
         for f in range(total_frames):
             t = f / fps
 
-            bg = Image.new("RGBA", (1920, 1080), (12, 14, 18, 255))
+            bg = Image.new("RGBA", (1920, 1080), (14, 18, 26, 255))
             draw = ImageDraw.Draw(bg)
 
-            # Gradient background
-            pulse = math.sin(t * 3.0) * 0.12 + 0.88
+            # Gradient background with pulsing survival grid
+            pulse = math.sin(t * 3.5) * 0.15 + 0.85
             for y in range(0, 1080, 4):
                 factor = y / 1080.0
-                r = int(14 + 14 * factor * pulse)
-                g = int(18 + 12 * factor)
-                b = int(26 + 18 * factor * pulse)
+                r = int(14 + 18 * factor * pulse)
+                g = int(20 + 14 * factor)
+                b = int(32 + 22 * factor * pulse)
                 draw.rectangle([(0, y), (1920, y + 4)], fill=(r, g, b, 255))
 
-            # Decorative neon accent borders
-            draw.rectangle([140, 140, 1780, 143], fill=(220, 38, 38, 220))
-            draw.rectangle([140, 940, 1780, 943], fill=(220, 38, 38, 220))
+            # Comic Accent Lines
+            draw.rectangle([120, 110, 1800, 116], fill=(239, 68, 68, 255))
+            draw.rectangle([120, 970, 1800, 976], fill=(239, 68, 68, 255))
 
-            # Header Banner
-            title_progress = min(1.0, t / 0.8)
-            title_y = 190 + int((1.0 - math.sin(title_progress * math.pi / 2)) * -50)
-            title_text = "THANKS FOR WATCHING!"
-            t_box = draw.textbbox((0, 0), title_text, font=font_header)
-            tw = t_box[2] - t_box[0]
-            draw.text(((1920 - tw) // 2 + 3, title_y + 3), title_text, fill=(0, 0, 0, 200), font=font_header)
-            draw.text(((1920 - tw) // 2, title_y), title_text, fill=(255, 255, 255, 255), font=font_header)
+            # Header Drop-in
+            title_progress = min(1.0, t / 0.7)
+            title_y = 150 + int((1.0 - math.sin(title_progress * math.pi / 2)) * -60)
 
-            sub_text = f"🔥 {series_title} • NEW EPISODES REGULARLY"
-            s_box = draw.textbbox((0, 0), sub_text, font=font_sub)
-            sw = s_box[2] - s_box[0]
-            draw.text(((1920 - sw) // 2, title_y + 75), sub_text, fill=(220, 38, 38, 240), font=font_sub)
-
-            # --- Button 1: LIKE ---
-            like_active = t >= 1.8
-            like_scale = 1.0 + (0.16 * math.sin((t - 1.8) * 12) if 1.8 <= t <= 2.4 else 0.0)
-            like_bg = (6, 182, 212, 255) if like_active else (30, 41, 59, 230)
-            like_border = (34, 211, 238, 255) if like_active else (71, 85, 105, 200)
-            like_label = "👍 LIKED!" if like_active else "👍 LIKE"
-            self._draw_button(
+            # Main Humorous Header
+            h_text = "WAIT! BEFORE YOU LEAVE..."
+            self._draw_comic_text(
                 draw=draw,
-                box=(250, 480, 590, 580),
-                bg_color=like_bg,
-                border_color=like_border,
-                text=like_label,
-                font=font_btn,
-                scale=like_scale,
+                pos=((1920 - draw.textbbox((0, 0), h_text, font=font_header)[2]) // 2, title_y),
+                text=h_text,
+                font=font_header,
+                fill_color=(255, 230, 0, 255),
             )
 
-            # --- Button 2: SHARE ---
-            share_active = t >= 2.8
-            share_scale = 1.0 + (0.16 * math.sin((t - 2.8) * 12) if 2.8 <= t <= 3.4 else 0.0)
-            share_bg = (16, 185, 129, 255) if share_active else (30, 41, 59, 230)
-            share_border = (52, 211, 153, 255) if share_active else (71, 85, 105, 200)
-            share_label = "🚀 SHARED!" if share_active else "↗ SHARE"
-            self._draw_button(
+            sub_text = "DON'T LEAVE YOUR BASE UNPROTECTED • UPGRADE YOUR FEED!"
+            self._draw_comic_text(
                 draw=draw,
-                box=(640, 480, 980, 580),
-                bg_color=share_bg,
-                border_color=share_border,
-                text=share_label,
-                font=font_btn,
-                scale=share_scale,
+                pos=((1920 - draw.textbbox((0, 0), sub_text, font=font_sub)[2]) // 2, title_y + 80),
+                text=sub_text,
+                font=font_sub,
+                fill_color=(255, 255, 255, 240),
+                stroke_width=2,
             )
 
-            # --- Button 3: UNIFIED SUBSCRIBE + BELL CONTAINER ---
-            sub_active = t >= 4.0
-            sub_scale = 1.0 + (0.18 * math.sin((t - 4.0) * 12) if 4.0 <= t <= 4.6 else 0.0)
-            pill_box = [1030, 480, 1670, 580]
-            cx, cy = (pill_box[0] + pill_box[2]) / 2, (pill_box[1] + pill_box[3]) / 2
-            pw, ph = (pill_box[2] - pill_box[0]) * sub_scale, (pill_box[3] - pill_box[1]) * sub_scale
-            s_box_scaled = [cx - pw / 2, cy - ph / 2, cx + pw / 2, cy + ph / 2]
+            # --- 1. LIKE BUTTON (Squash & Pop) ---
+            like_active = t >= 1.6
+            like_squash = 1.0 + (0.18 * math.sin((t - 1.6) * 14) if 1.6 <= t <= 2.2 else 0.0)
+            self._draw_button(
+                draw=draw,
+                box=(180, 390, 680, 510),
+                bg_color=(6, 182, 212, 255) if like_active else (30, 41, 59, 240),
+                border_color=(34, 211, 238, 255) if like_active else (100, 116, 139, 220),
+                text="LIKED! (+100 IQ)" if like_active else "SMASH LIKE!",
+                font=font_btn,
+                scale=like_squash,
+                badge_text="FREE BUFF" if not like_active else "BUFF ACTIVATED",
+                badge_font=font_badge,
+            )
 
-            sub_bg = (15, 23, 42, 255) if sub_active else (220, 38, 38, 255)
-            sub_border = (34, 197, 94, 255) if sub_active else (239, 68, 68, 255)
-            draw.rounded_rectangle([s_box_scaled[0] - 3, s_box_scaled[1] - 3, s_box_scaled[2] + 3, s_box_scaled[3] + 3], radius=18, fill=sub_border)
-            draw.rounded_rectangle(s_box_scaled, radius=18, fill=sub_bg)
+            # --- 2. SHARE BUTTON (Squash & Pop) ---
+            share_active = t >= 2.6
+            share_squash = 1.0 + (0.18 * math.sin((t - 2.6) * 14) if 2.6 <= t <= 3.2 else 0.0)
+            self._draw_button(
+                draw=draw,
+                box=(740, 390, 1240, 510),
+                bg_color=(16, 185, 129, 255) if share_active else (30, 41, 59, 240),
+                border_color=(52, 211, 153, 255) if share_active else (100, 116, 139, 220),
+                text="SHARED TO CLAN!" if share_active else "SHARE TO CLAN",
+                font=font_btn,
+                scale=share_squash,
+                badge_text="REINFORCE" if not share_active else "SENT!",
+                badge_font=font_badge,
+            )
 
-            # Subscribe text (Left wing of container)
-            sub_label = "✓ SUBSCRIBED" if sub_active else "SUBSCRIBE"
-            st_box = draw.textbbox((0, 0), sub_label, font=font_btn_lg)
-            st_w = st_box[2] - st_box[0]
-            st_h = st_box[3] - st_box[1]
-            draw.text((s_box_scaled[0] + 50, cy - st_h / 2 - 2), sub_label, fill=(255, 255, 255, 255), font=font_btn_lg)
+            # --- 3. GIANT SUBSCRIBE BUTTON ---
+            sub_active = t >= 3.8
+            sub_squash = 1.0 + (0.22 * math.sin((t - 3.8) * 12) if 3.8 <= t <= 4.5 else 0.0)
+            sub_box = (180, 560, 1240, 710)
+            self._draw_button(
+                draw=draw,
+                box=sub_box,
+                bg_color=(15, 23, 42, 255) if sub_active else (220, 38, 38, 255),
+                border_color=(34, 197, 94, 255) if sub_active else (239, 68, 68, 255),
+                text="BASE DEFENDED!" if sub_active else "SUBSCRIBE NOW!",
+                font=font_btn_lg,
+                scale=sub_squash,
+                badge_text="ZOMBIE-PROOF" if not sub_active else "100% IMMUNITY",
+                badge_font=font_badge,
+            )
 
-            # Subtle vertical divider line before bell section
-            divider_x = s_box_scaled[0] + pw - 150
-            draw.line([(divider_x, s_box_scaled[1] + 18), (divider_x, s_box_scaled[3] - 18)], fill=(100, 116, 139, 160), width=2)
-
-            # Bell section (Right wing of container - roomy and centered at divider_x + 75)
+            # --- 4. STANDALONE OVERSIZED BELL TOWER (X: 1540, Y: 550) ---
+            # Completely separated from subscribe button with dedicated stage
             bell_ringing = t >= 5.0
-            bell_angle = math.sin((t - 5.0) * 26) * 16.0 if bell_ringing else 0.0
-            bell_center = (int(divider_x + 75), int(cy))
-            self._draw_bell(draw=draw, center=bell_center, angle_deg=bell_angle, ringing=bell_ringing, size=32)
+            bell_angle = math.sin((t - 5.0) * 28) * 25.0 if bell_ringing else 0.0
+            bell_center = (1540, 550)
 
+            # Circular Spotlight Pedestal
+            draw.ellipse([bell_center[0] - 120, bell_center[1] - 120, bell_center[0] + 120, bell_center[1] + 120], fill=(24, 30, 42, 240), outline=(251, 191, 36, 230), width=4)
+            self._draw_standalone_bell(draw=draw, center=bell_center, angle_deg=bell_angle, ringing=bell_ringing, size=58)
+
+            # Comic Callout above or below the bell
             if bell_ringing:
-                b_note = "🔔 ALL ON"
-                bn_box = draw.textbbox((0, 0), b_note, font=font_small)
-                bn_w = bn_box[2] - bn_box[0]
-                draw.text((bell_center[0] - bn_w // 2, int(cy + 62)), b_note, fill=(251, 191, 36, 255), font=font_small)
+                callout_text = "DING DING DING!"
+                self._draw_comic_text(
+                    draw=draw,
+                    pos=(bell_center[0] - 120, bell_center[1] + 95),
+                    text=callout_text,
+                    font=font_comic,
+                    fill_color=(253, 224, 71, 255),
+                    stroke_color=(0, 0, 0, 255),
+                )
+            else:
+                self._draw_comic_text(
+                    draw=draw,
+                    pos=(bell_center[0] - 90, bell_center[1] + 95),
+                    text="RING THE BELL!",
+                    font=font_comic,
+                    fill_color=(241, 245, 249, 220),
+                    stroke_color=(0, 0, 0, 255),
+                )
 
-            # Cursor Pointer Movement
+            # --- 5. Cartoon Hand Pointer Trajectory ---
             cursor_pos = None
-            if 1.3 <= t < 2.0:
-                p = (t - 1.3) / 0.7
-                cursor_pos = (int(280 + p * 140), int(640 - math.sin(p * math.pi) * 80))
-            elif 2.3 <= t < 3.0:
-                p = (t - 2.3) / 0.7
-                cursor_pos = (int(670 + p * 140), int(640 - math.sin(p * math.pi) * 80))
-            elif 3.5 <= t < 4.2:
-                p = (t - 3.5) / 0.7
-                cursor_pos = (int(1060 + p * 160), int(640 - math.sin(p * math.pi) * 80))
-            elif 4.6 <= t < 5.3:
-                p = (t - 4.6) / 0.7
-                cursor_pos = (int(divider_x + 20 + p * 55), int(620 - math.sin(p * math.pi) * 70))
+            is_clicking = False
+            if 1.1 <= t < 1.9:
+                p = (t - 1.1) / 0.8
+                cursor_pos = (int(300 + p * 130), int(510 - math.sin(p * math.pi) * 60))
+                is_clicking = 1.5 <= t <= 1.8
+            elif 2.1 <= t < 2.9:
+                p = (t - 2.1) / 0.8
+                cursor_pos = (int(430 + p * 560), int(450 - math.sin(p * math.pi) * 60))
+                is_clicking = 2.5 <= t <= 2.8
+            elif 3.1 <= t < 4.1:
+                p = (t - 3.1) / 1.0
+                cursor_pos = (int(990 - p * 280), int(450 + p * 185 - math.sin(p * math.pi) * 40))
+                is_clicking = 3.7 <= t <= 4.0
+            elif 4.4 <= t < 5.3:
+                p = (t - 4.4) / 0.9
+                cursor_pos = (int(710 + p * 830), int(635 - p * 85 - math.sin(p * math.pi) * 80))
+                is_clicking = 4.9 <= t <= 5.2
 
             if cursor_pos:
-                self._draw_cursor(draw, cursor_pos)
+                self._draw_cartoon_hand(draw, cursor_pos, clicking=is_clicking)
 
-            # Bottom Callout
-            bottom_msg = "DROP A COMMENT WITH YOUR STRATEGIES • SEE YOU IN THE NEXT RAID!"
-            b_box = draw.textbbox((0, 0), bottom_msg, font=font_sub)
-            bw = b_box[2] - b_box[0]
-            draw.text(((1920 - bw) // 2, 850), bottom_msg, fill=(203, 213, 225, 230), font=font_sub)
+            # Bottom Comic Footer
+            bottom_msg = "DROP A COMMENT BELOW WITH YOUR BASE LAYOUT • NEXT RAID DROPS SOON!"
+            self._draw_comic_text(
+                draw=draw,
+                pos=((1920 - draw.textbbox((0, 0), bottom_msg, font=font_sub)[2]) // 2, 870),
+                text=bottom_msg,
+                font=font_sub,
+                fill_color=(203, 213, 225, 230),
+                stroke_width=2,
+            )
 
             # Fade to black (last 0.8s)
             if t >= duration - 0.8:
@@ -316,25 +449,26 @@ class OutroTailGenerator:
         return total_frames
 
     # -------------------------------------------------------------------------
-    # STYLE 2: Two-Tier Hero Studio (8.5s)
-    # Upper tier wings (Like & Share) + Lower giant centered Hero Subscribe Bar
+    # STYLE 2: MrBeast-Style High-Impact Hype Studio (9.5s)
+    # Bangers / Russo One typography, massive buttons, giant bell pedestal
     # -------------------------------------------------------------------------
-    def render_frames_two_tier(
+    def render_frames_hype_studio(
         self,
         temp_dir: Path,
-        duration: float = 8.5,
+        duration: float = 9.5,
         fps: int = 30,
         series_title: str = "LAST DAY ON EARTH: SURVIVAL",
     ) -> int:
-        """Renders 8.5s 'Two-Tier' style: symmetric floating wings + giant centered Subscribe hero bar."""
+        """Renders 9.5s MrBeast-Style Outro with giant elevated Bell Pedestal and intense pacing."""
         temp_dir.mkdir(parents=True, exist_ok=True)
         total_frames = int(duration * fps)
 
-        font_header = self._get_font(54, bold=True)
-        font_sub = self._get_font(26, bold=False)
-        font_btn = self._get_font(30, bold=True)
-        font_hero = self._get_font(36, bold=True)
-        font_small = self._get_font(22, bold=True)
+        font_header = self._get_font(62, style="bangers")
+        font_sub = self._get_font(28, style="russo")
+        font_btn = self._get_font(36, style="bangers")
+        font_hero = self._get_font(44, style="bangers")
+        font_badge = self._get_font(22, style="russo")
+        font_comic = self._get_font(32, style="luckiest")
 
         for f in range(total_frames):
             t = f / fps
@@ -342,288 +476,152 @@ class OutroTailGenerator:
             bg = Image.new("RGBA", (1920, 1080), (10, 12, 16, 255))
             draw = ImageDraw.Draw(bg)
 
-            # Background subtle cyber grid & glow
-            pulse = math.sin(t * 2.5) * 0.15 + 0.85
+            # Dark red survival atmosphere
+            pulse = math.sin(t * 3.0) * 0.16 + 0.84
             for y in range(0, 1080, 4):
                 factor = y / 1080.0
-                r = int(12 + 16 * factor * pulse)
-                g = int(15 + 14 * factor)
-                b = int(24 + 20 * factor * pulse)
+                r = int(18 + 22 * factor * pulse)
+                g = int(12 + 10 * factor)
+                b = int(18 + 14 * factor)
                 draw.rectangle([(0, y), (1920, y + 4)], fill=(r, g, b, 255))
 
-            draw.rectangle([160, 110, 1760, 113], fill=(220, 38, 38, 200))
-            draw.rectangle([160, 960, 1760, 963], fill=(220, 38, 38, 200))
+            draw.rectangle([140, 110, 1780, 115], fill=(220, 38, 38, 230))
+            draw.rectangle([140, 970, 1780, 975], fill=(220, 38, 38, 230))
 
             # Header
             title_progress = min(1.0, t / 0.8)
-            title_y = 160 + int((1.0 - math.sin(title_progress * math.pi / 2)) * -50)
-            title_text = "SURVIVAL MISSION COMPLETE!"
-            t_box = draw.textbbox((0, 0), title_text, font=font_header)
-            tw = t_box[2] - t_box[0]
-            draw.text(((1920 - tw) // 2, title_y), title_text, fill=(255, 255, 255, 255), font=font_header)
+            title_y = 150 + int((1.0 - math.sin(title_progress * math.pi / 2)) * -50)
+            h_text = "SURVIVAL MISSION COMPLETE!"
+            self._draw_comic_text(
+                draw=draw,
+                pos=((1920 - draw.textbbox((0, 0), h_text, font=font_header)[2]) // 2, title_y),
+                text=h_text,
+                font=font_header,
+                fill_color=(255, 255, 255, 255),
+            )
 
-            sub_text = f"🛡️ {series_title} • JOIN THE BASE"
-            s_box = draw.textbbox((0, 0), sub_text, font=font_sub)
-            sw = s_box[2] - s_box[0]
-            draw.text(((1920 - sw) // 2, title_y + 70), sub_text, fill=(220, 38, 38, 240), font=font_sub)
+            sub_text = "SUBSCRIBE IN THE NEXT 5 SECONDS TO BEAT BUNKER ALFA!"
+            self._draw_comic_text(
+                draw=draw,
+                pos=((1920 - draw.textbbox((0, 0), sub_text, font=font_sub)[2]) // 2, title_y + 80),
+                text=sub_text,
+                font=font_sub,
+                fill_color=(239, 68, 68, 255),
+                stroke_width=2,
+            )
 
-            # --- TIER 1: Upper Wings (Like & Share) centered symmetrically around 960 ---
-            # LIKE on left: [460, 380, 840, 480] (width 380)
-            # SHARE on right: [1080, 380, 1460, 480] (width 380)
-            # Center gap: 240px; Margin left: 460px; Margin right: 460px (Perfect Symmetry!)
-
+            # --- UPPER TIER WINGS (LIKE & SHARE) centered around X=750 ---
+            # LIKE [240, 380, 680, 490] (width 440)
+            # SHARE [740, 380, 1180, 490] (width 440)
             like_active = t >= 1.8
-            like_scale = 1.0 + (0.16 * math.sin((t - 1.8) * 12) if 1.8 <= t <= 2.4 else 0.0)
-            like_bg = (6, 182, 212, 255) if like_active else (30, 41, 59, 230)
-            like_border = (34, 211, 238, 255) if like_active else (71, 85, 105, 200)
+            like_scale = 1.0 + (0.16 * math.sin((t - 1.8) * 12) if 1.8 <= t <= 2.5 else 0.0)
             self._draw_button(
                 draw=draw,
-                box=(460, 380, 840, 480),
-                bg_color=like_bg,
-                border_color=like_border,
-                text="👍 LIKED!" if like_active else "👍 LIKE EPISODE",
+                box=(240, 380, 680, 490),
+                bg_color=(6, 182, 212, 255) if like_active else (30, 41, 59, 230),
+                border_color=(34, 211, 238, 255) if like_active else (71, 85, 105, 200),
+                text="LIKED! (+100 AURA)" if like_active else "SMASH LIKE!",
                 font=font_btn,
                 scale=like_scale,
+                badge_text="+100 XP" if not like_active else "CLAIMED!",
+                badge_font=font_badge,
             )
 
-            share_active = t >= 2.8
-            share_scale = 1.0 + (0.16 * math.sin((t - 2.8) * 12) if 2.8 <= t <= 3.4 else 0.0)
-            share_bg = (16, 185, 129, 255) if share_active else (30, 41, 59, 230)
-            share_border = (52, 211, 153, 255) if share_active else (71, 85, 105, 200)
+            share_active = t >= 3.0
+            share_scale = 1.0 + (0.16 * math.sin((t - 3.0) * 12) if 3.0 <= t <= 3.7 else 0.0)
             self._draw_button(
                 draw=draw,
-                box=(1080, 380, 1460, 480),
-                bg_color=share_bg,
-                border_color=share_border,
-                text="🚀 SHARED!" if share_active else "↗ SHARE WITH CLAN",
+                box=(740, 380, 1180, 490),
+                bg_color=(16, 185, 129, 255) if share_active else (30, 41, 59, 230),
+                border_color=(52, 211, 153, 255) if share_active else (71, 85, 105, 200),
+                text="SHARED TO CLAN!" if share_active else "SHARE EPISODE",
                 font=font_btn,
                 scale=share_scale,
+                badge_text="RAID TEAM" if not share_active else "DISPATCHED!",
+                badge_font=font_badge,
             )
 
-            # --- TIER 2: GIANT HERO SUBSCRIBE & BELL BAR (Y: 540 - 670) ---
-            # Box: [540, 540, 1380, 670] (width 840, height 130, centered exactly at X=960!)
-            sub_active = t >= 4.2
-            sub_scale = 1.0 + (0.18 * math.sin((t - 4.2) * 12) if 4.2 <= t <= 4.8 else 0.0)
-            hero_box = [540, 540, 1380, 670]
-            hcx, hcy = (hero_box[0] + hero_box[2]) / 2, (hero_box[1] + hero_box[3]) / 2
-            hw, hh = (hero_box[2] - hero_box[0]) * sub_scale, (hero_box[3] - hero_box[1]) * sub_scale
-            h_box_scaled = [hcx - hw / 2, hcy - hh / 2, hcx + hw / 2, hcy + hh / 2]
+            # --- LOWER TIER: GIANT HERO SUBSCRIBE SLAM BAR ---
+            # [240, 560, 1180, 710] (width 940, massive impact!)
+            sub_active = t >= 4.5
+            sub_scale = 1.0 + (0.22 * math.sin((t - 4.5) * 12) if 4.5 <= t <= 5.3 else 0.0)
+            self._draw_button(
+                draw=draw,
+                box=(240, 560, 1180, 710),
+                bg_color=(15, 23, 42, 255) if sub_active else (220, 38, 38, 255),
+                border_color=(34, 197, 94, 255) if sub_active else (239, 68, 68, 255),
+                text="BASE SAVED! SUBSCRIBED" if sub_active else "SUBSCRIBE OR ELSE!",
+                font=font_hero,
+                scale=sub_scale,
+                badge_text="ALPHA RAIDER" if sub_active else "SURVIVAL RANK #1",
+                badge_font=font_badge,
+            )
 
-            sub_bg = (15, 23, 42, 255) if sub_active else (220, 38, 38, 255)
-            sub_border = (34, 197, 94, 255) if sub_active else (239, 68, 68, 255)
-            draw.rounded_rectangle([h_box_scaled[0] - 4, h_box_scaled[1] - 4, h_box_scaled[2] + 4, h_box_scaled[3] + 4], radius=24, fill=sub_border)
-            draw.rounded_rectangle(h_box_scaled, radius=24, fill=sub_bg)
+            # --- DEDICATED ELEVATED BELL SANCTUARY (X: 1520, Y: 545) ---
+            # Completely separated from subscribe on the right wing
+            bell_ringing = t >= 6.2
+            bell_angle = math.sin((t - 6.2) * 28) * 26.0 if bell_ringing else 0.0
+            bell_center = (1520, 545)
 
-            # Hero Subscribe Text
-            hero_text = "✓ SUBSCRIBED TO CHANNEL" if sub_active else "SUBSCRIBE FOR NEXT RAID"
-            ht_box = draw.textbbox((0, 0), hero_text, font=font_hero)
-            ht_w = ht_box[2] - ht_box[0]
-            ht_h = ht_box[3] - ht_box[1]
-            draw.text((h_box_scaled[0] + 60, hcy - ht_h / 2 - 2), hero_text, fill=(255, 255, 255, 255), font=font_hero)
+            # Glowing circular pedestal
+            draw.ellipse([bell_center[0] - 125, bell_center[1] - 125, bell_center[0] + 125, bell_center[1] + 125], fill=(22, 27, 34, 240), outline=(251, 191, 36, 240), width=4)
+            self._draw_standalone_bell(draw=draw, center=bell_center, angle_deg=bell_angle, ringing=bell_ringing, size=60)
 
-            # Divider & Dedicated Bell Sanctuary (width 160px on right wing)
-            h_divider_x = h_box_scaled[0] + hw - 170
-            draw.line([(h_divider_x, h_box_scaled[1] + 20), (h_divider_x, h_box_scaled[3] - 20)], fill=(100, 116, 139, 160), width=3)
-
-            bell_ringing = t >= 5.5
-            bell_angle = math.sin((t - 5.5) * 26) * 18.0 if bell_ringing else 0.0
-            bell_center = (int(h_divider_x + 85), int(hcy))
-            self._draw_bell(draw=draw, center=bell_center, angle_deg=bell_angle, ringing=bell_ringing, size=38)
-
+            # Speech bubble / callout
             if bell_ringing:
-                b_note = "🔔 ALL ON"
-                bn_box = draw.textbbox((0, 0), b_note, font=font_small)
-                bn_w = bn_box[2] - bn_box[0]
-                draw.text((bell_center[0] - bn_w // 2, int(hcy + 82)), b_note, fill=(251, 191, 36, 255), font=font_small)
+                self._draw_comic_text(
+                    draw=draw,
+                    pos=(bell_center[0] - 135, bell_center[1] + 105),
+                    text="ALL NOTIFICATIONS ON!",
+                    font=font_comic,
+                    fill_color=(253, 224, 71, 255),
+                )
+            else:
+                self._draw_comic_text(
+                    draw=draw,
+                    pos=(bell_center[0] - 85, bell_center[1] + 105),
+                    text="RING THE BELL!",
+                    font=font_comic,
+                    fill_color=(255, 255, 255, 230),
+                )
 
-            # Cursor Trajectory
+            # --- Cursor Movement ---
             cursor_pos = None
+            is_clicking = False
             if 1.2 <= t < 2.0:
                 p = (t - 1.2) / 0.8
-                cursor_pos = (int(500 + p * 150), int(520 - math.sin(p * math.pi) * 80))
-            elif 2.2 <= t < 3.0:
-                p = (t - 2.2) / 0.8
-                cursor_pos = (int(1120 + p * 150), int(520 - math.sin(p * math.pi) * 80))
-            elif 3.6 <= t < 4.4:
-                p = (t - 3.6) / 0.8
-                cursor_pos = (int(620 + p * 200), int(720 - math.sin(p * math.pi) * 80))
-            elif 5.0 <= t < 5.8:
-                p = (t - 5.0) / 0.8
-                cursor_pos = (int(h_divider_x + 30 + p * 55), int(710 - math.sin(p * math.pi) * 70))
+                cursor_pos = (int(200 + p * 240), int(500 - math.sin(p * math.pi) * 80))
+                is_clicking = 1.6 <= t <= 1.9
+            elif 2.4 <= t < 3.2:
+                p = (t - 2.4) / 0.8
+                cursor_pos = (int(700 + p * 240), int(500 - math.sin(p * math.pi) * 80))
+                is_clicking = 2.8 <= t <= 3.1
+            elif 3.8 <= t < 4.8:
+                p = (t - 3.8) / 1.0
+                cursor_pos = (int(500 + p * 350), int(730 - math.sin(p * math.pi) * 90))
+                is_clicking = 4.4 <= t <= 4.7
+            elif 5.5 <= t < 6.5:
+                p = (t - 5.5) / 1.0
+                cursor_pos = (int(1350 + p * 160), int(680 - math.sin(p * math.pi) * 90))
+                is_clicking = 6.1 <= t <= 6.4
 
             if cursor_pos:
-                self._draw_cursor(draw, cursor_pos)
+                self._draw_cartoon_hand(draw, cursor_pos, clicking=is_clicking)
 
-            # Bottom message
-            bottom_msg = "NEW SURVIVAL EPISODES UPLOADED REGULARLY • LEAVE YOUR BASE DESIGN TIPS BELOW!"
-            b_box = draw.textbbox((0, 0), bottom_msg, font=font_sub)
-            bw = b_box[2] - b_box[0]
-            draw.text(((1920 - bw) // 2, 870), bottom_msg, fill=(203, 213, 225, 230), font=font_sub)
+            # Footer
+            bottom_msg = "NEW SURVIVAL RAIDS UPLOADED DAILY • LEAVE YOUR SURVIVAL TIPS IN THE COMMENTS!"
+            self._draw_comic_text(
+                draw=draw,
+                pos=((1920 - draw.textbbox((0, 0), bottom_msg, font=font_sub)[2]) // 2, 885),
+                text=bottom_msg,
+                font=font_sub,
+                fill_color=(203, 213, 225, 230),
+                stroke_width=2,
+            )
 
             # Fade to black (last 1.0s)
             if t >= duration - 1.0:
                 fade_alpha = int(((t - (duration - 1.0)) / 1.0) * 255)
-                overlay = Image.new("RGBA", (1920, 1080), (0, 0, 0, fade_alpha))
-                bg.paste(overlay, (0, 0), overlay)
-
-            frame_path = temp_dir / f"frame_{f:04d}.jpg"
-            bg.convert("RGB").save(str(frame_path), format="JPEG", quality=92)
-
-        return total_frames
-
-    # -------------------------------------------------------------------------
-    # STYLE 3: Cinematic Slate with YouTube End-Card Alignment (10.0s)
-    # Designed specifically for YouTube 10s End Screen Cards (Next video + Playlist)
-    # -------------------------------------------------------------------------
-    def render_frames_cinematic_slate(
-        self,
-        temp_dir: Path,
-        duration: float = 10.0,
-        fps: int = 30,
-        series_title: str = "LAST DAY ON EARTH: SURVIVAL",
-    ) -> int:
-        """Renders 10.0s 'Cinematic Slate' style: YouTube card zones + animated CTA footer."""
-        temp_dir.mkdir(parents=True, exist_ok=True)
-        total_frames = int(duration * fps)
-
-        font_header = self._get_font(48, bold=True)
-        font_sub = self._get_font(24, bold=False)
-        font_card = self._get_font(28, bold=True)
-        font_btn = self._get_font(28, bold=True)
-        font_small = self._get_font(20, bold=True)
-
-        for f in range(total_frames):
-            t = f / fps
-
-            bg = Image.new("RGBA", (1920, 1080), (10, 12, 16, 255))
-            draw = ImageDraw.Draw(bg)
-
-            # Gradient background
-            for y in range(0, 1080, 4):
-                factor = y / 1080.0
-                r = int(14 + 10 * factor)
-                g = int(16 + 8 * factor)
-                b = int(22 + 12 * factor)
-                draw.rectangle([(0, y), (1920, y + 4)], fill=(r, g, b, 255))
-
-            # Header Banner
-            title_text = f"THANKS FOR WATCHING • {series_title.upper()}"
-            t_box = draw.textbbox((0, 0), title_text, font=font_header)
-            tw = t_box[2] - t_box[0]
-            draw.text(((1920 - tw) // 2, 80), title_text, fill=(240, 240, 240, 255), font=font_header)
-
-            sub_text = "WATCH NEXT SURVIVAL RAID BELOW OR SELECT THE FULL PLAYLIST"
-            s_box = draw.textbbox((0, 0), sub_text, font=font_sub)
-            sw = s_box[2] - s_box[0]
-            draw.text(((1920 - sw) // 2, 145), sub_text, fill=(220, 38, 38, 255), font=font_sub)
-
-            # Decorative border
-            draw.rectangle([140, 195, 1780, 198], fill=(220, 38, 38, 180))
-
-            # --- YOUTUBE END-SCREEN CARDS ZONE (Y: 240 - 580) ---
-            # Card 1: Next Episode [180, 240, 840, 580] (width 660, height 340, 16:9 ratio)
-            draw.rounded_rectangle([180, 240, 840, 580], radius=16, fill=(18, 22, 28, 200), outline=(220, 38, 38, 220), width=3)
-            draw.text((210, 270), "🎬 NEXT SURVIVAL EPISODE", fill=(255, 255, 255, 255), font=font_card)
-            draw.text((210, 315), "Click here to continue the survival series", fill=(148, 163, 184, 255), font=font_sub)
-
-            # Card 2: Full Playlist [1080, 240, 1740, 580] (width 660, height 340, 16:9 ratio)
-            draw.rounded_rectangle([1080, 240, 1740, 580], radius=16, fill=(18, 22, 28, 200), outline=(220, 38, 38, 220), width=3)
-            draw.text((1110, 270), "📺 FULL SERIES PLAYLIST", fill=(255, 255, 255, 255), font=font_card)
-            draw.text((1110, 315), "Watch all episodes from Day 1 in order", fill=(148, 163, 184, 255), font=font_sub)
-
-            # Decorative border between cards and CTA row
-            draw.rectangle([140, 630, 1780, 633], fill=(220, 38, 38, 180))
-
-            # --- LOWER CTA ROW (Y: 670 - 770) ---
-            # 1. LIKE: [220, 670, 560, 770] (width 340)
-            # 2. SHARE: [610, 670, 950, 770] (width 340)
-            # 3. SUBSCRIBE + BELL: [1000, 670, 1700, 770] (width 700 - spacious unified container)
-
-            like_active = t >= 2.0
-            like_scale = 1.0 + (0.16 * math.sin((t - 2.0) * 12) if 2.0 <= t <= 2.6 else 0.0)
-            self._draw_button(
-                draw=draw,
-                box=(220, 670, 560, 770),
-                bg_color=(6, 182, 212, 255) if like_active else (30, 41, 59, 230),
-                border_color=(34, 211, 238, 255) if like_active else (71, 85, 105, 200),
-                text="👍 LIKED!" if like_active else "👍 LIKE",
-                font=font_btn,
-                scale=like_scale,
-            )
-
-            share_active = t >= 3.4
-            share_scale = 1.0 + (0.16 * math.sin((t - 3.4) * 12) if 3.4 <= t <= 4.0 else 0.0)
-            self._draw_button(
-                draw=draw,
-                box=(610, 670, 950, 770),
-                bg_color=(16, 185, 129, 255) if share_active else (30, 41, 59, 230),
-                border_color=(52, 211, 153, 255) if share_active else (71, 85, 105, 200),
-                text="🚀 SHARED!" if share_active else "↗ SHARE",
-                font=font_btn,
-                scale=share_scale,
-            )
-
-            # Subscribe + Bell Container
-            sub_active = t >= 5.0
-            sub_scale = 1.0 + (0.18 * math.sin((t - 5.0) * 12) if 5.0 <= t <= 5.6 else 0.0)
-            sp_box = [1000, 670, 1700, 770]
-            sp_cx, sp_cy = (sp_box[0] + sp_box[2]) / 2, (sp_box[1] + sp_box[3]) / 2
-            sp_w, sp_h = (sp_box[2] - sp_box[0]) * sub_scale, (sp_box[3] - sp_box[1]) * sub_scale
-            sp_scaled = [sp_cx - sp_w / 2, sp_cy - sp_h / 2, sp_cx + sp_w / 2, sp_cy + sp_h / 2]
-
-            sub_bg = (15, 23, 42, 255) if sub_active else (220, 38, 38, 255)
-            sub_border = (34, 197, 94, 255) if sub_active else (239, 68, 68, 255)
-            draw.rounded_rectangle([sp_scaled[0] - 3, sp_scaled[1] - 3, sp_scaled[2] + 3, sp_scaled[3] + 3], radius=18, fill=sub_border)
-            draw.rounded_rectangle(sp_scaled, radius=18, fill=sub_bg)
-
-            sub_label = "✓ SUBSCRIBED TO CHANNEL" if sub_active else "SUBSCRIBE FOR NEXT RAID"
-            sbt_box = draw.textbbox((0, 0), sub_label, font=font_btn)
-            sbt_w = sbt_box[2] - sbt_box[0]
-            sbt_h = sbt_box[3] - sbt_box[1]
-            draw.text((sp_scaled[0] + 50, sp_cy - sbt_h / 2 - 2), sub_label, fill=(255, 255, 255, 255), font=font_btn)
-
-            # Divider & Bell
-            divider_x = sp_scaled[0] + sp_w - 160
-            draw.line([(divider_x, sp_scaled[1] + 16), (divider_x, sp_scaled[3] - 16)], fill=(100, 116, 139, 160), width=2)
-
-            bell_ringing = t >= 6.5
-            bell_angle = math.sin((t - 6.5) * 26) * 16.0 if bell_ringing else 0.0
-            bell_center = (int(divider_x + 80), int(sp_cy))
-            self._draw_bell(draw=draw, center=bell_center, angle_deg=bell_angle, ringing=bell_ringing, size=32)
-
-            if bell_ringing:
-                b_note = "🔔 ALL ON"
-                bn_box = draw.textbbox((0, 0), b_note, font=font_small)
-                bn_w = bn_box[2] - bn_box[0]
-                draw.text((bell_center[0] - bn_w // 2, int(sp_cy + 58)), b_note, fill=(251, 191, 36, 255), font=font_small)
-
-            # Cursor Trajectory
-            cursor_pos = None
-            if 1.4 <= t < 2.2:
-                p = (t - 1.4) / 0.8
-                cursor_pos = (int(260 + p * 130), int(800 - math.sin(p * math.pi) * 80))
-            elif 2.8 <= t < 3.6:
-                p = (t - 2.8) / 0.8
-                cursor_pos = (int(650 + p * 130), int(800 - math.sin(p * math.pi) * 80))
-            elif 4.4 <= t < 5.2:
-                p = (t - 4.4) / 0.8
-                cursor_pos = (int(1050 + p * 170), int(800 - math.sin(p * math.pi) * 80))
-            elif 5.9 <= t < 6.7:
-                p = (t - 5.9) / 0.8
-                cursor_pos = (int(divider_x + 25 + p * 55), int(790 - math.sin(p * math.pi) * 70))
-
-            if cursor_pos:
-                self._draw_cursor(draw, cursor_pos)
-
-            # Bottom note
-            bottom_msg = "DROP A COMMENT WITH YOUR BASE DESIGN • NEW EPISODES UPLOADED REGULARLY"
-            b_box = draw.textbbox((0, 0), bottom_msg, font=font_sub)
-            bw = b_box[2] - b_box[0]
-            draw.text(((1920 - bw) // 2, 890), bottom_msg, fill=(148, 163, 184, 230), font=font_sub)
-
-            # Fade to black (last 1.2s)
-            if t >= duration - 1.2:
-                fade_alpha = int(((t - (duration - 1.2)) / 1.2) * 255)
                 overlay = Image.new("RGBA", (1920, 1080), (0, 0, 0, fade_alpha))
                 bg.paste(overlay, (0, 0), overlay)
 
@@ -638,15 +636,15 @@ class OutroTailGenerator:
     def render_outro_clip(
         self,
         output_mp4_path: Optional[Path] = None,
-        duration: float = 7.5,
+        duration: float = 8.0,
         fps: int = 30,
-        style: str = "cyber_row",  # "cyber_row", "two_tier", "cinematic_slate"
+        style: str = "cartoon_comedy",  # "cartoon_comedy" (8.0s), "hype_studio" (9.5s)
         audio_track: Optional[Path] = None,
         series_title: str = "LAST DAY ON EARTH: SURVIVAL",
         force_recreate: bool = False,
     ) -> Path:
-        """Renders standalone animated outro MP4 video using the selected style."""
-        target_path = output_mp4_path or (self.assets_dir / f"outro_{style}_{int(duration)}s.mp4")
+        """Renders standalone animated outro MP4 video with sound cues."""
+        target_path = output_mp4_path or (self.assets_dir / f"outro_{style}_{duration}s.mp4")
 
         # Reuse cached animation if exists and valid
         if target_path.exists() and target_path.stat().st_size > 50000 and not force_recreate:
@@ -657,29 +655,22 @@ class OutroTailGenerator:
         logger.info(f"Rendering animated outro tail frames (style={style}, {duration}s @ {fps}fps)...")
 
         try:
-            if style == "two_tier":
-                total_frames = self.render_frames_two_tier(
+            if style == "hype_studio":
+                total_frames = self.render_frames_hype_studio(
                     temp_dir=temp_frames_dir,
                     duration=duration,
                     fps=fps,
                     series_title=series_title,
                 )
-            elif style == "cinematic_slate":
-                total_frames = self.render_frames_cinematic_slate(
-                    temp_dir=temp_frames_dir,
-                    duration=duration,
-                    fps=fps,
-                    series_title=series_title,
-                )
-            else:  # default "cyber_row"
-                total_frames = self.render_frames_cyber_row(
+            else:  # default "cartoon_comedy"
+                total_frames = self.render_frames_cartoon_comedy(
                     temp_dir=temp_frames_dir,
                     duration=duration,
                     fps=fps,
                     series_title=series_title,
                 )
 
-            # Audio selection (upbeat punchy audio)
+            # Select audio track
             selected_audio = audio_track
             if not selected_audio or not Path(selected_audio).exists():
                 for candidate in ["electro_cabello.mp3", "groove_grove.mp3", "decisions.mp3"]:
@@ -688,33 +679,29 @@ class OutroTailGenerator:
                         selected_audio = cand_path
                         break
 
-            fadeout_len = 1.5 if duration >= 8.0 else 1.0
+            fadeout_len = 1.2
+
+            # FFmpeg Command with background music + high-pitch bell chime chime SFX
+            # Bell ding occurs at 5.0s (for cartoon_comedy) or 6.2s (for hype_studio)
+            bell_time = 5.0 if style != "hype_studio" else 6.2
+
+            filter_complex = (
+                f"[1:a]afade=t=in:st=0:d=0.3,afade=t=out:st={duration - fadeout_len}:d={fadeout_len},volume=0.85[bg];"
+                f"[2:a]adelay={int(bell_time * 1000)}|{int(bell_time * 1000)},volume=1.4[chime];"
+                f"[bg][chime]amix=inputs=2:duration=first:dropout_transition=0[aout]"
+            )
 
             cmd = [
                 "ffmpeg",
                 "-y",
                 "-framerate", str(fps),
                 "-i", str(temp_frames_dir / "frame_%04d.jpg"),
-            ]
-
-            if selected_audio and Path(selected_audio).exists():
-                cmd.extend([
-                    "-i", str(selected_audio),
-                    "-t", str(duration),
-                    "-filter_complex", f"[1:a]afade=t=in:st=0:d=0.3,afade=t=out:st={duration - fadeout_len}:d={fadeout_len}[aout]",
-                    "-map", "0:v",
-                    "-map", "[aout]",
-                ])
-            else:
-                cmd.extend([
-                    "-f", "lavfi",
-                    "-i", "anullsrc=channel_layout=stereo:sample_rate=44100",
-                    "-t", str(duration),
-                    "-map", "0:v",
-                    "-map", "1:a",
-                ])
-
-            cmd.extend([
+                "-i", str(selected_audio),
+                "-f", "lavfi", "-i", "sine=frequency=1760:duration=0.8",  # High-pitch bell ding
+                "-t", str(duration),
+                "-filter_complex", filter_complex,
+                "-map", "0:v",
+                "-map", "[aout]",
                 "-c:v", "libx264",
                 "-preset", "faster",
                 "-pix_fmt", "yuv420p",
@@ -722,7 +709,7 @@ class OutroTailGenerator:
                 "-b:a", "192k",
                 "-movflags", "+faststart",
                 str(target_path),
-            ])
+            ]
 
             target_path.parent.mkdir(parents=True, exist_ok=True)
             logger.info(f"Assembling animated outro tail via FFmpeg: {target_path}")

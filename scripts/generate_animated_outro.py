@@ -30,15 +30,15 @@ def main():
     parser.add_argument(
         "--style",
         type=str,
-        default="cyber_row",
-        choices=["cyber_row", "two_tier", "cinematic_slate"],
-        help="Animation style: cyber_row (7.5s), two_tier (8.5s), cinematic_slate (10.0s)",
+        default="cartoon_comedy",
+        choices=["cartoon_comedy", "hype_studio"],
+        help="Animation style: cartoon_comedy (8.0s, Luckiest Guy font, funny meme hooks), hype_studio (9.5s, Bangers font, MrBeast pacing)",
     )
-    parser.add_argument("--duration", type=float, default=None, help="Custom duration in seconds")
+    parser.add_argument("--duration", type=float, default=None, help="Custom duration in seconds (7-10s)")
     parser.add_argument("--fps", type=int, default=30, help="Framerate (default: 30)")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 file path")
     parser.add_argument("--force", action="store_true", help="Force re-rendering even if cached asset exists")
-    parser.add_argument("--all", action="store_true", help="Render all 3 options side by side for selection")
+    parser.add_argument("--all", action="store_true", help="Render both options (8.0s & 9.5s) side by side for selection")
 
     args = parser.parse_args()
     settings = get_settings()
@@ -46,18 +46,36 @@ def main():
     generator = OutroTailGenerator(
         assets_dir=Path("assets/animations"),
         audio_library_dir=settings.processing.music_library_file.parent / "audio",
+        fonts_dir=Path("config/fonts"),
     )
+
+    def extract_preview_snapshot(video_path: Path, timestamp: float = 5.2) -> Path:
+        preview_path = video_path.with_suffix(".preview.jpg")
+        try:
+            import subprocess
+            cmd = [
+                "ffmpeg", "-y",
+                "-ss", str(timestamp),
+                "-i", str(video_path),
+                "-frames:v", "1",
+                "-update", "1",
+                "-q:v", "2",
+                str(preview_path),
+            ]
+            subprocess.run(cmd, capture_output=True, check=True)
+            return preview_path
+        except Exception:
+            return preview_path
 
     if args.all:
         presets = [
-            ("Option 1: Cyber-Survival Row", "cyber_row", 7.5, Path("assets/animations/option1_cyber_row_7.5s.mp4")),
-            ("Option 2: Two-Tier Hero Studio", "two_tier", 8.5, Path("assets/animations/option2_two_tier_hero_8.5s.mp4")),
-            ("Option 3: Cinematic End-Screen Slate", "cinematic_slate", 10.0, Path("assets/animations/option3_cinematic_slate_10.0s.mp4")),
+            ("Option A: Cartoon Comedy & Meme Survival", "cartoon_comedy", 8.0, Path("assets/animations/optionA_cartoon_comedy_8.0s.mp4")),
+            ("Option B: Hype Studio & MrBeast Action", "hype_studio", 9.5, Path("assets/animations/optionB_hype_studio_9.5s.mp4")),
         ]
 
-        print("\n" + "=" * 70)
-        print("🎬 GENERATING ALL 3 ANIMATED OUTRO TAIL OPTIONS (7 - 10s)")
-        print("=" * 70)
+        print("\n" + "=" * 75)
+        print("🎬 GENERATING ANIMATED LIKE, SHARE & SUBSCRIBE OUTRO TAIL OPTIONS (7 - 10s)")
+        print("=" * 75)
 
         results = []
         for title, style_name, default_dur, out_path in presets:
@@ -71,25 +89,26 @@ def main():
                 series_title=settings.youtube.series_title,
                 force_recreate=True,
             )
+            preview = extract_preview_snapshot(clip, timestamp=min(dur - 2.0, 5.2))
             size_kb = round(clip.stat().st_size / 1024, 1)
-            print(f"   ✅ Saved: {clip} ({size_kb} KB)")
-            results.append((title, clip, dur))
+            print(f"   ✅ Video:    {clip} ({size_kb} KB)")
+            print(f"   📸 Snapshot: {preview}")
+            results.append((title, clip, preview, dur))
 
-        print("\n" + "=" * 70)
-        print("🎉 ALL 3 OPTIONS GENERATED SUCCESSFULLY FOR SELECTION:")
-        print("=" * 70)
-        for title, clip, dur in results:
-            print(f"• {title:<36} | {dur:4.1f}s | {clip.resolve()}")
-        print("=" * 70 + "\n")
+        print("\n" + "=" * 75)
+        print("🎉 ALL OUTRO TAIL OPTIONS GENERATED SUCCESSFULLY FOR SELECTION:")
+        print("=" * 75)
+        for title, clip, preview, dur in results:
+            print(f"• {title:<40} | {dur:4.1f}s | {clip.name}")
+        print("=" * 75 + "\n")
         return
 
     # Single render
     default_durs = {
-        "cyber_row": 7.5,
-        "two_tier": 8.5,
-        "cinematic_slate": 10.0,
+        "cartoon_comedy": 8.0,
+        "hype_studio": 9.5,
     }
-    duration = args.duration or default_durs.get(args.style, 7.5)
+    duration = args.duration or default_durs.get(args.style, 8.0)
     target_path = Path(args.output) if args.output else Path(f"assets/animations/outro_{args.style}_{duration}s.mp4")
 
     print("\n" + "=" * 65)
@@ -109,10 +128,12 @@ def main():
         series_title=settings.youtube.series_title,
         force_recreate=args.force,
     )
+    preview = extract_preview_snapshot(out_file, timestamp=min(duration - 2.0, 5.2))
 
     size_kb = round(out_file.stat().st_size / 1024, 1)
     print(f"✅ Generated successfully! ({size_kb} KB)")
-    print(f"🎥 Video location: {out_file.resolve()}\n")
+    print(f"🎥 Video location:    {out_file.resolve()}")
+    print(f"📸 Preview snapshot:  {preview.resolve()}\n")
 
 
 if __name__ == "__main__":
