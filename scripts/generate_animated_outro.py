@@ -111,7 +111,7 @@ def main():
         "cartoon_comedy": 8.0,
     }
     duration = args.duration or default_durs.get(args.style, 9.5)
-    target_path = Path(args.output) if args.output else Path(f"assets/animations/outro_{args.style}_{duration}s.mp4")
+    target_path = Path(args.output) if args.output else Path("assets/animations/like_share_subscribe_endcredits.mp4")
 
     print("\n" + "=" * 65)
     print("🎬 GENERATING ANIMATED LIKE, SHARE & SUBSCRIBE OUTRO TAIL")
