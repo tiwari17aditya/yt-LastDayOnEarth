@@ -1496,5 +1496,39 @@
       "privacy_redacted": true,
       "md5_checksum": "3003066f0616679f443ec90942ca1acb"
     }
+  },
+  {
+    "job_id": "job_20261024_063547",
+    "timestamp": "2026-10-24T06:35:47.563153+00:00",
+    "input_filename": "ScreenRecording_10-24-2026 00-28-22_1.mp4",
+    "output_filename": "ScreenRecording_10-24-2026_00-28-22_1_Processed_24102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "amfF7cJrM_E",
+    "youtube_url": "https://youtu.be/amfF7cJrM_E",
+    "details": {
+      "video_id": "amfF7cJrM_E",
+      "youtube_url": "https://youtu.be/amfF7cJrM_E",
+      "video_output": "output/ScreenRecording_10-24-2026_00-28-22_1_Processed_24102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-24-2026_00-28-22_1_Processed_24102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-24-2026_00-28-22_1_Processed_24102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #53",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #53",
+        "walkthrough": "Surviving Day 53: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #53"
+      },
+      "duration_seconds": 1582.958254,
+      "soundtrack_tracks": [
+        "Local Forecast",
+        "Fretless",
+        "Shores of Avalon",
+        "Clean Soul",
+        "Constance",
+        "Carefree",
+        "Daily Beetle"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "04b06cc65b5e49cfd1e6fa68abb0525a"
+    }
   }
 ]
