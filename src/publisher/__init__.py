@@ -1,8 +1,11 @@
-"""YouTube publishing and metadata generation module."""
+"""YouTube and open-source multi-platform publishing and metadata generation module."""
 
 from src.publisher.youtube_client import BasePublisher, YouTubeClient, VideoPublishMetadata
 from src.publisher.title_manager import TitleManager, TitlePackage
 from src.publisher.metadata_generator import DynamicTagGenerator
+from src.publisher.peertube_client import PeerTubeClient
+from src.publisher.fediverse_broadcaster import FediverseBroadcaster
+from src.publisher.multi_publisher import MultiPlatformPublisher, MultiPlatformPublishResult
 
 __all__ = [
     "BasePublisher",
@@ -11,4 +14,8 @@ __all__ = [
     "TitleManager",
     "TitlePackage",
     "DynamicTagGenerator",
+    "PeerTubeClient",
+    "FediverseBroadcaster",
+    "MultiPlatformPublisher",
+    "MultiPlatformPublishResult",
 ]

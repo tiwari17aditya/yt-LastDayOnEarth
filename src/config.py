@@ -90,6 +90,29 @@ class SMTPSettings(BaseModel):
     )
 
 
+class PeerTubeSettings(BaseModel):
+    enabled: bool = Field(default_factory=lambda: os.getenv("PEERTUBE_ENABLED", "false").lower() == "true")
+    instance_url: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_INSTANCE_URL"))
+    username: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_USERNAME"))
+    password: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_PASSWORD"))
+    client_id: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_CLIENT_ID"))
+    client_secret: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_CLIENT_SECRET"))
+    access_token: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_ACCESS_TOKEN"))
+    channel_name: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_CHANNEL_NAME"))
+    privacy_status: int = Field(default_factory=lambda: int(os.getenv("PEERTUBE_PRIVACY_STATUS", "1")))
+
+
+class FediverseSettings(BaseModel):
+    enabled: bool = Field(default_factory=lambda: os.getenv("FEDIVERSE_ENABLED", "false").lower() == "true")
+    mastodon_instance: Optional[str] = Field(default_factory=lambda: os.getenv("MASTODON_INSTANCE_URL"))
+    mastodon_access_token: Optional[str] = Field(default_factory=lambda: os.getenv("MASTODON_ACCESS_TOKEN"))
+    lemmy_instance: Optional[str] = Field(default_factory=lambda: os.getenv("LEMMY_INSTANCE_URL"))
+    lemmy_auth_token: Optional[str] = Field(default_factory=lambda: os.getenv("LEMMY_AUTH_TOKEN"))
+    lemmy_community_id: Optional[int] = Field(
+        default_factory=lambda: int(os.getenv("LEMMY_COMMUNITY_ID")) if os.getenv("LEMMY_COMMUNITY_ID") else None
+    )
+
+
 class ProcessingSettings(BaseModel):
     resolution: str = Field(default_factory=lambda: os.getenv("VIDEO_RESOLUTION", "1920x1080"))
     target_fps: int = Field(default_factory=lambda: int(os.getenv("VIDEO_TARGET_FPS", "60")))
@@ -114,6 +137,8 @@ class PipelineSettings(BaseModel):
     gmail: GmailSettings = Field(default_factory=GmailSettings)
     gemini: GeminiSettings = Field(default_factory=GeminiSettings)
     youtube: YouTubeSettings = Field(default_factory=YouTubeSettings)
+    peertube: PeerTubeSettings = Field(default_factory=PeerTubeSettings)
+    fediverse: FediverseSettings = Field(default_factory=FediverseSettings)
     smtp: SMTPSettings = Field(default_factory=SMTPSettings)
     processing: ProcessingSettings = Field(default_factory=ProcessingSettings)
 

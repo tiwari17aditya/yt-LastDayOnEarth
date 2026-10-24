@@ -77,16 +77,19 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 - **Naming Rule**: `<Original_Title>_Processed_<DDMMYYYY>.mp4`
 
 ### 3.6 Publisher & Dynamic Metadata (`src/publisher/`)
-- **Responsibility**: Formulate engaging, SEO-optimized front-loaded titles, descriptions with chapter markers & ~50 dynamic trending hashtags, dynamic video tags, automated custom HD thumbnail generation, direct Public upload via YouTube Data API v3, and dedicated playlist management.
+- **Responsibility**: Formulate engaging, SEO-optimized front-loaded titles, descriptions with chapter markers & ~50 dynamic trending hashtags, dynamic video tags, automated custom HD thumbnail generation, direct Public upload via YouTube Data API v3, dedicated playlist management, and automated decentralized cross-posting across open-source networks.
 - **Components**:
-  - `YouTubeClient`: Handles OAuth upload, thumbnail upload, playlist management, and video assignment.
+  - `BasePublisher`: Abstract base interface defining metadata generation and video uploading contracts.
+  - `YouTubeClient`: Handles OAuth upload, thumbnail upload, playlist management, and video assignment on YouTube.
+  - `PeerTubeClient`: Open-source decentralized video hosting client implementing `BasePublisher` via PeerTube REST API v1 (federated across the global ActivityPub Fediverse).
+  - `FediverseBroadcaster`: Cross-posts rich release announcements with custom thumbnails, video links, and dynamic hashtags to Mastodon and Lemmy communities.
+  - `MultiPlatformPublisher`: Orchestrates primary publishing (YouTube) and non-blocking open-source mirrors and social broadcasts (PeerTube + Fediverse), preserving fail-safe pipeline semantics.
   - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`) to ensure consecutive numbering across ephemeral CI/CD environments.
   - `DynamicTagGenerator` (`src/publisher/metadata_generator.py`): Dynamically analyzes gameplay events and titles to synthesize ~50 trending hashtags via Gemini AI or multi-cluster contextual algorithmic selection with seeded rotation.
 - **Interface**: `BasePublisher`
   - `generate_metadata(video_title: str, events: List[GameplayEvent], ...) -> VideoPublishMetadata`
   - `upload_video(video_path: Path, metadata: VideoPublishMetadata) -> str`
-  - `get_or_create_playlist(youtube, title: str, description: str, privacy_status: str) -> Optional[str]`
-  - `add_video_to_playlist(youtube, video_id: str, playlist_id: str) -> bool`
+  - `publish_all(video_path: Path, metadata: VideoPublishMetadata) -> MultiPlatformPublishResult` (in `MultiPlatformPublisher`)
 
 ### 3.7 Notifications & Reporting (`src/notifications/`)
 - **Responsibility**: Format and send HTML status emails for each job, and aggregate statistics for weekly and monthly reports.

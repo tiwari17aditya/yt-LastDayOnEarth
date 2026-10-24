@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-23
+
+### Added
+- **Open-Source Multi-Platform Video Publishing & Fediverse Reach Expansion**:
+  - `PeerTubeClient` (`src/publisher/peertube_client.py`): Implements `BasePublisher` for decentralized, open-source video hosting via PeerTube REST API v1 (federated across the global ActivityPub network).
+  - `FediverseBroadcaster` (`src/publisher/fediverse_broadcaster.py`): Automated promotional broadcast module sharing episode announcements, links, custom thumbnails, and dynamic gaming hashtags to Mastodon and Lemmy communities.
+  - `MultiPlatformPublisher` (`src/publisher/multi_publisher.py`): Non-blocking orchestrator coordinating primary YouTube publishing with decentralized mirrors and social promotion without degrading core pipeline stability.
+  - Added `PeerTubeSettings` and `FediverseSettings` in `src/config.py` and updated `.env.example` with full configuration templates.
+- **Reporting & Dispatch Fixes**:
+  - Configured explicit `GMAIL_SENDER` in `.env` and `.github/workflows/weekly_report.yml` to guarantee RFC 5322 compliance and prevent spam quarantine.
+
 ## [1.6.0] - 2026-10-23
 
 ### Changed

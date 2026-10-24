@@ -83,6 +83,9 @@ from src.processor.video_processor import VideoProcessor
 from src.processor.thumbnail_generator import ThumbnailGenerator
 from src.publisher.youtube_client import YouTubeClient, is_quota_exceeded_error
 from src.publisher.title_manager import TitleManager
+from src.publisher.peertube_client import PeerTubeClient
+from src.publisher.fediverse_broadcaster import FediverseBroadcaster
+from src.publisher.multi_publisher import MultiPlatformPublisher
 from src.notifications.email_client import EmailNotifier
 from src.notifications.gmail_client import GmailNotifier
 from src.notifications.report_generator import WeeklyReportGenerator
@@ -161,7 +164,7 @@ def run_pipeline(
         sync_youtube=settings.youtube.sync_episode_with_youtube,
     )
     thumbnail_gen = ThumbnailGenerator(output_dir=settings.processing.output_dir)
-    publisher = YouTubeClient(
+    youtube_pub = YouTubeClient(
         client_secrets_file=settings.youtube.client_secrets_file,
         token_file=settings.youtube.token_file,
         privacy_status=settings.youtube.privacy_status,
@@ -169,6 +172,41 @@ def run_pipeline(
         title_manager=title_mgr,
         gemini_api_key=settings.gemini.api_key,
         gemini_model=settings.gemini.model,
+    )
+
+    peertube_pub = (
+        PeerTubeClient(
+            instance_url=settings.peertube.instance_url,
+            username=settings.peertube.username,
+            password=settings.peertube.password,
+            client_id=settings.peertube.client_id,
+            client_secret=settings.peertube.client_secret,
+            access_token=settings.peertube.access_token,
+            channel_name=settings.peertube.channel_name,
+            privacy_status=settings.peertube.privacy_status,
+        )
+        if settings.peertube.enabled
+        else None
+    )
+
+    fediverse_broadcaster = (
+        FediverseBroadcaster(
+            mastodon_instance=settings.fediverse.mastodon_instance,
+            mastodon_access_token=settings.fediverse.mastodon_access_token,
+            lemmy_instance=settings.fediverse.lemmy_instance,
+            lemmy_auth_token=settings.fediverse.lemmy_auth_token,
+            lemmy_community_id=settings.fediverse.lemmy_community_id,
+        )
+        if settings.fediverse.enabled
+        else None
+    )
+
+    publisher = MultiPlatformPublisher(
+        youtube_client=youtube_pub,
+        peertube_client=peertube_pub,
+        fediverse_broadcaster=fediverse_broadcaster,
+        enable_peertube=settings.peertube.enabled,
+        enable_fediverse_broadcast=settings.fediverse.enabled,
     )
 
     # Pre-flight quota check when publishing to YouTube

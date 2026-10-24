@@ -46,6 +46,7 @@ jobs:
           GCP_CLIENT_ID: ${{ secrets.GCP_CLIENT_ID }}
           GCP_CLIENT_SECRET: ${{ secrets.GCP_CLIENT_SECRET }}
           GCP_REFRESH_TOKEN: ${{ secrets.GCP_REFRESH_TOKEN }}
+          GMAIL_SENDER: ${{ secrets.GMAIL_SENDER || 'addytiwari3@gmail.com' }}
           NOTIFICATION_RECIPIENTS: ${{ secrets.NOTIFICATION_RECIPIENTS }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
