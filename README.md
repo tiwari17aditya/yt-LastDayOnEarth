@@ -117,8 +117,15 @@ python scripts/manage_playlist.py --dedup
 # Vertical YouTube Shorts (9:16) Auto-Clipper
 python scripts/generate_short.py --video data/output/gameplay.mp4 --start 45.0 --duration 35.0 --episode 12
 
-# Cinematic Outro End-Screen Video Generator (1080p)
-python scripts/generate_endscreen.py --duration 12.0 --output data/endscreens/outro_slate.mp4
+# Cinematic Animated Outro Tail with Smooth Fade-Out/In Transition
+python scripts/generate_animated_outro.py
+
+# Sync Static Video & Audio Assets with Google Drive
+python -m src.main sync-assets --download   # Pull missing assets from Drive
+python -m src.main sync-assets --upload     # Mirror local assets to Drive
+
+# Channel Video Duration Distribution Analysis
+python scripts/analyze_video_durations.py
 
 # Channel Growth & Retention Performance Digest
 python scripts/generate_channel_digest.py

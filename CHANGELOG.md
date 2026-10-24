@@ -8,12 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.7.0] - 2026-10-24
 
 ### Added
-- **Animated Funky "Like, Share & Subscribe" Outro Tail (Priority 7)**:
-  - `OutroTailGenerator` (`src/processor/outro_generator.py`): Generates 5–8 second high-energy 1080p animated signature brand outro clips with interactive button transitions (Like, Share, Subscribe, Bell), visual cursor interaction, neon pulse effects, and punchy upbeat audio stings.
-  - `VideoProcessor.append_outro_tail()` (`src/processor/video_processor.py`): Automated FFmpeg concat filter complex normalizing stream resolution (1920x1080), framerate (60fps), and audio codecs (AAC stereo 44100Hz) to guarantee seamless, artifact-free video stitching.
-  - Automated Pipeline Integration (`src/main.py`): Automatically stitches the outro tail to rendered episodes when `OUTRO_TAIL_ENABLED="true"` and auto-generates missing animation assets on demand.
-  - Standalone CLI Utility (`scripts/generate_animated_outro.py`): Allows on-demand rendering, customization, and preview of the animated outro tail.
-  - Configuration Settings: Added `outro_tail_enabled`, `outro_tail_path`, and `outro_tail_duration` in `src/config.py` and `.env.example`.
+- **Finalized Animated "Like, Share & Subscribe" Outro Tail & Cinematic Dip-to-Black Transition**:
+  - Master Outro Asset (`assets/animations/like_share_subscribe_endcredits.mp4`): 9.5s @ 30fps with Last Day on Earth cover art background, high-energy creator copy, and a climactic 4.5x expanding bell zoom with golden soundwaves, screen dimming, and crystal chime audio effects.
+  - Smooth Cinematic Fade Transition (`src/processor/video_processor.py`): Concurrent video and audio fade-out (`fade=t=out`, `afade=t=out`) on original gameplay paired with video/audio fade-in (`fade=t=in`, `afade=t=in`) on the outro clip over 0.7s to create a broadcast-quality dip to black.
+- **Dedicated Google Drive `Assets` Hierarchy & Automated Cloud Sync**:
+  - `GoogleDriveSettings` & `GoogleDriveClient` (`src/ingestion/drive_client.py`): Established isolated `MyDrive -> youtube-projects -> LastDayOnEarth -> Assets` directory for static and recurring video/image resources.
+  - Bidirectional asset sync CLI: `python -m src.main sync-assets --download` and `--upload`.
+  - Self-healing pipeline integration: Pipeline automatically fetches missing outro assets from Google Drive on the fly if not cached locally.
+  - GitHub Actions integration: Pre-flight asset download step added to `.github/workflows/scheduled_pipeline.yml`.
+- **YouTube Video Duration Distribution Audit Utility**:
+  - `scripts/analyze_video_durations.py`: Queries YouTube Data API v3 (`contentDetails.duration`) across all uploads on the channel and buckets videos by length (`< 10 min`, `10-20 min`, `20-30 min`, `30-40 min`, etc.).
 - **Open-Source Multi-Platform Video Publishing & Fediverse Reach Expansion**:
   - `PeerTubeClient` (`src/publisher/peertube_client.py`): Implements `BasePublisher` for decentralized, open-source video hosting via PeerTube REST API v1 (federated across the global ActivityPub network).
   - `FediverseBroadcaster` (`src/publisher/fediverse_broadcaster.py`): Automated promotional broadcast module sharing episode announcements, links, custom thumbnails, and dynamic gaming hashtags to Mastodon and Lemmy communities.
