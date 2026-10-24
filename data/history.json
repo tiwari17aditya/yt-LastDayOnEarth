@@ -1464,5 +1464,37 @@
       "privacy_redacted": true,
       "md5_checksum": "a222b59de80e59c568ec3b6187023d67"
     }
+  },
+  {
+    "job_id": "job_20261024_014125",
+    "timestamp": "2026-10-24T01:41:25.904637+00:00",
+    "input_filename": "ScreenRecording_10-24-2026 00-58-41_1.mp4",
+    "output_filename": "ScreenRecording_10-24-2026_00-58-41_1_Processed_24102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "SLo8tcOVfqY",
+    "youtube_url": "https://youtu.be/SLo8tcOVfqY",
+    "details": {
+      "video_id": "SLo8tcOVfqY",
+      "youtube_url": "https://youtu.be/SLo8tcOVfqY",
+      "video_output": "output/ScreenRecording_10-24-2026_00-58-41_1_Processed_24102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-24-2026_00-58-41_1_Processed_24102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-24-2026_00-58-41_1_Processed_24102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations + Workshop & Smelting! | LDoE Survival #52",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Workshop & Smelting Furnaces Plus... #52",
+        "walkthrough": "Surviving Day 52: Home Base Operations And Workshop & Smelting Furnaces Plus Crafting... #52"
+      },
+      "duration_seconds": 895.172767,
+      "soundtrack_tracks": [
+        "Fretless",
+        "Decisions",
+        "Local Forecast",
+        "Pamgaea",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "3003066f0616679f443ec90942ca1acb"
+    }
   }
 ]
