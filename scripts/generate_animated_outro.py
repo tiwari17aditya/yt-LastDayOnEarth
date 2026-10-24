@@ -36,6 +36,7 @@ def main():
     )
     parser.add_argument("--duration", type=float, default=None, help="Custom duration in seconds (7-10s)")
     parser.add_argument("--fps", type=int, default=30, help="Framerate (default: 30)")
+    parser.add_argument("--background", type=str, default="assets/backgrounds/ldoe_cover_art.jpg", help="Path to background cover art image")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 file path")
     parser.add_argument("--force", action="store_true", help="Force re-rendering even if cached asset exists")
     parser.add_argument("--all", action="store_true", help="Render both options side by side for selection")
@@ -117,8 +118,9 @@ def main():
     print("=" * 65)
     print(f"🎨 Style:      {args.style}")
     print(f"⏱️ Duration:   {duration}s @ {args.fps}fps")
-    print(f"📁 Output:     {target_path}")
-    print(f"🔄 Recreate:   {args.force}")
+    bg_path = Path(args.background) if args.background and Path(args.background).exists() else None
+    if bg_path:
+        print(f"🖼️ Cover Art:  {bg_path}")
     print("-" * 65)
 
     out_file = generator.render_outro_clip(
@@ -127,9 +129,10 @@ def main():
         fps=args.fps,
         style=args.style,
         series_title=settings.youtube.series_title,
+        background_image=bg_path,
         force_recreate=args.force,
     )
-    preview = extract_preview_snapshot(out_file, timestamp=min(duration - 2.0, 5.2))
+    preview = extract_preview_snapshot(out_file, timestamp=7.6 if "zoom" in args.style else 5.2)
 
     size_kb = round(out_file.stat().st_size / 1024, 1)
     print(f"✅ Generated successfully! ({size_kb} KB)")

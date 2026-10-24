@@ -461,8 +461,9 @@ class OutroTailGenerator:
         fps: int = 30,
         series_title: str = "LAST DAY ON EARTH: SURVIVAL",
         bell_zoom: bool = False,
+        background_image: Optional[Path] = None,
     ) -> int:
-        """Renders 9.5s MrBeast-Style Outro with optional continuous Bell Zoom and scene fade."""
+        """Renders 9.5s MrBeast-Style Outro with optional continuous Bell Zoom, scene fade, and LDoE cover art."""
         temp_dir.mkdir(parents=True, exist_ok=True)
         total_frames = int(duration * fps)
 
@@ -472,23 +473,42 @@ class OutroTailGenerator:
         font_hero = self._get_font(44, style="bangers")
         font_comic = self._get_font(32, style="luckiest")
 
+        # Load LDoE Background Cover Art if available
+        base_bg_img = None
+        target_bg = background_image or (Path("assets/backgrounds/ldoe_cover_art.jpg"))
+        if target_bg and Path(target_bg).exists():
+            try:
+                raw_bg = Image.open(str(target_bg)).convert("RGBA")
+                base_bg_img = raw_bg.resize((1920, 1080), Image.Resampling.LANCZOS)
+                # Apply dark cinematic overlay (65% opacity) so text & buttons remain crystal clear
+                tint = Image.new("RGBA", (1920, 1080), (12, 16, 24, 165))
+                base_bg_img.paste(tint, (0, 0), tint)
+            except Exception as e:
+                logger.warning(f"Could not load background image {target_bg}: {e}")
+
         for f in range(total_frames):
             t = f / fps
 
-            bg = Image.new("RGBA", (1920, 1080), (10, 12, 16, 255))
-            draw = ImageDraw.Draw(bg)
+            if base_bg_img:
+                bg = base_bg_img.copy()
+                draw = ImageDraw.Draw(bg)
+                pulse = math.sin(t * 3.0) * 0.16 + 0.84
+                border_alpha = int(180 + 40 * pulse)
+                draw.rectangle([140, 110, 1780, 115], fill=(220, 38, 38, border_alpha))
+                draw.rectangle([140, 970, 1780, 975], fill=(220, 38, 38, border_alpha))
+            else:
+                bg = Image.new("RGBA", (1920, 1080), (10, 12, 16, 255))
+                draw = ImageDraw.Draw(bg)
+                pulse = math.sin(t * 3.0) * 0.16 + 0.84
+                for y in range(0, 1080, 4):
+                    factor = y / 1080.0
+                    r = int(18 + 22 * factor * pulse)
+                    g = int(12 + 10 * factor)
+                    b = int(18 + 14 * factor)
+                    draw.rectangle([(0, y), (1920, y + 4)], fill=(r, g, b, 255))
 
-            # Dark red survival atmosphere
-            pulse = math.sin(t * 3.0) * 0.16 + 0.84
-            for y in range(0, 1080, 4):
-                factor = y / 1080.0
-                r = int(18 + 22 * factor * pulse)
-                g = int(12 + 10 * factor)
-                b = int(18 + 14 * factor)
-                draw.rectangle([(0, y), (1920, y + 4)], fill=(r, g, b, 255))
-
-            draw.rectangle([140, 110, 1780, 115], fill=(220, 38, 38, 230))
-            draw.rectangle([140, 970, 1780, 975], fill=(220, 38, 38, 230))
+                draw.rectangle([140, 110, 1780, 115], fill=(220, 38, 38, 230))
+                draw.rectangle([140, 970, 1780, 975], fill=(220, 38, 38, 230))
 
             # Header
             title_progress = min(1.0, t / 0.8)
@@ -672,6 +692,7 @@ class OutroTailGenerator:
         style: str = "hype_bell_zoom",  # Primary: "hype_bell_zoom" (9.5s), "hype_studio" (9.5s), "cartoon_comedy" (8.0s)
         audio_track: Optional[Path] = None,
         series_title: str = "LAST DAY ON EARTH: SURVIVAL",
+        background_image: Optional[Path] = None,
         force_recreate: bool = False,
     ) -> Path:
         """Renders standalone animated outro MP4 video with sound cues."""
@@ -693,6 +714,7 @@ class OutroTailGenerator:
                     fps=fps,
                     series_title=series_title,
                     bell_zoom=True,
+                    background_image=background_image,
                 )
             elif style == "hype_studio":
                 total_frames = self.render_frames_hype_studio(
@@ -701,6 +723,7 @@ class OutroTailGenerator:
                     fps=fps,
                     series_title=series_title,
                     bell_zoom=False,
+                    background_image=background_image,
                 )
             else:  # default "cartoon_comedy"
                 total_frames = self.render_frames_cartoon_comedy(
