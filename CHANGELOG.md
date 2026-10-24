@@ -5,9 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.7.0] - 2026-10-23
+## [1.7.0] - 2026-10-24
 
 ### Added
+- **Animated Funky "Like, Share & Subscribe" Outro Tail (Priority 7)**:
+  - `OutroTailGenerator` (`src/processor/outro_generator.py`): Generates 5–8 second high-energy 1080p animated signature brand outro clips with interactive button transitions (Like, Share, Subscribe, Bell), visual cursor interaction, neon pulse effects, and punchy upbeat audio stings.
+  - `VideoProcessor.append_outro_tail()` (`src/processor/video_processor.py`): Automated FFmpeg concat filter complex normalizing stream resolution (1920x1080), framerate (60fps), and audio codecs (AAC stereo 44100Hz) to guarantee seamless, artifact-free video stitching.
+  - Automated Pipeline Integration (`src/main.py`): Automatically stitches the outro tail to rendered episodes when `OUTRO_TAIL_ENABLED="true"` and auto-generates missing animation assets on demand.
+  - Standalone CLI Utility (`scripts/generate_animated_outro.py`): Allows on-demand rendering, customization, and preview of the animated outro tail.
+  - Configuration Settings: Added `outro_tail_enabled`, `outro_tail_path`, and `outro_tail_duration` in `src/config.py` and `.env.example`.
 - **Open-Source Multi-Platform Video Publishing & Fediverse Reach Expansion**:
   - `PeerTubeClient` (`src/publisher/peertube_client.py`): Implements `BasePublisher` for decentralized, open-source video hosting via PeerTube REST API v1 (federated across the global ActivityPub network).
   - `FediverseBroadcaster` (`src/publisher/fediverse_broadcaster.py`): Automated promotional broadcast module sharing episode announcements, links, custom thumbnails, and dynamic gaming hashtags to Mastodon and Lemmy communities.

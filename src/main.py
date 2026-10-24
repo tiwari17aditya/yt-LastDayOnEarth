@@ -324,6 +324,28 @@ def run_pipeline(
         output_path = processor.get_output_path(input_video_path.name)
         logger.info(f"Target processed video: {output_path}")
 
+        # Check and prepare animated outro tail (Priority 7)
+        outro_tail_clip = None
+        if settings.processing.outro_tail_enabled:
+            outro_path = settings.processing.outro_tail_path
+            if not outro_path.exists():
+                try:
+                    logger.info("Outro tail animation not found; generating animated outro tail...")
+                    from src.processor.outro_generator import OutroTailGenerator
+                    outro_gen = OutroTailGenerator(
+                        assets_dir=outro_path.parent,
+                        audio_library_dir=settings.processing.music_library_file.parent / "audio",
+                    )
+                    outro_gen.render_outro_clip(
+                        output_mp4_path=outro_path,
+                        duration=settings.processing.outro_tail_duration,
+                        series_title=settings.youtube.series_title,
+                    )
+                except Exception as oe:
+                    logger.warning(f"Could not generate animated outro tail: {oe}. Proceeding without tail.")
+            if outro_path.exists():
+                outro_tail_clip = outro_path
+
         try:
             processor.render(
                 input_video=input_video_path,
@@ -333,6 +355,7 @@ def run_pipeline(
                 privacy_filter=blur_filter,
                 ducking_db=settings.processing.audio_ducking_db,
                 preset=settings.processing.video_preset,
+                outro_tail=outro_tail_clip,
             )
         except Exception as ve:
             raise VideoProcessingError(

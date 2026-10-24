@@ -77,8 +77,9 @@ This document outlines prioritized enhancements designed to maximize YouTube alg
   - **Automated Video Stitching**:
     - Implement an automated concat step in [`src/processor/video_processor.py`](file:///d:/youtube-projects/LastDayOnEarth/src/processor/video_processor.py) to append the animated outro as the video tail.
     - Standardize parameters (1920x1080, matching framerate & AAC audio) to guarantee seamless, artifact-free concatenation.
-    - Configure via `config/settings.yaml` (`outro_tail_enabled: true`, `outro_tail_path: "assets/animations/like_share_subscribe.mp4"`).
+    - Configure via `config/settings.yaml` / `.env` (`OUTRO_TAIL_ENABLED="true"`, `OUTRO_TAIL_PATH="assets/animations/like_share_subscribe.mp4"`).
 * **Impact**: +35% subscriber conversion from viewers reaching end-of-video; strong brand recall.
+* **Status**: ✅ Completed ([`src/processor/outro_generator.py`](file:///d:/youtube-projects/LastDayOnEarth/src/processor/outro_generator.py), [`src/processor/video_processor.py`](file:///d:/youtube-projects/LastDayOnEarth/src/processor/video_processor.py), & [`scripts/generate_animated_outro.py`](file:///d:/youtube-projects/LastDayOnEarth/scripts/generate_animated_outro.py)).
 
 ### Priority 8: YouTube Shorts Automated Scheduling & Pipeline Hook
 * **Goal**: Automatically extract and schedule 1–2 Shorts from every processed long-form video during the main pipeline run.
@@ -112,7 +113,7 @@ This document outlines prioritized enhancements designed to maximize YouTube alg
 | Upcoming Module | Target Phase | Complexity | Expected CTR / Retention Impact | Priority | Status |
 |:---|:---:|:---:|:---:|:---:|:---:|
 | **6. Episode Thumbnails (#1 to #120)** | Phase 2 | Medium | +30% CTR Consistency | 🔥 High | ✅ Completed |
-| **7. Animated Like/Share/Sub Outro Tail (5–8s)** | Phase 2 | Low/Med | +35% Subscriber Conversion | 🔥 High | 📋 Planned |
+| **7. Animated Like/Share/Sub Outro Tail (5–8s)** | Phase 2 | Low/Med | +35% Subscriber Conversion | 🔥 High | ✅ Completed |
 | **8. Automated Shorts Pipeline & Scheduling** | Phase 2 | Medium | +50% Reach & Funnel | 🔥 High | 📋 Planned |
 | **9. Automated Community Posts & Polls** | Phase 3 | Low | +15% Return Viewers | ⚡ Medium | 📋 Planned |
 | **10. Dynamic Combat SFX Audio Ducking** | Phase 3 | Medium | +10% Watch Time | ⚡ Medium | 📋 Planned |

@@ -121,6 +121,54 @@ class VideoProcessor:
 
         return cmd
 
+    def append_outro_tail(
+        self,
+        main_video: Path,
+        outro_video: Path,
+        output_video: Path,
+        preset: str = "veryfast",
+    ) -> Path:
+        """Seamlessly concatenates the animated outro tail to the rendered video."""
+        if not outro_video.exists():
+            logger.warning(f"Outro tail video not found at {outro_video}; skipping outro appending.")
+            return main_video
+
+        filter_complex = (
+            "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60[v0];"
+            "[1:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60[v1];"
+            "[0:a]aformat=sample_rates=44100:channel_layouts=stereo[a0];"
+            "[1:a]aformat=sample_rates=44100:channel_layouts=stereo[a1];"
+            "[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]"
+        )
+
+        cmd = [
+            "ffmpeg", "-y", "-nostdin",
+            "-i", str(main_video),
+            "-i", str(outro_video),
+            "-filter_complex", filter_complex,
+            "-map", "[v]",
+            "-map", "[a]",
+            "-c:v", "libx264",
+            "-preset", preset,
+            "-crf", "20",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-movflags", "+faststart",
+            str(output_video),
+        ]
+
+        logger.info(f"Appending animated outro tail ({outro_video.name}) to final video: {output_video.name}")
+        res = subprocess.run(cmd, capture_output=True, text=True, check=False, stdin=subprocess.DEVNULL)
+        if res.returncode != 0:
+            raise VideoProcessingError(
+                operation="append_outro_tail",
+                root_cause=f"FFmpeg concat failed: {res.stderr[-400:]}",
+                recovery_action="Check FFmpeg filters and input stream codecs.",
+                file_path=str(output_video),
+            )
+
+        return output_video
+
     def render(
         self,
         input_video: Path,
@@ -130,11 +178,19 @@ class VideoProcessor:
         privacy_filter: Optional[str] = None,
         ducking_db: str = "-15dB",
         preset: str = "veryfast",
+        outro_tail: Optional[Path] = None,
     ) -> Path:
-        """Executes FFmpeg composite render."""
+        """Executes FFmpeg composite render and optionally appends the animated outro tail."""
+        has_outro = outro_tail is not None and Path(outro_tail).exists()
+        target_render_video = (
+            output_video.parent / f"staged_composite_{output_video.name}"
+            if has_outro
+            else output_video
+        )
+
         cmd = self.build_ffmpeg_command(
             input_video=input_video,
-            output_video=output_video,
+            output_video=target_render_video,
             subtitle_file=subtitle_file,
             music_file=music_file,
             privacy_filter=privacy_filter,
@@ -142,7 +198,7 @@ class VideoProcessor:
             preset=preset,
         )
 
-        logger.info("Executing FFmpeg render command", extra_data={"output": str(output_video)})
+        logger.info("Executing FFmpeg render command", extra_data={"output": str(target_render_video)})
         try:
             result = subprocess.run(
                 cmd,
@@ -158,13 +214,27 @@ class VideoProcessor:
                     recovery_action="Check FFmpeg filters and input stream codecs.",
                     file_path=str(input_video),
                 )
-            if not output_video.exists() or output_video.stat().st_size == 0:
+            if not target_render_video.exists() or target_render_video.stat().st_size == 0:
                 raise VideoProcessingError(
                     operation="render",
                     root_cause="FFmpeg completed but output video file is missing or 0 bytes.",
                     recovery_action="Check disk space and FFmpeg encoder settings.",
-                    file_path=str(output_video),
+                    file_path=str(target_render_video),
                 )
+
+            # If animated outro tail is requested, seamlessly stitch it to the tail
+            if has_outro:
+                try:
+                    self.append_outro_tail(
+                        main_video=target_render_video,
+                        outro_video=Path(outro_tail),
+                        output_video=output_video,
+                        preset=preset,
+                    )
+                finally:
+                    if target_render_video.exists():
+                        target_render_video.unlink()
+            
             logger.info("FFmpeg video rendering completed successfully", extra_data={"output": str(output_video)})
             return output_video
         except Exception as e:

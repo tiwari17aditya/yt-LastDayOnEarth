@@ -128,6 +128,15 @@ class ProcessingSettings(BaseModel):
     generate_thumbnail: bool = Field(
         default_factory=lambda: os.getenv("GENERATE_THUMBNAIL", "true").lower() == "true"
     )
+    outro_tail_enabled: bool = Field(
+        default_factory=lambda: os.getenv("OUTRO_TAIL_ENABLED", "true").lower() == "true"
+    )
+    outro_tail_path: Path = Field(
+        default_factory=lambda: Path(os.getenv("OUTRO_TAIL_PATH", "assets/animations/like_share_subscribe.mp4"))
+    )
+    outro_tail_duration: float = Field(
+        default_factory=lambda: float(os.getenv("OUTRO_TAIL_DURATION", "6.0"))
+    )
 
 
 class PipelineSettings(BaseModel):

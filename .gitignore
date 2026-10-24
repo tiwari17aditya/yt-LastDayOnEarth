@@ -62,6 +62,7 @@ downloads/
 *.mp3
 !config/audio/*.mp3
 !config/audio_samples/*.mp3
+!assets/animations/*.mp4
 
 # Testing & Coverage
 .pytest_cache/
