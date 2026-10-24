@@ -135,7 +135,7 @@ class ProcessingSettings(BaseModel):
         default_factory=lambda: Path(os.getenv("OUTRO_TAIL_PATH", "assets/animations/like_share_subscribe.mp4"))
     )
     outro_tail_duration: float = Field(
-        default_factory=lambda: float(os.getenv("OUTRO_TAIL_DURATION", "6.0"))
+        default_factory=lambda: float(os.getenv("OUTRO_TAIL_DURATION", "9.5"))
     )
 
 

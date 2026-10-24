@@ -212,20 +212,22 @@ class OutroTailGenerator:
 
         # Exaggerated Radiating Comic Soundwave Arcs if ringing
         if ringing:
-            for ring_r in [eff_size + 18, eff_size + 36, eff_size + 54]:
+            arc_w = max(4, int(4 * scale))
+            for ring_step in [18, 36, 54, 76]:
+                ring_r = int(eff_size + ring_step * max(1.0, scale * 0.75))
                 draw.arc(
                     [cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r],
                     start=-60,
                     end=60,
                     fill=(251, 191, 36, 230),
-                    width=4,
+                    width=arc_w,
                 )
                 draw.arc(
                     [cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r],
                     start=120,
                     end=240,
                     fill=(251, 191, 36, 230),
-                    width=4,
+                    width=arc_w,
                 )
 
     def _draw_cartoon_hand(self, draw: ImageDraw.ImageDraw, pos: Tuple[int, int], clicking: bool = False) -> None:
@@ -458,8 +460,9 @@ class OutroTailGenerator:
         duration: float = 9.5,
         fps: int = 30,
         series_title: str = "LAST DAY ON EARTH: SURVIVAL",
+        bell_zoom: bool = False,
     ) -> int:
-        """Renders 9.5s MrBeast-Style Outro with giant elevated Bell Pedestal and intense pacing."""
+        """Renders 9.5s MrBeast-Style Outro with optional continuous Bell Zoom and scene fade."""
         temp_dir.mkdir(parents=True, exist_ok=True)
         total_frames = int(duration * fps)
 
@@ -467,7 +470,6 @@ class OutroTailGenerator:
         font_sub = self._get_font(28, style="russo")
         font_btn = self._get_font(36, style="bangers")
         font_hero = self._get_font(44, style="bangers")
-        font_badge = self._get_font(22, style="russo")
         font_comic = self._get_font(32, style="luckiest")
 
         for f in range(total_frames):
@@ -510,9 +512,7 @@ class OutroTailGenerator:
                 stroke_width=2,
             )
 
-            # --- UPPER TIER WINGS (LIKE & SHARE) centered around X=750 ---
-            # LIKE [240, 380, 680, 490] (width 440)
-            # SHARE [740, 380, 1180, 490] (width 440)
+            # --- UPPER TIER WINGS (LIKE & SHARE) ---
             like_active = t >= 1.8
             like_scale = 1.0 + (0.16 * math.sin((t - 1.8) * 12) if 1.8 <= t <= 2.5 else 0.0)
             self._draw_button(
@@ -523,8 +523,6 @@ class OutroTailGenerator:
                 text="LIKED! (+100 AURA)" if like_active else "SMASH LIKE!",
                 font=font_btn,
                 scale=like_scale,
-                badge_text="+100 XP" if not like_active else "CLAIMED!",
-                badge_font=font_badge,
             )
 
             share_active = t >= 3.0
@@ -537,12 +535,9 @@ class OutroTailGenerator:
                 text="SHARED TO CLAN!" if share_active else "SHARE EPISODE",
                 font=font_btn,
                 scale=share_scale,
-                badge_text="RAID TEAM" if not share_active else "DISPATCHED!",
-                badge_font=font_badge,
             )
 
             # --- LOWER TIER: GIANT HERO SUBSCRIBE SLAM BAR ---
-            # [240, 560, 1180, 710] (width 940, massive impact!)
             sub_active = t >= 4.5
             sub_scale = 1.0 + (0.22 * math.sin((t - 4.5) * 12) if 4.5 <= t <= 5.3 else 0.0)
             self._draw_button(
@@ -553,37 +548,18 @@ class OutroTailGenerator:
                 text="BASE SAVED! SUBSCRIBED" if sub_active else "SUBSCRIBE OR ELSE!",
                 font=font_hero,
                 scale=sub_scale,
-                badge_text="ALPHA RAIDER" if sub_active else "SURVIVAL RANK #1",
-                badge_font=font_badge,
             )
 
-            # --- DEDICATED ELEVATED BELL SANCTUARY (X: 1520, Y: 545) ---
-            # Completely separated from subscribe on the right wing
-            bell_ringing = t >= 6.2
-            bell_angle = math.sin((t - 6.2) * 28) * 26.0 if bell_ringing else 0.0
-            bell_center = (1520, 545)
-
-            # Glowing circular pedestal
-            draw.ellipse([bell_center[0] - 125, bell_center[1] - 125, bell_center[0] + 125, bell_center[1] + 125], fill=(22, 27, 34, 240), outline=(251, 191, 36, 240), width=4)
-            self._draw_standalone_bell(draw=draw, center=bell_center, angle_deg=bell_angle, ringing=bell_ringing, size=60)
-
-            # Speech bubble / callout
-            if bell_ringing:
-                self._draw_comic_text(
-                    draw=draw,
-                    pos=(bell_center[0] - 135, bell_center[1] + 105),
-                    text="ALL NOTIFICATIONS ON!",
-                    font=font_comic,
-                    fill_color=(253, 224, 71, 255),
-                )
-            else:
-                self._draw_comic_text(
-                    draw=draw,
-                    pos=(bell_center[0] - 85, bell_center[1] + 105),
-                    text="RING THE BELL!",
-                    font=font_comic,
-                    fill_color=(255, 255, 255, 230),
-                )
+            # Footer
+            bottom_msg = "NEW SURVIVAL RAIDS UPLOADED DAILY • LEAVE YOUR SURVIVAL TIPS IN THE COMMENTS!"
+            self._draw_comic_text(
+                draw=draw,
+                pos=((1920 - draw.textbbox((0, 0), bottom_msg, font=font_sub)[2]) // 2, 885),
+                text=bottom_msg,
+                font=font_sub,
+                fill_color=(203, 213, 225, 230),
+                stroke_width=2,
+            )
 
             # --- Cursor Movement ---
             cursor_pos = None
@@ -600,28 +576,83 @@ class OutroTailGenerator:
                 p = (t - 3.8) / 1.0
                 cursor_pos = (int(500 + p * 350), int(730 - math.sin(p * math.pi) * 90))
                 is_clicking = 4.4 <= t <= 4.7
-            elif 5.5 <= t < 6.5:
-                p = (t - 5.5) / 1.0
+            elif 5.5 <= t < 6.4:
+                p = (t - 5.5) / 0.9
                 cursor_pos = (int(1350 + p * 160), int(680 - math.sin(p * math.pi) * 90))
-                is_clicking = 6.1 <= t <= 6.4
+                is_clicking = 6.1 <= t <= 6.35
 
             if cursor_pos:
                 self._draw_cartoon_hand(draw, cursor_pos, clicking=is_clicking)
 
-            # Footer
-            bottom_msg = "NEW SURVIVAL RAIDS UPLOADED DAILY • LEAVE YOUR SURVIVAL TIPS IN THE COMMENTS!"
-            self._draw_comic_text(
-                draw=draw,
-                pos=((1920 - draw.textbbox((0, 0), bottom_msg, font=font_sub)[2]) // 2, 885),
-                text=bottom_msg,
-                font=font_sub,
-                fill_color=(203, 213, 225, 230),
-                stroke_width=2,
-            )
+            # --- BELL & DYNAMIC CLIMAX ---
+            bell_ringing = t >= 6.2
+            bell_angle = math.sin((t - 6.2) * 28) * 26.0 if bell_ringing else 0.0
 
-            # Fade to black (last 1.0s)
-            if t >= duration - 1.0:
-                fade_alpha = int(((t - (duration - 1.0)) / 1.0) * 255)
+            if bell_zoom and bell_ringing:
+                # PROGRESSIVE ZOOM & SCENE FADE (as requested)
+                zoom_p = min(1.0, (t - 6.2) / (duration - 6.2))
+                
+                # Dim & fade the rest of the video into darkness
+                dim_alpha = int(min(240, zoom_p * 290))
+                dim_overlay = Image.new("RGBA", (1920, 1080), (10, 12, 16, dim_alpha))
+                bg.paste(dim_overlay, (0, 0), dim_overlay)
+                draw = ImageDraw.Draw(bg)
+
+                # Continuous zoom calculation (glides toward screen center while swelling up to 4.5x)
+                ease_zoom = 1.0 - (1.0 - zoom_p) ** 2
+                curr_cx = int(1520 + (960 - 1520) * ease_zoom)
+                curr_cy = int(545 + (500 - 545) * ease_zoom)
+                curr_scale = 1.0 + zoom_p * 3.6
+                bell_center = (curr_cx, curr_cy)
+
+                # Giant glowing pedestal
+                pedestal_r = int(125 * min(1.8, curr_scale))
+                draw.ellipse(
+                    [bell_center[0] - pedestal_r, bell_center[1] - pedestal_r, bell_center[0] + pedestal_r, bell_center[1] + pedestal_r],
+                    fill=(22, 27, 34, 240),
+                    outline=(251, 191, 36, 240),
+                    width=int(4 * min(2.5, curr_scale)),
+                )
+                self._draw_standalone_bell(draw=draw, center=bell_center, angle_deg=bell_angle, ringing=True, scale=curr_scale, size=60)
+
+                # Giant heroic callout beneath the expanding bell
+                font_zoom_callout = self._get_font(int(36 + zoom_p * 22), style="bangers")
+                callout_text = "ALL NOTIFICATIONS ON!"
+                tb = draw.textbbox((0, 0), callout_text, font=font_zoom_callout)
+                callout_y = int(curr_cy + (60 * curr_scale * 0.72) + 20)
+                self._draw_comic_text(
+                    draw=draw,
+                    pos=((1920 - (tb[2] - tb[0])) // 2, callout_y),
+                    text=callout_text,
+                    font=font_zoom_callout,
+                    fill_color=(253, 224, 71, 255),
+                )
+            else:
+                # Standard stationary pedestal on the right wing
+                bell_center = (1520, 545)
+                draw.ellipse([bell_center[0] - 125, bell_center[1] - 125, bell_center[0] + 125, bell_center[1] + 125], fill=(22, 27, 34, 240), outline=(251, 191, 36, 240), width=4)
+                self._draw_standalone_bell(draw=draw, center=bell_center, angle_deg=bell_angle, ringing=bell_ringing, size=60)
+
+                if bell_ringing:
+                    self._draw_comic_text(
+                        draw=draw,
+                        pos=(bell_center[0] - 135, bell_center[1] + 105),
+                        text="ALL NOTIFICATIONS ON!",
+                        font=font_comic,
+                        fill_color=(253, 224, 71, 255),
+                    )
+                else:
+                    self._draw_comic_text(
+                        draw=draw,
+                        pos=(bell_center[0] - 85, bell_center[1] + 105),
+                        text="RING THE BELL!",
+                        font=font_comic,
+                        fill_color=(255, 255, 255, 230),
+                    )
+
+            # Final fade to black (last 0.8s)
+            if t >= duration - 0.8:
+                fade_alpha = int(((t - (duration - 0.8)) / 0.8) * 255)
                 overlay = Image.new("RGBA", (1920, 1080), (0, 0, 0, fade_alpha))
                 bg.paste(overlay, (0, 0), overlay)
 
@@ -636,9 +667,9 @@ class OutroTailGenerator:
     def render_outro_clip(
         self,
         output_mp4_path: Optional[Path] = None,
-        duration: float = 8.0,
+        duration: float = 9.5,
         fps: int = 30,
-        style: str = "cartoon_comedy",  # "cartoon_comedy" (8.0s), "hype_studio" (9.5s)
+        style: str = "hype_bell_zoom",  # Primary: "hype_bell_zoom" (9.5s), "hype_studio" (9.5s), "cartoon_comedy" (8.0s)
         audio_track: Optional[Path] = None,
         series_title: str = "LAST DAY ON EARTH: SURVIVAL",
         force_recreate: bool = False,
@@ -655,12 +686,21 @@ class OutroTailGenerator:
         logger.info(f"Rendering animated outro tail frames (style={style}, {duration}s @ {fps}fps)...")
 
         try:
-            if style == "hype_studio":
+            if style == "hype_bell_zoom":
                 total_frames = self.render_frames_hype_studio(
                     temp_dir=temp_frames_dir,
                     duration=duration,
                     fps=fps,
                     series_title=series_title,
+                    bell_zoom=True,
+                )
+            elif style == "hype_studio":
+                total_frames = self.render_frames_hype_studio(
+                    temp_dir=temp_frames_dir,
+                    duration=duration,
+                    fps=fps,
+                    series_title=series_title,
+                    bell_zoom=False,
                 )
             else:  # default "cartoon_comedy"
                 total_frames = self.render_frames_cartoon_comedy(

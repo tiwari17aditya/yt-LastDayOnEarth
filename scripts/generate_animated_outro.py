@@ -30,15 +30,15 @@ def main():
     parser.add_argument(
         "--style",
         type=str,
-        default="cartoon_comedy",
-        choices=["cartoon_comedy", "hype_studio"],
-        help="Animation style: cartoon_comedy (8.0s, Luckiest Guy font, funny meme hooks), hype_studio (9.5s, Bangers font, MrBeast pacing)",
+        default="hype_bell_zoom",
+        choices=["hype_bell_zoom", "hype_studio", "cartoon_comedy"],
+        help="Animation style: hype_bell_zoom (9.5s, bell zoom + fade), hype_studio (9.5s, clean static bell), cartoon_comedy (8.0s)",
     )
     parser.add_argument("--duration", type=float, default=None, help="Custom duration in seconds (7-10s)")
     parser.add_argument("--fps", type=int, default=30, help="Framerate (default: 30)")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 file path")
     parser.add_argument("--force", action="store_true", help="Force re-rendering even if cached asset exists")
-    parser.add_argument("--all", action="store_true", help="Render both options (8.0s & 9.5s) side by side for selection")
+    parser.add_argument("--all", action="store_true", help="Render both options side by side for selection")
 
     args = parser.parse_args()
     settings = get_settings()
@@ -49,7 +49,7 @@ def main():
         fonts_dir=Path("config/fonts"),
     )
 
-    def extract_preview_snapshot(video_path: Path, timestamp: float = 5.2) -> Path:
+    def extract_preview_snapshot(video_path: Path, timestamp: float = 7.8) -> Path:
         preview_path = video_path.with_suffix(".preview.jpg")
         try:
             import subprocess
@@ -69,8 +69,8 @@ def main():
 
     if args.all:
         presets = [
-            ("Option A: Cartoon Comedy & Meme Survival", "cartoon_comedy", 8.0, Path("assets/animations/optionA_cartoon_comedy_8.0s.mp4")),
-            ("Option B: Hype Studio & MrBeast Action", "hype_studio", 9.5, Path("assets/animations/optionB_hype_studio_9.5s.mp4")),
+            ("Option B1: Hype Studio + Continuous Bell Zoom & Scene Fade", "hype_bell_zoom", 9.5, Path("assets/animations/optionB1_hype_bell_zoom_9.5s.mp4")),
+            ("Option B2: Hype Studio Clean Static Pedestal", "hype_studio", 9.5, Path("assets/animations/optionB2_hype_studio_clean_9.5s.mp4")),
         ]
 
         print("\n" + "=" * 75)
@@ -89,7 +89,7 @@ def main():
                 series_title=settings.youtube.series_title,
                 force_recreate=True,
             )
-            preview = extract_preview_snapshot(clip, timestamp=min(dur - 2.0, 5.2))
+            preview = extract_preview_snapshot(clip, timestamp=7.6 if "zoom" in style_name else 5.2)
             size_kb = round(clip.stat().st_size / 1024, 1)
             print(f"   ✅ Video:    {clip} ({size_kb} KB)")
             print(f"   📸 Snapshot: {preview}")
@@ -99,16 +99,17 @@ def main():
         print("🎉 ALL OUTRO TAIL OPTIONS GENERATED SUCCESSFULLY FOR SELECTION:")
         print("=" * 75)
         for title, clip, preview, dur in results:
-            print(f"• {title:<40} | {dur:4.1f}s | {clip.name}")
+            print(f"• {title:<58} | {dur:4.1f}s | {clip.name}")
         print("=" * 75 + "\n")
         return
 
     # Single render
     default_durs = {
-        "cartoon_comedy": 8.0,
+        "hype_bell_zoom": 9.5,
         "hype_studio": 9.5,
+        "cartoon_comedy": 8.0,
     }
-    duration = args.duration or default_durs.get(args.style, 8.0)
+    duration = args.duration or default_durs.get(args.style, 9.5)
     target_path = Path(args.output) if args.output else Path(f"assets/animations/outro_{args.style}_{duration}s.mp4")
 
     print("\n" + "=" * 65)
