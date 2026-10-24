@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 from google.oauth2.credentials import Credentials
 
 from src.logging_config import get_logger
@@ -21,6 +21,7 @@ ALLOWED_PROJECT_FOLDER = "LastDayOnEarth"
 DEFAULT_INPUT_FOLDER = "Input"
 DEFAULT_PROCESSED_FOLDER = "Processed"
 DEFAULT_OUTPUT_FOLDER = "Output"
+DEFAULT_ASSETS_FOLDER = "Assets"
 
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".avi", ".m4v"}
 
@@ -48,7 +49,7 @@ class GoogleDriveClient(BaseIngestionClient):
     """Google Drive API v3 client with strict folder-boundary isolation.
     
     SAFETY RULE: NEVER touches or lists any folder/file outside:
-    MyDrive -> youtube-projects -> LastDayOnEarth -> (Input | Processed | Output)
+    MyDrive -> youtube-projects -> LastDayOnEarth -> (Input | Processed | Output | Assets)
     """
 
     def __init__(
@@ -57,11 +58,13 @@ class GoogleDriveClient(BaseIngestionClient):
         input_folder_name: str = DEFAULT_INPUT_FOLDER,
         processed_folder_name: str = DEFAULT_PROCESSED_FOLDER,
         output_folder_name: str = DEFAULT_OUTPUT_FOLDER,
+        assets_folder_name: str = DEFAULT_ASSETS_FOLDER,
     ) -> None:
         self.credentials = credentials
         self.input_folder_name = input_folder_name
         self.processed_folder_name = processed_folder_name
         self.output_folder_name = output_folder_name
+        self.assets_folder_name = assets_folder_name
         self.service = None
 
         # Resolved Drive folder IDs (Strictly locked to project boundaries)
@@ -69,6 +72,7 @@ class GoogleDriveClient(BaseIngestionClient):
         self.input_folder_id: Optional[str] = None
         self.processed_folder_id: Optional[str] = None
         self.output_folder_id: Optional[str] = None
+        self.assets_folder_id: Optional[str] = None
 
     def connect(self) -> None:
         """Connects to Google Drive API and verifies strict folder hierarchy."""
@@ -158,10 +162,11 @@ class GoogleDriveClient(BaseIngestionClient):
                 recovery_action=f"Create folder '{ALLOWED_PROJECT_FOLDER}' inside '{ALLOWED_PARENT_FOLDER}' in Google Drive.",
             )
 
-        # 3. Locate or create Input, Processed, and Output inside LastDayOnEarth
+        # 3. Locate or create Input, Processed, Output, and Assets inside LastDayOnEarth
         self.input_folder_id = self._ensure_folder(self.input_folder_name, parent_id=self.project_root_id)
         self.processed_folder_id = self._ensure_folder(self.processed_folder_name, parent_id=self.project_root_id)
         self.output_folder_id = self._ensure_folder(self.output_folder_name, parent_id=self.project_root_id)
+        self.assets_folder_id = self._ensure_folder(self.assets_folder_name, parent_id=self.project_root_id)
 
         logger.info(
             "Drive folder boundaries locked successfully",
@@ -170,6 +175,7 @@ class GoogleDriveClient(BaseIngestionClient):
                 "input_folder_id": self.input_folder_id,
                 "processed_folder_id": self.processed_folder_id,
                 "output_folder_id": self.output_folder_id,
+                "assets_folder_id": self.assets_folder_id,
             },
         )
 
@@ -615,3 +621,176 @@ class GoogleDriveClient(BaseIngestionClient):
                 recovery_action="Check Google Drive storage quota and folder permissions.",
                 file_path=str(local_video_path),
             )
+
+    def download_file_by_id(self, file_id: str, destination_path: Path) -> Path:
+        """Downloads any remote Google Drive file chunk-by-chunk to destination_path."""
+        if not self.service:
+            self.connect()
+
+        destination_path.parent.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Downloading Drive asset ({file_id}) to {destination_path}")
+
+        try:
+            request = self.service.files().get_media(fileId=file_id)
+            with io.FileIO(destination_path, "wb") as fh:
+                downloader = MediaIoBaseDownload(fh, request, chunksize=10 * 1024 * 1024)
+                done = False
+                while not done:
+                    status, done = downloader.next_chunk()
+                    if status:
+                        logger.info(f"Asset download progress ({destination_path.name}): {int(status.progress() * 100)}%")
+
+            if not destination_path.exists() or destination_path.stat().st_size == 0:
+                if destination_path.exists():
+                    destination_path.unlink()
+                raise IngestionError(
+                    operation="download_file_by_id",
+                    root_cause="Downloaded asset is 0 bytes or empty.",
+                    recovery_action="Check source asset on Google Drive and network connectivity.",
+                    file_path=str(destination_path),
+                )
+
+            logger.info(f"Asset downloaded successfully: {destination_path} ({destination_path.stat().st_size} bytes)")
+            return destination_path
+        except Exception as e:
+            if destination_path.exists():
+                destination_path.unlink()
+            if isinstance(e, IngestionError):
+                raise
+            raise IngestionError(
+                operation="download_file_by_id",
+                root_cause=str(e),
+                recovery_action="Verify Drive permissions and network connection.",
+                file_path=str(destination_path),
+            )
+
+    def upload_static_asset(
+        self,
+        local_path: Path,
+        subfolder_name: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Uploads a static asset (video, image, audio) into Drive Assets or a subfolder within Assets."""
+        if not self.service or not self.assets_folder_id:
+            self.connect()
+
+        if not local_path.exists():
+            raise IngestionError(
+                operation="upload_static_asset",
+                root_cause=f"Local asset file not found: {local_path}",
+                recovery_action="Verify the local file exists before uploading.",
+                file_path=str(local_path),
+            )
+
+        target_folder_id = self.assets_folder_id
+        if subfolder_name:
+            target_folder_id = self._ensure_folder(subfolder_name, parent_id=self.assets_folder_id)
+
+        # Check if asset already exists in target folder
+        filename = local_path.name
+        query = f"'{target_folder_id}' in parents and name = '{filename}' and trashed = false"
+        res = self.service.files().list(q=query, fields="files(id, name, size)").execute()
+        files = res.get("files", [])
+
+        # Determine mimetype
+        suffix = local_path.suffix.lower()
+        mime_map = {
+            ".mp4": "video/mp4",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".mp3": "audio/mpeg",
+            ".wav": "audio/wav",
+            ".ttf": "font/ttf",
+        }
+        mimetype = mime_map.get(suffix, "application/octet-stream")
+
+        media = MediaFileUpload(str(local_path), mimetype=mimetype, resumable=True)
+
+        if files:
+            file_id = files[0]["id"]
+            logger.info(f"Updating existing Drive static asset: {filename} in {subfolder_name or 'Assets'} (ID: {file_id})")
+            req = self.service.files().update(fileId=file_id, media_body=media, fields="id, name, webViewLink")
+        else:
+            logger.info(f"Uploading new Drive static asset: {filename} into {subfolder_name or 'Assets'}")
+            body = {"name": filename, "parents": [target_folder_id]}
+            req = self.service.files().create(body=body, media_body=media, fields="id, name, webViewLink")
+
+        response = None
+        while response is None:
+            status, response = req.next_chunk()
+            if status:
+                logger.info(f"Asset upload progress ({filename}): {int(status.progress() * 100)}%")
+
+        uploaded_id = response.get("id")
+        logger.info(f"Static asset uploaded successfully: {filename} (ID: {uploaded_id})")
+        return {
+            "id": uploaded_id,
+            "name": filename,
+            "link": response.get("webViewLink"),
+            "subfolder": subfolder_name,
+        }
+
+    def sync_static_assets_from_drive(self, local_assets_dir: Path = Path("assets")) -> List[Path]:
+        """Scans Google Drive Assets directory and downloads all static assets to local_assets_dir."""
+        if not self.service or not self.assets_folder_id:
+            self.connect()
+
+        logger.info(f"Syncing static assets from Google Drive Assets to {local_assets_dir}")
+        local_assets_dir.mkdir(parents=True, exist_ok=True)
+        synced_files = []
+
+        # 1. List all subfolders and direct files in Assets
+        query = f"'{self.assets_folder_id}' in parents and trashed = false"
+        res = self.service.files().list(q=query, fields="files(id, name, mimeType)").execute()
+        items = res.get("files", [])
+
+        for item in items:
+            item_id = item["id"]
+            item_name = item["name"]
+            item_mime = item.get("mimeType", "")
+
+            if item_mime == "application/vnd.google-apps.folder":
+                # Subfolder (e.g. animations, backgrounds)
+                sub_query = f"'{item_id}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'"
+                sub_res = self.service.files().list(q=sub_query, fields="files(id, name, size)").execute()
+                for sub_item in sub_res.get("files", []):
+                    target_local = local_assets_dir / item_name / sub_item["name"]
+                    if not target_local.exists() or target_local.stat().st_size == 0:
+                        logger.info(f"Missing local asset detected: {target_local}. Downloading from Drive...")
+                        self.download_file_by_id(sub_item["id"], target_local)
+                        synced_files.append(target_local)
+                    else:
+                        logger.info(f"Static asset {target_local} is already present locally.")
+            else:
+                # Direct file in Assets
+                target_local = local_assets_dir / item_name
+                if not target_local.exists() or target_local.stat().st_size == 0:
+                    logger.info(f"Missing local asset detected: {target_local}. Downloading from Drive...")
+                    self.download_file_by_id(item_id, target_local)
+                    synced_files.append(target_local)
+                else:
+                    logger.info(f"Static asset {target_local} is already present locally.")
+
+        logger.info(f"Static assets sync complete. Downloaded {len(synced_files)} missing asset(s).")
+        return synced_files
+
+    def sync_static_assets_to_drive(self, local_assets_dir: Path = Path("assets")) -> List[Dict[str, Any]]:
+        """Scans local assets directory and uploads all static assets into Google Drive Assets."""
+        if not self.service or not self.assets_folder_id:
+            self.connect()
+
+        logger.info(f"Uploading local static assets from {local_assets_dir} to Google Drive Assets")
+        uploaded_results = []
+
+        if not local_assets_dir.exists():
+            return uploaded_results
+
+        for file_path in local_assets_dir.rglob("*"):
+            if file_path.is_file():
+                # Check relative subfolder
+                rel_path = file_path.relative_to(local_assets_dir)
+                subfolder = rel_path.parent.as_posix() if rel_path.parent != Path(".") else None
+                res = self.upload_static_asset(local_path=file_path, subfolder_name=subfolder)
+                uploaded_results.append(res)
+
+        return uploaded_results

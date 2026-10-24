@@ -60,6 +60,17 @@ jobs:
         run: |
           python -c "from pathlib import Path; files = list(Path('config/audio').glob('*.mp3')); assert len(files) >= 5, f'Found {len(files)} files'" || python scripts/generate_safe_ambient_theme.py
 
+      - name: Sync Static Video & Audio Assets from Google Drive
+        env:
+          GCP_CLIENT_ID: ${{ secrets.GCP_CLIENT_ID }}
+          GCP_CLIENT_SECRET: ${{ secrets.GCP_CLIENT_SECRET }}
+          GCP_REFRESH_TOKEN: ${{ secrets.GCP_REFRESH_TOKEN }}
+          GDRIVE_PARENT_FOLDER_NAME: "youtube-projects"
+          GDRIVE_PROJECT_FOLDER_NAME: "LastDayOnEarth"
+          GDRIVE_ASSETS_FOLDER_NAME: "Assets"
+        run: |
+          python -m src.main sync-assets --download || echo "Asset sync warning: will use local bundled assets if available"
+
       - name: Run Pipeline Scheduled Task
         env:
           GCP_CLIENT_ID: ${{ secrets.GCP_CLIENT_ID }}
@@ -71,6 +82,7 @@ jobs:
           GDRIVE_PROJECT_FOLDER_NAME: "LastDayOnEarth"
           GDRIVE_INPUT_FOLDER_NAME: "Input"
           GDRIVE_PROCESSED_FOLDER_NAME: "Processed"
+          GDRIVE_ASSETS_FOLDER_NAME: "Assets"
           YOUTUBE_PRIVACY_STATUS: "public"
           VIDEO_PRESET: "veryfast"
           ENVIRONMENT: "production"

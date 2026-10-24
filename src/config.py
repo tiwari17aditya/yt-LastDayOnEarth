@@ -15,10 +15,12 @@ class GoogleDriveSettings(BaseModel):
     project_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_PROJECT_FOLDER_NAME", "LastDayOnEarth"))
     input_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_INPUT_FOLDER_NAME", "Input"))
     processed_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_PROCESSED_FOLDER_NAME", "Processed"))
+    output_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_OUTPUT_FOLDER_NAME", "Output"))
     output_retention_days: int = Field(default_factory=lambda: int(os.getenv("GDRIVE_OUTPUT_RETENTION_DAYS", "7")))
     client_id: Optional[str] = Field(default_factory=lambda: os.getenv("GCP_CLIENT_ID"))
     client_secret: Optional[str] = Field(default_factory=lambda: os.getenv("GCP_CLIENT_SECRET"))
     refresh_token: Optional[str] = Field(default_factory=lambda: os.getenv("GCP_REFRESH_TOKEN"))
+    assets_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_ASSETS_FOLDER_NAME", "Assets"))
     credentials_file: str = Field(
         default_factory=lambda: os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "config/credentials.json")
     )

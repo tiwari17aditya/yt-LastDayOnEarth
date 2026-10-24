@@ -330,6 +330,19 @@ def run_pipeline(
             outro_path = settings.processing.outro_tail_path
             if not outro_path.exists():
                 try:
+                    logger.info(f"Outro tail not found locally at {outro_path}; checking Google Drive Assets folder...")
+                    drive_client = GoogleDriveClient(
+                        input_folder_name=settings.drive.input_folder_name,
+                        processed_folder_name=settings.drive.processed_folder_name,
+                        output_folder_name=settings.drive.output_folder_name,
+                        assets_folder_name=settings.drive.assets_folder_name,
+                    )
+                    drive_client.sync_static_assets_from_drive(local_assets_dir=Path("assets"))
+                except Exception as de:
+                    logger.warning(f"Could not sync assets from Google Drive: {de}")
+
+            if not outro_path.exists():
+                try:
                     logger.info("Outro tail animation not found; generating animated outro tail...")
                     from src.processor.outro_generator import OutroTailGenerator
                     outro_gen = OutroTailGenerator(
@@ -804,6 +817,11 @@ def main() -> None:
     report_parser.add_argument("--email", action="store_true", help="Send formatted HTML report via Gmail/SMTP")
     report_parser.add_argument("--output", type=str, help="Destination markdown path for report")
 
+    # Assets Sync command (Google Drive Assets <-> local assets/)
+    assets_parser = subparsers.add_parser("sync-assets", help="Sync static video & audio assets with Google Drive")
+    assets_parser.add_argument("--download", action="store_true", default=True, help="Download static assets from Google Drive Assets (default)")
+    assets_parser.add_argument("--upload", action="store_true", help="Upload local assets to Google Drive Assets folder")
+
     args = parser.parse_args()
 
     if args.command == "process":
@@ -816,6 +834,22 @@ def main() -> None:
     elif args.command == "watch":
         upload_flag = not args.no_upload
         run_watcher(interval=args.interval, limit=args.limit, upload=upload_flag, force=args.force)
+    elif args.command == "sync-assets":
+        settings = get_settings()
+        client = GoogleDriveClient(
+            input_folder_name=settings.drive.input_folder_name,
+            processed_folder_name=settings.drive.processed_folder_name,
+            output_folder_name=settings.drive.output_folder_name,
+            assets_folder_name=settings.drive.assets_folder_name,
+        )
+        if args.upload:
+            print("Uploading static assets to Google Drive Assets folder...")
+            uploaded = client.sync_static_assets_to_drive(local_assets_dir=Path("assets"))
+            print(f"Uploaded {len(uploaded)} asset(s) to Google Drive.")
+        else:
+            print("Syncing static assets from Google Drive Assets folder...")
+            synced = client.sync_static_assets_from_drive(local_assets_dir=Path("assets"))
+            print(f"Downloaded {len(synced)} missing asset(s) from Google Drive.")
     elif args.command == "report":
         gen = WeeklyReportGenerator()
         summary = gen.compile_weekly_summary(days=args.days)
