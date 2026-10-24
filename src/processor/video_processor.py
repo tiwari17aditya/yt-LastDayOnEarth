@@ -121,25 +121,55 @@ class VideoProcessor:
 
         return cmd
 
+    def get_duration(self, video_path: Path) -> float:
+        """Retrieves duration of a media file in seconds using ffprobe."""
+        cmd = [
+            "ffprobe", "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            str(video_path),
+        ]
+        res = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if res.returncode == 0 and res.stdout.strip():
+            try:
+                return float(res.stdout.strip())
+            except ValueError:
+                pass
+        return 0.0
+
     def append_outro_tail(
         self,
         main_video: Path,
         outro_video: Path,
         output_video: Path,
         preset: str = "veryfast",
+        fade_duration: float = 0.7,
     ) -> Path:
-        """Seamlessly concatenates the animated outro tail to the rendered video."""
+        """Seamlessly appends the animated outro tail with a smooth cinematic fade-out/fade-in dip to black."""
         if not outro_video.exists():
             logger.warning(f"Outro tail video not found at {outro_video}; skipping outro appending.")
             return main_video
 
-        filter_complex = (
-            "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60[v0];"
-            "[1:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60[v1];"
-            "[0:a]aformat=sample_rates=44100:channel_layouts=stereo[a0];"
-            "[1:a]aformat=sample_rates=44100:channel_layouts=stereo[a1];"
-            "[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]"
-        )
+        main_duration = self.get_duration(main_video)
+        fade_dur = min(fade_duration, max(0.2, main_duration / 2.0)) if main_duration > 0 else 0.7
+        fade_start = max(0.0, main_duration - fade_dur) if main_duration > 0 else 0.0
+
+        if main_duration > 0:
+            filter_complex = (
+                f"[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60,fade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}[v0];"
+                f"[1:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60,fade=t=in:st=0:d={fade_dur:.2f}[v1];"
+                f"[0:a]aformat=sample_rates=44100:channel_layouts=stereo,afade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}[a0];"
+                f"[1:a]aformat=sample_rates=44100:channel_layouts=stereo,afade=t=in:st=0:d={fade_dur:.2f}[a1];"
+                f"[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]"
+            )
+        else:
+            filter_complex = (
+                "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60[v0];"
+                "[1:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60[v1];"
+                "[0:a]aformat=sample_rates=44100:channel_layouts=stereo[a0];"
+                "[1:a]aformat=sample_rates=44100:channel_layouts=stereo[a1];"
+                "[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]"
+            )
 
         cmd = [
             "ffmpeg", "-y", "-nostdin",
