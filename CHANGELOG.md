@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] - 2026-10-25
+
+### Fixed
+- **Weekly Report Dispatch Crash & Missing Secret Protection**:
+  - Implemented safe type-converting helpers `_safe_int()` and `_safe_float()` in `src/config.py` with fallback defaults. Empty environment variable strings (`""`) passed from unset GitHub Actions secrets (such as `SMTP_PORT`, `OUTPUT_RETENTION_DAYS`, `TARGET_FPS`, `OUTRO_TAIL_DURATION`) no longer cause `ValueError: invalid literal for int() with base 10: ''`.
+  - Added fallback defaults in `.github/workflows/weekly_report.yml` for `NOTIFICATION_RECIPIENTS` to ensure weekly digest reports are reliably dispatched to `addytiwari3@gmail.com` even when repository secrets are unset.
+  - Sanitized CLI input argument evaluation in `weekly_report.yml` for automatic scheduled cron executions where `github.event.inputs` is null.
+
+- **Scheduled Pipeline Timeout Deadlock & Single-Pass Render Optimization**:
+  - Re-architected `VideoProcessor.build_ffmpeg_command()` and `VideoProcessor.render()` in `src/processor/video_processor.py` to synthesize background audio mixing, ducking, subtitles, privacy redaction, and outro tail concatenation into a **single FFmpeg composite filter pass**.
+  - Eliminated the redundant second FFmpeg pass that was re-encoding the entire 40+ minute video from scratch, reducing total render time by ~50% and eliminating ~4.5 GB of temporary disk space usage per run.
+  - Increased GitHub Actions job timeout in `.github/workflows/scheduled_pipeline.yml` from `60` to `120` minutes (`timeout-minutes: 120`), permanently preventing large recordings (such as 4.4 GB / 41-minute gameplay) from exceeding the job timeout and triggering cascading concurrency queue cancellations.
+  - Added `GMAIL_SENDER` and `NOTIFICATION_RECIPIENTS` fallbacks to `scheduled_pipeline.yml`.
+  - Added comprehensive unit tests in `tests/test_processor_and_config.py` verifying safe configuration defaults and single-pass FFmpeg command generation.
+
 ## [1.7.1] - 2026-10-25
 
 ### Fixed

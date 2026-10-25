@@ -47,7 +47,7 @@ jobs:
           GCP_CLIENT_SECRET: ${{ secrets.GCP_CLIENT_SECRET }}
           GCP_REFRESH_TOKEN: ${{ secrets.GCP_REFRESH_TOKEN }}
           GMAIL_SENDER: ${{ secrets.GMAIL_SENDER || 'addytiwari3@gmail.com' }}
-          NOTIFICATION_RECIPIENTS: ${{ secrets.NOTIFICATION_RECIPIENTS }}
+          NOTIFICATION_RECIPIENTS: ${{ secrets.NOTIFICATION_RECIPIENTS || 'addytiwari3@gmail.com' }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
@@ -56,16 +56,17 @@ jobs:
           LOG_LEVEL: "INFO"
         run: |
           EXTRA_ARGS="--email"
-          if [ "${{ github.event.inputs.email }}" = "false" ]; then
+          INPUT_EMAIL="${{ github.event.inputs.email }}"
+          if [ "$INPUT_EMAIL" = "false" ]; then
             EXTRA_ARGS=""
           fi
           DAYS="${{ github.event.inputs.days }}"
-          if [ -z "$DAYS" ]; then
+          if [ -z "$DAYS" ] || [ "$DAYS" = "null" ]; then
             DAYS="7"
           fi
 
           echo "Generating weekly report for last $DAYS days (email=$EXTRA_ARGS)..."
-          python scripts/generate_weekly_report.py --days $DAYS $EXTRA_ARGS
+          python scripts/generate_weekly_report.py --days "$DAYS" $EXTRA_ARGS
 
       - name: Persist Generated Weekly Reports
         if: always()

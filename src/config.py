@@ -10,13 +10,33 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _safe_int(val: Optional[str], default: int) -> int:
+    """Safely converts an environment variable string to integer with fallback default."""
+    if val is None or str(val).strip() == "":
+        return default
+    try:
+        return int(val)
+    except (ValueError, TypeError):
+        return default
+
+
+def _safe_float(val: Optional[str], default: float) -> float:
+    """Safely converts an environment variable string to float with fallback default."""
+    if val is None or str(val).strip() == "":
+        return default
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return default
+
+
 class GoogleDriveSettings(BaseModel):
     parent_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_PARENT_FOLDER_NAME", "youtube-projects"))
     project_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_PROJECT_FOLDER_NAME", "LastDayOnEarth"))
     input_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_INPUT_FOLDER_NAME", "Input"))
     processed_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_PROCESSED_FOLDER_NAME", "Processed"))
     output_folder_name: str = Field(default_factory=lambda: os.getenv("GDRIVE_OUTPUT_FOLDER_NAME", "Output"))
-    output_retention_days: int = Field(default_factory=lambda: int(os.getenv("GDRIVE_OUTPUT_RETENTION_DAYS", "7")))
+    output_retention_days: int = Field(default_factory=lambda: _safe_int(os.getenv("GDRIVE_OUTPUT_RETENTION_DAYS"), 7))
     client_id: Optional[str] = Field(default_factory=lambda: os.getenv("GCP_CLIENT_ID"))
     client_secret: Optional[str] = Field(default_factory=lambda: os.getenv("GCP_CLIENT_SECRET"))
     refresh_token: Optional[str] = Field(default_factory=lambda: os.getenv("GCP_REFRESH_TOKEN"))
@@ -80,7 +100,7 @@ class YouTubeSettings(BaseModel):
 
 class SMTPSettings(BaseModel):
     host: str = Field(default_factory=lambda: os.getenv("SMTP_HOST", "smtp.gmail.com"))
-    port: int = Field(default_factory=lambda: int(os.getenv("SMTP_PORT", "587")))
+    port: int = Field(default_factory=lambda: _safe_int(os.getenv("SMTP_PORT"), 587))
     user: Optional[str] = Field(default_factory=lambda: os.getenv("SMTP_USER"))
     password: Optional[str] = Field(default_factory=lambda: os.getenv("SMTP_PASSWORD"))
     recipients: List[str] = Field(
@@ -101,7 +121,7 @@ class PeerTubeSettings(BaseModel):
     client_secret: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_CLIENT_SECRET"))
     access_token: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_ACCESS_TOKEN"))
     channel_name: Optional[str] = Field(default_factory=lambda: os.getenv("PEERTUBE_CHANNEL_NAME"))
-    privacy_status: int = Field(default_factory=lambda: int(os.getenv("PEERTUBE_PRIVACY_STATUS", "1")))
+    privacy_status: int = Field(default_factory=lambda: _safe_int(os.getenv("PEERTUBE_PRIVACY_STATUS"), 1))
 
 
 class FediverseSettings(BaseModel):
@@ -111,13 +131,13 @@ class FediverseSettings(BaseModel):
     lemmy_instance: Optional[str] = Field(default_factory=lambda: os.getenv("LEMMY_INSTANCE_URL"))
     lemmy_auth_token: Optional[str] = Field(default_factory=lambda: os.getenv("LEMMY_AUTH_TOKEN"))
     lemmy_community_id: Optional[int] = Field(
-        default_factory=lambda: int(os.getenv("LEMMY_COMMUNITY_ID")) if os.getenv("LEMMY_COMMUNITY_ID") else None
+        default_factory=lambda: _safe_int(os.getenv("LEMMY_COMMUNITY_ID"), None) if os.getenv("LEMMY_COMMUNITY_ID") else None
     )
 
 
 class ProcessingSettings(BaseModel):
     resolution: str = Field(default_factory=lambda: os.getenv("VIDEO_RESOLUTION", "1920x1080"))
-    target_fps: int = Field(default_factory=lambda: int(os.getenv("VIDEO_TARGET_FPS", "60")))
+    target_fps: int = Field(default_factory=lambda: _safe_int(os.getenv("VIDEO_TARGET_FPS"), 60))
     audio_ducking_db: str = Field(default_factory=lambda: os.getenv("VIDEO_AUDIO_DUCKING_DB", "-15dB"))
     video_preset: str = Field(default_factory=lambda: os.getenv("VIDEO_PRESET", "veryfast"))
     temp_dir: Path = Field(default_factory=lambda: Path(os.getenv("TEMP_PROCESSING_DIR", "temp")))
@@ -137,7 +157,7 @@ class ProcessingSettings(BaseModel):
         default_factory=lambda: Path(os.getenv("OUTRO_TAIL_PATH", "assets/animations/like_share_subscribe_endcredits.mp4"))
     )
     outro_tail_duration: float = Field(
-        default_factory=lambda: float(os.getenv("OUTRO_TAIL_DURATION", "9.5"))
+        default_factory=lambda: _safe_float(os.getenv("OUTRO_TAIL_DURATION"), 9.5)
     )
 
 

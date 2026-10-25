@@ -66,13 +66,19 @@ class VideoProcessor:
         privacy_filter: Optional[str] = None,
         ducking_db: str = "-8dB",
         preset: str = "veryfast",
+        outro_video: Optional[Path] = None,
+        fade_duration: float = 0.7,
     ) -> List[str]:
-        """Assembles robust FFmpeg command for composite rendering."""
+        """Assembles robust FFmpeg command for composite rendering in a single pass."""
         cmd = ["ffmpeg", "-y", "-nostdin", "-i", str(input_video)]
 
         has_music = music_file is not None and Path(music_file).exists()
         if has_music:
             cmd.extend(["-i", str(music_file)])
+
+        has_outro = outro_video is not None and Path(outro_video).exists()
+        if has_outro:
+            cmd.extend(["-i", str(outro_video)])
 
         video_filters = []
         if privacy_filter:
@@ -83,7 +89,46 @@ class VideoProcessor:
             escaped_sub = str(subtitle_file).replace("\\", "/").replace(":", "\\:")
             video_filters.append(f"subtitles='{escaped_sub}'")
 
-        if video_filters and has_music:
+        if has_outro:
+            outro_idx = 2 if has_music else 1
+            main_dur = self.get_duration(input_video)
+            fade_dur = min(fade_duration, max(0.2, main_dur / 2.0)) if main_dur > 0 else 0.7
+            fade_start = max(0.0, main_dur - fade_dur) if main_dur > 0 else 0.0
+
+            video_filters.append("scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60")
+            if main_dur > 0:
+                video_filters.append(f"fade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}")
+
+            outro_v_filters = [
+                "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60",
+                f"fade=t=in:st=0:d={fade_dur:.2f}",
+            ]
+
+            if has_music:
+                audio_chain = (
+                    f"[1:a]volume={ducking_db}[bg];"
+                    f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo,afade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}[a0];"
+                )
+            else:
+                audio_chain = (
+                    f"[0:a]aformat=sample_rates=44100:channel_layouts=stereo,afade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}[a0];"
+                )
+
+            outro_a_chain = f"[{outro_idx}:a]aformat=sample_rates=44100:channel_layouts=stereo,afade=t=in:st=0:d={fade_dur:.2f}[a1];"
+            concat_chain = "[v0][a0][v1][a1]concat=n=2:v=1:a=1[vout][aout]"
+
+            filter_complex = (
+                f"[0:v]{','.join(video_filters)}[v0];"
+                f"[{outro_idx}:v]{','.join(outro_v_filters)}[v1];"
+                f"{audio_chain}{outro_a_chain}{concat_chain}"
+            )
+            cmd.extend([
+                "-filter_complex", filter_complex,
+                "-map", "[vout]",
+                "-map", "[aout]",
+            ])
+
+        elif video_filters and has_music:
             vf_string = ",".join(video_filters)
             filter_complex = (
                 f"[0:v]{vf_string}[vout];"
@@ -210,25 +255,25 @@ class VideoProcessor:
         preset: str = "veryfast",
         outro_tail: Optional[Path] = None,
     ) -> Path:
-        """Executes FFmpeg composite render and optionally appends the animated outro tail."""
+        """Executes FFmpeg composite render with high-efficiency single-pass pipeline."""
         has_outro = outro_tail is not None and Path(outro_tail).exists()
-        target_render_video = (
-            output_video.parent / f"staged_composite_{output_video.name}"
-            if has_outro
-            else output_video
-        )
+        outro_path = Path(outro_tail) if has_outro else None
 
         cmd = self.build_ffmpeg_command(
             input_video=input_video,
-            output_video=target_render_video,
+            output_video=output_video,
             subtitle_file=subtitle_file,
             music_file=music_file,
             privacy_filter=privacy_filter,
             ducking_db=ducking_db,
             preset=preset,
+            outro_video=outro_path,
         )
 
-        logger.info("Executing FFmpeg render command", extra_data={"output": str(target_render_video)})
+        logger.info(
+            "Executing single-pass FFmpeg composite render command",
+            extra_data={"output": str(output_video), "has_outro": has_outro},
+        )
         try:
             result = subprocess.run(
                 cmd,
@@ -238,34 +283,45 @@ class VideoProcessor:
                 stdin=subprocess.DEVNULL,
             )
             if result.returncode != 0:
+                # If single-pass with outro fails due to an unexpected stream mismatch, attempt fallback to staged append
+                if has_outro:
+                    logger.warning(
+                        f"Single-pass outro render failed ({result.stderr[-200:]}). Falling back to staged two-pass append."
+                    )
+                    staged_target = output_video.parent / f"staged_composite_{output_video.name}"
+                    fallback_cmd = self.build_ffmpeg_command(
+                        input_video=input_video,
+                        output_video=staged_target,
+                        subtitle_file=subtitle_file,
+                        music_file=music_file,
+                        privacy_filter=privacy_filter,
+                        ducking_db=ducking_db,
+                        preset=preset,
+                        outro_video=None,
+                    )
+                    sub_res = subprocess.run(fallback_cmd, capture_output=True, text=True, check=False, stdin=subprocess.DEVNULL)
+                    if sub_res.returncode == 0 and staged_target.exists():
+                        try:
+                            return self.append_outro_tail(staged_target, outro_path, output_video, preset=preset)
+                        finally:
+                            if staged_target.exists():
+                                staged_target.unlink()
+
                 raise VideoProcessingError(
                     operation="render",
                     root_cause=f"FFmpeg failed with exit code {result.returncode}: {result.stderr[-400:]}",
                     recovery_action="Check FFmpeg filters and input stream codecs.",
                     file_path=str(input_video),
                 )
-            if not target_render_video.exists() or target_render_video.stat().st_size == 0:
+            if not output_video.exists() or output_video.stat().st_size == 0:
                 raise VideoProcessingError(
                     operation="render",
                     root_cause="FFmpeg completed but output video file is missing or 0 bytes.",
                     recovery_action="Check disk space and FFmpeg encoder settings.",
-                    file_path=str(target_render_video),
+                    file_path=str(output_video),
                 )
 
-            # If animated outro tail is requested, seamlessly stitch it to the tail
-            if has_outro:
-                try:
-                    self.append_outro_tail(
-                        main_video=target_render_video,
-                        outro_video=Path(outro_tail),
-                        output_video=output_video,
-                        preset=preset,
-                    )
-                finally:
-                    if target_render_video.exists():
-                        target_render_video.unlink()
-            
-            logger.info("FFmpeg video rendering completed successfully", extra_data={"output": str(output_video)})
+            logger.info("FFmpeg video rendering completed successfully in single pass", extra_data={"output": str(output_video)})
             return output_video
         except Exception as e:
             if isinstance(e, VideoProcessingError):
