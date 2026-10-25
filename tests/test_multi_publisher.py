@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from src.publisher.youtube_client import VideoPublishMetadata, BasePublisher
-from src.publisher.multi_publisher import MultiPlatformPublisher, MultiPlatformPublishResult
+from src.publisher.multi_publisher import MultiPlatformPublisher
 
 
 @pytest.fixture
