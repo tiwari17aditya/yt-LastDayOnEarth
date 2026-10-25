@@ -92,6 +92,7 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `DynamicTagGenerator` (`src/publisher/metadata_generator.py`): Dynamically analyzes gameplay events and titles to synthesize ~50 trending hashtags via Gemini AI or multi-cluster contextual algorithmic selection with seeded rotation.
 - **Interface**: `BasePublisher`
   - `generate_metadata(video_title: str, events: List[GameplayEvent], ...) -> VideoPublishMetadata`
+  - `export_metadata_json(metadata: VideoPublishMetadata, output_json_path: Path) -> Path`
   - `upload_video(video_path: Path, metadata: VideoPublishMetadata) -> str`
   - `publish_all(video_path: Path, metadata: VideoPublishMetadata) -> MultiPlatformPublishResult` (in `MultiPlatformPublisher`)
 

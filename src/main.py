@@ -419,8 +419,6 @@ def run_pipeline(
                 thumbnail_path=thumbnail_path,
                 episode_number=ep_num_for_publishing,
             )
-            metadata_json_path = output_path.with_name(f"{output_path.stem}_metadata.json")
-            publisher.export_metadata_json(metadata, metadata_json_path)
         except Exception as me:
             raise PublishingError(
                 operation="generate_metadata",
@@ -428,6 +426,22 @@ def run_pipeline(
                 recovery_action="Review title templates and Gemini API configuration.",
                 file_path=str(output_path),
                 status="FAILED",
+            )
+
+        metadata_json_path = output_path.with_name(f"{output_path.stem}_metadata.json")
+        try:
+            publisher.export_metadata_json(metadata, metadata_json_path)
+        except Exception as ee:
+            logger.warning(
+                f"Could not export metadata JSON to {metadata_json_path}: {ee}. Proceeding with YouTube upload.",
+                extra_data={
+                    "operation": "export_metadata_json",
+                    "component": "Publisher",
+                    "file": str(metadata_json_path),
+                    "root_cause": str(ee),
+                    "recovery_action": "Check directory write permissions or disk space.",
+                    "status": "DEGRADED",
+                },
             )
 
         youtube_url = "N/A (Local execution)"

@@ -4,6 +4,7 @@ Provides a single extensible orchestration entry point to publish gaming videos
 to primary platforms and cross-post to open-source decentralized networks for maximized reach.
 """
 
+import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -75,6 +76,22 @@ class MultiPlatformPublisher(BasePublisher):
             thumbnail_path=thumbnail_path,
             episode_number=episode_number,
         )
+
+    def export_metadata_json(self, metadata: VideoPublishMetadata, output_json_path: Path) -> Path:
+        """Exports publishing metadata to a JSON file, delegating to the primary YouTube client."""
+        if hasattr(self.youtube, "export_metadata_json"):
+            return self.youtube.export_metadata_json(metadata, output_json_path)
+        output_json_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_json_path, "w", encoding="utf-8") as f:
+            json.dump(metadata.to_dict(), f, indent=2)
+        logger.info("Exported publishing metadata to JSON", extra_data={"path": str(output_json_path)})
+        return output_json_path
+
+    def __getattr__(self, name: str) -> Any:
+        """Transparently delegates any unhandled publisher attribute or method to the underlying YouTube client."""
+        if hasattr(self, "youtube") and hasattr(self.youtube, name):
+            return getattr(self.youtube, name)
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
     def upload_video(self, video_path: Path, metadata: VideoPublishMetadata) -> str:
         """Standard BasePublisher interface: publishes to YouTube as primary and returns YouTube URL."""

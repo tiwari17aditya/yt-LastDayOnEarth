@@ -64,6 +64,14 @@ class BasePublisher(ABC):
         """Upload video to YouTube and return the video URL."""
         pass
 
+    def export_metadata_json(self, metadata: VideoPublishMetadata, output_json_path: Path) -> Path:
+        """Saves generated metadata to JSON file alongside processed video."""
+        output_json_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_json_path, "w", encoding="utf-8") as f:
+            json.dump(metadata.to_dict(), f, indent=2)
+        logger.info("Exported publishing metadata to JSON", extra_data={"path": str(output_json_path)})
+        return output_json_path
+
 
 from src.publisher.metadata_generator import DynamicTagGenerator
 from src.publisher.playlist_manager import PlaylistManager

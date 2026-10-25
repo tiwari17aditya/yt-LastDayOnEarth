@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2026-10-25
+
+### Fixed
+- **MultiPlatformPublisher Metadata Export & Pipeline Resilience**:
+  - Added `export_metadata_json` to `BasePublisher` and delegated implementation in `MultiPlatformPublisher` (`src/publisher/multi_publisher.py`), resolving `'MultiPlatformPublisher' object has no attribute 'export_metadata_json'`.
+  - Added dynamic attribute proxying via `__getattr__` in `MultiPlatformPublisher` to transparently forward any unhandled calls to the underlying `YouTubeClient`.
+  - Isolated metadata JSON file export error handling in `src/main.py`: non-critical local file export warnings no longer crash the pipeline or block primary YouTube publishing.
+  - Added unit test suite `tests/test_multi_publisher.py` validating metadata export, delegation, fallback, and error handling.
+
 ## [1.7.0] - 2026-10-24
 
 ### Added
