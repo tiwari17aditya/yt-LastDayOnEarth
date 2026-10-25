@@ -1530,5 +1530,45 @@
       "privacy_redacted": true,
       "md5_checksum": "04b06cc65b5e49cfd1e6fa68abb0525a"
     }
+  },
+  {
+    "job_id": "job_20261025_152105",
+    "timestamp": "2026-10-25T15:21:05.742377+00:00",
+    "input_filename": "ScreenRecording_10-23-2026 23-46-40_1.mp4",
+    "output_filename": "ScreenRecording_10-23-2026_23-46-40_1_Processed_25102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "9ZEOW_rsr7M",
+    "youtube_url": "https://youtu.be/9ZEOW_rsr7M",
+    "details": {
+      "video_id": "9ZEOW_rsr7M",
+      "youtube_url": "https://youtu.be/9ZEOW_rsr7M",
+      "video_output": "output/ScreenRecording_10-23-2026_23-46-40_1_Processed_25102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-23-2026_23-46-40_1_Processed_25102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-23-2026_23-46-40_1_Processed_25102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #54",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #54",
+        "walkthrough": "Surviving Day 54: Workbench & Blueprints And Crafting Planks & Upgrades Plus Organizing... #54"
+      },
+      "duration_seconds": 2494.134716,
+      "soundtrack_tracks": [
+        "Shores of Avalon",
+        "Daily Beetle",
+        "Pamgaea",
+        "Fretless",
+        "Somewhere Sunny",
+        "Local Forecast",
+        "Life of Riley",
+        "Monkeys Spinning Monkeys",
+        "Groove Grove",
+        "Monkeys Spinning Monkeys",
+        "Shores of Avalon",
+        "Life of Riley",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "7c363b7f44e2504052c65cb1dacb43ba"
+    }
   }
 ]
