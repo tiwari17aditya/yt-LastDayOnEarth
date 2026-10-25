@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 56,
+  "current_episode": 57,
   "completed_episodes": [
     {
       "episode": 1,
@@ -376,6 +376,13 @@
       "video_id": "UBod5nQnkKU",
       "youtube_url": "https://youtu.be/UBod5nQnkKU",
       "job_id": "UBod5nQnkKU"
+    },
+    {
+      "episode": 56,
+      "title": "Blueprint Upgrades + Workshop & Smelting! | LDoE Survival #56",
+      "video_id": "blCWJlqkZ1s",
+      "youtube_url": "https://youtu.be/blCWJlqkZ1s",
+      "job_id": "blCWJlqkZ1s"
     }
   ]
 }

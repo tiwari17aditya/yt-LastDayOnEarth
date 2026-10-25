@@ -1602,5 +1602,37 @@
       "privacy_redacted": true,
       "md5_checksum": "86151a7357fbd0f6ae44e01fa46a736e"
     }
+  },
+  {
+    "job_id": "job_20261025_211747",
+    "timestamp": "2026-10-25T21:17:47.087823+00:00",
+    "input_filename": "ScreenRecording_10-24-2026 23-39-59_1.mp4",
+    "output_filename": "ScreenRecording_10-24-2026_23-39-59_1_Processed_25102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "blCWJlqkZ1s",
+    "youtube_url": "https://youtu.be/blCWJlqkZ1s",
+    "details": {
+      "video_id": "blCWJlqkZ1s",
+      "youtube_url": "https://youtu.be/blCWJlqkZ1s",
+      "video_output": "output/ScreenRecording_10-24-2026_23-39-59_1_Processed_25102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-24-2026_23-39-59_1_Processed_25102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-24-2026_23-39-59_1_Processed_25102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Workshop & Smelting! | LDoE Survival #56",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Workshop & Smelting Furnaces Plus Home... #56",
+        "walkthrough": "Surviving Day 56: Workbench & Blueprints And Workshop & Smelting Furnaces Plus Home Base... #56"
+      },
+      "duration_seconds": 990.940907,
+      "soundtrack_tracks": [
+        "Bossa Antigua",
+        "Local Forecast",
+        "Groove Grove",
+        "Life of Riley",
+        "Wallpaper"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "19757703ff9a41c7680f935bafcd8a9d"
+    }
   }
 ]
