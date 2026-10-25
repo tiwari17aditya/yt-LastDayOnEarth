@@ -25,7 +25,9 @@ def test_base_publisher_export_metadata_json(sample_metadata, tmp_path):
         def generate_metadata(self, *args, **kwargs):
             return sample_metadata
 
-        def upload_video(self, video_path: Path, metadata: VideoPublishMetadata) -> str:
+        def upload_video(
+            self, video_path: Path, metadata: VideoPublishMetadata
+        ) -> str:
             return "https://youtu.be/dummy123"
 
     publisher = DummyPublisher()
@@ -42,7 +44,9 @@ def test_base_publisher_export_metadata_json(sample_metadata, tmp_path):
     assert data["tags"] == ["ldoe", "survival", "zombies"]
 
 
-def test_multi_platform_publisher_export_metadata_json_delegates(sample_metadata, tmp_path):
+def test_multi_platform_publisher_export_metadata_json_delegates(
+    sample_metadata, tmp_path
+):
     mock_yt = MagicMock()
     out_json = tmp_path / "metadata_del.json"
     mock_yt.export_metadata_json.return_value = out_json
@@ -50,11 +54,15 @@ def test_multi_platform_publisher_export_metadata_json_delegates(sample_metadata
     pub = MultiPlatformPublisher(youtube_client=mock_yt)
     res = pub.export_metadata_json(sample_metadata, out_json)
 
-    mock_yt.export_metadata_json.assert_called_once_with(sample_metadata, out_json)
+    mock_yt.export_metadata_json.assert_called_once_with(
+        sample_metadata, out_json
+    )
     assert res == out_json
 
 
-def test_multi_platform_publisher_export_metadata_json_fallback(sample_metadata, tmp_path):
+def test_multi_platform_publisher_export_metadata_json_fallback(
+    sample_metadata, tmp_path
+):
     mock_yt = MagicMock(spec=[])  # No export_metadata_json attribute
     out_json = tmp_path / "subdir" / "metadata_fallback.json"
 
@@ -83,10 +91,14 @@ def test_multi_platform_publisher_getattr_delegation():
         _ = pub.non_existent_attribute_xyz
 
 
-def test_export_metadata_json_error_handling(sample_metadata, tmp_path, monkeypatch):
-    """Verifies that an error during metadata export does not crash downstream logic."""
+def test_export_metadata_json_error_handling(
+    sample_metadata, tmp_path, monkeypatch
+):
+    """Verifies that error during metadata export does not crash downstream."""
     mock_yt = MagicMock()
-    mock_yt.export_metadata_json.side_effect = PermissionError("Permission denied writing json")
+    mock_yt.export_metadata_json.side_effect = PermissionError(
+        "Permission denied writing json"
+    )
 
     pub = MultiPlatformPublisher(youtube_client=mock_yt)
     out_json = tmp_path / "protected" / "metadata.json"

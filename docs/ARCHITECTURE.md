@@ -75,7 +75,7 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 ### 3.5 Video Processor & Outro Animation Engine (`src/processor/`)
 - **Responsibility**: Assemble video streams, blur filters, burned-in styled subtitles, mixed audio, and animated brand outro tails using FFmpeg into a broadcast-standard YouTube-ready MP4.
 - **Components**:
-  - `VideoProcessor`: Composite FFmpeg rendering pipeline with automatic resolution/audio stream normalization and fail-safe concat stitching (`append_outro_tail`).
+  - `VideoProcessor`: Single-pass composite FFmpeg rendering pipeline synthesizing resolution normalization, blur filters, subtitle burning, background music ducking, and outro tail concatenation in a single filter graph, with fallback to two-pass stitching (`append_outro_tail`).
   - `OutroTailGenerator` (`src/processor/outro_generator.py`): Generates 5–8 second high-energy 1080p animated outro videos featuring interactive dynamic buttons (Like, Share, Subscribe, Bell) with visual cursor interaction, neon pulse effects, and energetic audio stings.
   - `EndScreenGenerator` (`src/processor/endscreen_generator.py`): Visual template slate generator matching YouTube interactive card layout dimensions.
 - **Naming Rule**: `<Original_Title>_Processed_<DDMMYYYY>.mp4`
