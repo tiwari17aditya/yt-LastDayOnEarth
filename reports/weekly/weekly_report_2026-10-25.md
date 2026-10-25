@@ -1,5 +1,5 @@
 # 📊 Weekly Pipeline & Channel Performance Report
-**Period**: `2026-10-18` to `2026-10-25` | **Generated**: `2026-10-25 13:33:52`
+**Period**: `2026-10-18` to `2026-10-25` | **Generated**: `2026-10-25 14:47:09`
 
 ## ⚙️ Automated Pipeline Execution Statistics
 - **Videos Processed**: `8`
@@ -16,8 +16,8 @@
 - **Total Views**: `13,090`
 - **Total Published Videos**: `344`
 - **Algorithmic Health Rating**: `FAIR`
-- **Average Like Ratio**: `1.03%`
-- **Average Comment Ratio**: `24.69%`
+- **Average Like Ratio**: `0.94%`
+- **Average Comment Ratio**: `24.49%`
 
 ## 🎬 Processed Episodes This Week
 
@@ -39,8 +39,8 @@
 | 🔥 Global Climate Talks & Top News (25 Oc... | 2026-10-25 | 9 | 0 | 1 | 0.0% | [Link](https://youtu.be/frIq_GsJ1OU) |
 | Weekly Current Affairs Masterclass (19 O... | 2026-10-25 | 0 | 0 | 1 | 0.0% | [Link](https://youtu.be/pQJTmn5Tjf8) |
 | 🔥 NEET/JAM Updates & Top News (24 Octobe... | 2026-10-24 | 3 | 0 | 1 | 0.0% | [Link](https://youtu.be/DO91wv9SGi8) |
-| Blueprint Upgrades & Home Base Operation... | 2026-10-24 | 19 | 1 | 5 | 5.26% | [Link](https://youtu.be/amfF7cJrM_E) |
-| Home Base Operations + Workshop & Smelti... | 2026-10-24 | 30 | 2 | 1 | 6.67% | [Link](https://youtu.be/SLo8tcOVfqY) |
+| Blueprint Upgrades & Home Base Operation... | 2026-10-24 | 21 | 1 | 5 | 4.76% | [Link](https://youtu.be/amfF7cJrM_E) |
+| Home Base Operations + Workshop & Smelti... | 2026-10-24 | 35 | 2 | 1 | 5.71% | [Link](https://youtu.be/SLo8tcOVfqY) |
 | Home Base Operations & Base Storage Opti... | 2026-10-23 | 28 | 1 | 1 | 3.57% | [Link](https://youtu.be/j4ZW7xtQ2iU) |
 | Entering Home Base & Entering Home Base ... | 2026-10-23 | 4 | 0 | 2 | 0.0% | [Link](https://youtu.be/40sH8RYaplI) |
 
