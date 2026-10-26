@@ -1666,5 +1666,41 @@
       "privacy_redacted": true,
       "md5_checksum": "b3992315aba0e0287d1b0eb68367eb39"
     }
+  },
+  {
+    "job_id": "job_20261026_015734",
+    "timestamp": "2026-10-26T01:57:34.401801+00:00",
+    "input_filename": "ScreenRecording_10-24-2026 22-33-19_1.mp4",
+    "output_filename": "ScreenRecording_10-24-2026_22-33-19_1_Processed_26102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "fwbKJ_VI46E",
+    "youtube_url": "https://youtu.be/fwbKJ_VI46E",
+    "details": {
+      "video_id": "fwbKJ_VI46E",
+      "youtube_url": "https://youtu.be/fwbKJ_VI46E",
+      "video_output": "output/ScreenRecording_10-24-2026_22-33-19_1_Processed_26102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-24-2026_22-33-19_1_Processed_26102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-24-2026_22-33-19_1_Processed_26102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #58",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #58",
+        "walkthrough": "Surviving Day 58: Workbench & Blueprints And Crafting Planks & Upgrades Plus Entering Home... #58"
+      },
+      "duration_seconds": 1859.88,
+      "soundtrack_tracks": [
+        "Sneaky Snitch",
+        "Urban Gauntlet",
+        "Life of Riley",
+        "Electro Cabello",
+        "Volatile Reaction",
+        "Clean Soul",
+        "Local Forecast",
+        "Daily Beetle",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "590821c59b588756015f23958643aea7"
+    }
   }
 ]
