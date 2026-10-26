@@ -88,12 +88,14 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `PeerTubeClient`: Open-source decentralized video hosting client implementing `BasePublisher` via PeerTube REST API v1 (federated across the global ActivityPub Fediverse).
   - `FediverseBroadcaster`: Cross-posts rich release announcements with custom thumbnails, video links, and dynamic hashtags to Mastodon and Lemmy communities.
   - `MultiPlatformPublisher`: Orchestrates primary publishing (YouTube) and non-blocking open-source mirrors and social broadcasts (PeerTube + Fediverse), preserving fail-safe pipeline semantics.
-  - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`) to ensure consecutive numbering across ephemeral CI/CD environments.
+  - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, search-intent tutorial formula (`search_guide`, +37% viewer retention), persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`).
+  - `MetadataLocalizer` (`src/publisher/localization.py`): Multi-language translation engine producing YouTube Data API v3 `localizations` payloads and synchronized `.srt` Closed Caption tracks for key player regions: Russian (`ru`), Portuguese (`pt`), and Spanish (`es`).
   - `DynamicTagGenerator` (`src/publisher/metadata_generator.py`): Dynamically analyzes gameplay events and titles to synthesize ~50 trending hashtags via Gemini AI or multi-cluster contextual algorithmic selection with seeded rotation.
 - **Interface**: `BasePublisher`
   - `generate_metadata(video_title: str, events: List[GameplayEvent], ...) -> VideoPublishMetadata`
   - `export_metadata_json(metadata: VideoPublishMetadata, output_json_path: Path) -> Path`
   - `upload_video(video_path: Path, metadata: VideoPublishMetadata) -> str`
+  - `upload_captions(youtube: Any, video_id: str, events: List[Any], languages: List[str]) -> Dict[str, str]`
   - `publish_all(video_path: Path, metadata: VideoPublishMetadata) -> MultiPlatformPublishResult` (in `MultiPlatformPublisher`)
 
 ### 3.7 Notifications & Reporting (`src/notifications/`)
