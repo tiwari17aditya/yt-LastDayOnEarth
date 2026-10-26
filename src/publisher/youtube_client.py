@@ -39,6 +39,8 @@ class VideoPublishMetadata:
     thumbnail_path: Optional[str] = None
     title_candidates: Optional[Dict[str, str]] = None
     episode_number: Optional[int] = None
+    localizations: Optional[Dict[str, Dict[str, str]]] = None
+    default_language: str = "en"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -75,6 +77,7 @@ class BasePublisher(ABC):
 
 from src.publisher.metadata_generator import DynamicTagGenerator
 from src.publisher.playlist_manager import PlaylistManager
+from src.publisher.localization import MetadataLocalizer
 
 
 class YouTubeClient(BasePublisher):
@@ -100,6 +103,10 @@ class YouTubeClient(BasePublisher):
             gemini_api_key=gemini_api_key,
             gemini_model=gemini_model,
             target_hashtag_count=50,
+        )
+        self.localizer = MetadataLocalizer(
+            gemini_api_key=gemini_api_key,
+            gemini_model=gemini_model,
         )
 
     def generate_metadata(
@@ -188,6 +195,16 @@ class YouTubeClient(BasePublisher):
             hashtags=trending_hashtags,
         )
 
+        full_description = "\n".join(description_lines)
+
+        # Generate multi-language localized titles and descriptions (RU, PT, ES)
+        localizations = self.localizer.generate_localizations(
+            primary_title=selected_title,
+            primary_description=full_description,
+            episode_number=title_pkg.episode_number,
+            events=events,
+        )
+
         title_candidates = {
             "action_hook": title_pkg.action_hook,
             "curiosity": title_pkg.curiosity,
@@ -196,13 +213,15 @@ class YouTubeClient(BasePublisher):
 
         return VideoPublishMetadata(
             title=selected_title[:100],
-            description="\n".join(description_lines),
+            description=full_description,
             tags=tags,
             category_id="20",
             privacy_status=self.privacy_status,
             thumbnail_path=str(thumbnail_path) if thumbnail_path else None,
             title_candidates=title_candidates,
             episode_number=title_pkg.episode_number,
+            localizations=localizations,
+            default_language="en",
         )
 
     def export_metadata_json(self, metadata: VideoPublishMetadata, output_json_path: Path) -> Path:
@@ -405,12 +424,14 @@ class YouTubeClient(BasePublisher):
                 safe_tags.append(clean_tag)
                 running_len += cost
 
+            insert_parts = ["snippet", "status"]
             body = {
                 "snippet": {
                     "title": metadata.title,
                     "description": metadata.description,
                     "tags": safe_tags,
                     "categoryId": metadata.category_id,
+                    "defaultLanguage": getattr(metadata, "default_language", "en") or "en",
                 },
                 "status": {
                     "privacyStatus": metadata.privacy_status,
@@ -418,7 +439,11 @@ class YouTubeClient(BasePublisher):
                 },
             }
 
-            def _execute_upload(upload_body: dict):
+            if getattr(metadata, "localizations", None):
+                body["localizations"] = metadata.localizations
+                insert_parts.append("localizations")
+
+            def _execute_upload(upload_body: dict, parts: List[str]):
                 media = MediaFileUpload(
                     str(video_path),
                     chunksize=10 * 1024 * 1024,
@@ -426,7 +451,7 @@ class YouTubeClient(BasePublisher):
                     mimetype="video/mp4",
                 )
                 req = youtube.videos().insert(
-                    part="snippet,status",
+                    part=",".join(parts),
                     body=upload_body,
                     media_body=media,
                 )
@@ -438,7 +463,7 @@ class YouTubeClient(BasePublisher):
                 return resp
 
             try:
-                response = _execute_upload(body)
+                response = _execute_upload(body, insert_parts)
             except Exception as upload_err:
                 err_str = str(upload_err)
                 content_bytes = getattr(upload_err, "content", b"")
@@ -446,7 +471,15 @@ class YouTubeClient(BasePublisher):
                 details_str = str(getattr(upload_err, "error_details", ""))
                 combined_err = f"{err_str} {content_str} {details_str}".lower()
 
-                if "invalidtags" in combined_err or "invalid video keywords" in combined_err:
+                if "localizations" in insert_parts and any(k in combined_err for k in ["localization", "language", "invalidvalue"]):
+                    logger.warning(
+                        "YouTube rejected localization metadata. Retrying upload without localizations...",
+                        extra_data={"error": err_str},
+                    )
+                    clean_body = dict(body)
+                    clean_body.pop("localizations", None)
+                    response = _execute_upload(clean_body, ["snippet", "status"])
+                elif "invalidtags" in combined_err or "invalid video keywords" in combined_err:
                     logger.warning(
                         "YouTube rejected tags with 'invalidTags' error. "
                         "Retrying upload with minimal safe core tags...",
@@ -460,7 +493,7 @@ class YouTubeClient(BasePublisher):
                         "LDoE Gameplay",
                         "Zombie Survival",
                     ]
-                    response = _execute_upload(fallback_body)
+                    response = _execute_upload(fallback_body, insert_parts)
                 else:
                     raise upload_err
 
