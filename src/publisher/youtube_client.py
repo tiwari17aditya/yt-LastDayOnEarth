@@ -209,6 +209,7 @@ class YouTubeClient(BasePublisher):
             "action_hook": title_pkg.action_hook,
             "curiosity": title_pkg.curiosity,
             "walkthrough": title_pkg.walkthrough,
+            "search_guide": title_pkg.search_guide,
         }
 
         return VideoPublishMetadata(
@@ -312,20 +313,33 @@ class YouTubeClient(BasePublisher):
         episode_number: Optional[int] = None,
         playlist_url: Optional[str] = None,
         custom_question: Optional[str] = None,
+        events: Optional[List[Any]] = None,
     ) -> Optional[str]:
         """Post a high-engagement creator comment immediately after publish to drive algorithmic engagement."""
         try:
             if not custom_question:
                 next_ep_str = f"Episode #{episode_number + 1}" if episode_number else "the next episode"
-                ep_prompts = [
-                    f"Survivor checkpoint! 🧟‍♂️ What base upgrade or weapon craft should we tackle in {next_ep_str}?",
-                    f"Drop your best survival strategies below! What zone should we raid next in {next_ep_str}?",
-                    f"How would you rate our defense setup? What would you change before {next_ep_str}?",
-                    f"Drop a comment: What's the rarest loot you've pulled from a red zone crate? 🎒📦",
-                    f"Surviving the zombie wasteland day by day! What blueprint should we prioritize next? 🔨",
-                ]
-                idx = (episode_number or 1) % len(ep_prompts)
-                custom_question = ep_prompts[idx]
+                event_text = " ".join([getattr(ev, "description", "") for ev in (events or [])]).lower()
+
+                # Context-aware high-converting prompt selection
+                if any(k in event_text for k in ["chopper", "bike", "motorcycle"]):
+                    custom_question = "Survivor progress check! 🏍️ What level is your Chopper right now, and what parts are you still hunting for?"
+                elif any(k in event_text for k in ["bunker", "alfa", "bravo", "farm", "crooked"]):
+                    custom_question = "Combat survey! ⚔️ What's your go-to budget weapon for clearing Bunker Alfa and the Farm? Melee or guns?"
+                elif any(k in event_text for k in ["smelt", "furnace", "titanium", "steel", "iron"]):
+                    custom_question = "The resource grind is real! ⛏️ How long did it take you guys to farm your first stack of steel/titanium? Drop your stats below!"
+                else:
+                    # Rotational high-engagement prompts targeting community discussion & grind empathy
+                    ep_prompts = [
+                        "Survivor survey! 🏍️ What level is your Chopper right now, and what engine parts are you still hunting for?",
+                        "Combat question! ⚔️ What's your absolute favorite budget weapon for clearing the Spooky Farm and Bunker Alfa?",
+                        "The grind is real! 🎒📦 How many red crates or bunker runs did it take you to find your first ATV transmission or engine part?",
+                        f"Survivor checkpoint! 🧟‍♂️ What base upgrade or weapon craft should we tackle in {next_ep_str}?",
+                        "Loot flex check! 🏆 What is the rarest single item you've pulled from a red zone run so far? Drop your stories below!",
+                        "Defense audit! 🔨 How would you rate our base layout? What would you change before the zombie horde arrives?",
+                    ]
+                    idx = (episode_number or 1) % len(ep_prompts)
+                    custom_question = ep_prompts[idx]
 
             comment_lines = [
                 f"🔥 {custom_question}",

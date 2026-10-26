@@ -30,7 +30,8 @@ def main():
     parser.add_argument("--duration", type=float, default=35.0, help="Duration in seconds (default: 35.0, max 58.0)")
     parser.add_argument("--headline", type=str, default="LAST DAY ON EARTH", help="Top header headline")
     parser.add_argument("--subtitle", type=str, default="SURVIVAL INTENSIFIES", help="Subtitle hook")
-    parser.add_argument("--episode", type=int, help="Episode number to display")
+    parser.add_argument("--metadata", type=str, help="Path to video metadata JSON or events JSON for viral hook detection")
+    parser.add_argument("--auto-viral", action="store_true", help="Automatically detect peak emotional/fail moment from events")
 
     args = parser.parse_args()
 
@@ -46,15 +47,51 @@ def main():
         output_path = Path(f"data/shorts/short{ep_label}_{input_path.stem}.mp4")
 
     generator = ShortsGenerator()
+    start_time = args.start
+    duration = args.duration
+    headline = args.headline
+    subtitle = args.subtitle
+
+    if args.auto_viral:
+        import json
+        events = []
+        meta_candidates = []
+        if args.metadata:
+            meta_candidates.append(Path(args.metadata))
+        meta_candidates.extend([
+            input_path.with_suffix(".json"),
+            Path("data/history.json"),
+        ])
+        for p in meta_candidates:
+            if p.exists():
+                try:
+                    data = json.loads(p.read_text(encoding="utf-8"))
+                    if isinstance(data, dict) and "events" in data:
+                        events = data["events"]
+                        break
+                    elif isinstance(data, list):
+                        events = data
+                        break
+                except Exception:
+                    pass
+
+        viral_data = generator.auto_detect_viral_moment(events)
+        start_time = viral_data["start_time"]
+        duration = viral_data["duration"]
+        headline = viral_data["headline"]
+        subtitle = viral_data["subtitle"]
+        logger.info(
+            f"Auto-detected viral moment: '{headline}' at {start_time:.1f}s ({viral_data.get('hook_type')})"
+        )
 
     try:
         final_short = generator.generate_short(
             input_video=input_path,
             output_path=output_path,
-            start_time=args.start,
-            duration=args.duration,
-            headline=args.headline,
-            subtitle=args.subtitle,
+            start_time=start_time,
+            duration=duration,
+            headline=headline,
+            subtitle=subtitle,
             episode_number=args.episode,
         )
         print(f"🎉 YouTube Short rendered successfully!")
