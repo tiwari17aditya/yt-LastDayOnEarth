@@ -1799,5 +1799,40 @@
       "privacy_redacted": true,
       "md5_checksum": "b0f5b66a3ca9937e12f1b4b854ffd1bf"
     }
+  },
+  {
+    "job_id": "job_20261026_235602",
+    "timestamp": "2026-10-26T23:56:02.784845+00:00",
+    "input_filename": "ScreenRecording_10-25-2026 14-27-09_1.mp4",
+    "output_filename": "ScreenRecording_10-25-2026_14-27-09_1_Processed_26102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "1djBl76UYeE",
+    "youtube_url": "https://youtu.be/1djBl76UYeE",
+    "details": {
+      "video_id": "1djBl76UYeE",
+      "youtube_url": "https://youtu.be/1djBl76UYeE",
+      "video_output": "output/ScreenRecording_10-25-2026_14-27-09_1_Processed_26102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-25-2026_14-27-09_1_Processed_26102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-25-2026_14-27-09_1_Processed_26102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #62",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #62",
+        "walkthrough": "Surviving Day 62: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #62"
+      },
+      "duration_seconds": 1710.894943,
+      "soundtrack_tracks": [
+        "Volatile Reaction",
+        "Constance",
+        "Bossa Antigua",
+        "Fretless",
+        "Pamgaea",
+        "Life of Riley",
+        "Constance",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "d05ee26a8298270e807ebc28b1d68a5f"
+    }
   }
 ]
