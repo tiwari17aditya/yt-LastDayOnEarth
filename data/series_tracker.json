@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 61,
+  "current_episode": 62,
   "completed_episodes": [
     {
       "episode": 1,
@@ -411,6 +411,13 @@
       "video_id": "BexqInDJLiY",
       "youtube_url": "https://youtu.be/BexqInDJLiY",
       "job_id": "BexqInDJLiY"
+    },
+    {
+      "episode": 61,
+      "title": "Workshop & Smelting + Entering Home Base! | LDoE Survival #61",
+      "video_id": "yeToi_Fgay0",
+      "youtube_url": "https://youtu.be/yeToi_Fgay0",
+      "job_id": "yeToi_Fgay0"
     }
   ]
 }

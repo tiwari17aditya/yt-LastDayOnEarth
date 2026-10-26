@@ -1766,5 +1766,38 @@
       "privacy_redacted": true,
       "md5_checksum": "224b161779911a84999c23d72b667fe5"
     }
+  },
+  {
+    "job_id": "job_20261026_200104",
+    "timestamp": "2026-10-26T20:01:04.407710+00:00",
+    "input_filename": "ScreenRecording_10-25-2026 17-59-44_1.mp4",
+    "output_filename": "ScreenRecording_10-25-2026_17-59-44_1_Processed_26102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "yeToi_Fgay0",
+    "youtube_url": "https://youtu.be/yeToi_Fgay0",
+    "details": {
+      "video_id": "yeToi_Fgay0",
+      "youtube_url": "https://youtu.be/yeToi_Fgay0",
+      "video_output": "output/ScreenRecording_10-25-2026_17-59-44_1_Processed_26102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-25-2026_17-59-44_1_Processed_26102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-25-2026_17-59-44_1_Processed_26102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Entering Home Base! | LDoE Survival #61",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Entering Home Base Plus Home... #61",
+        "walkthrough": "Surviving Day 61: Workshop & Smelting Furnaces And Entering Home Base Plus Home Base... #61"
+      },
+      "duration_seconds": 1258.209252,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Pamgaea",
+        "Clean Soul",
+        "Shores of Avalon",
+        "Bossa Antigua",
+        "Daily Beetle"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "b0f5b66a3ca9937e12f1b4b854ffd1bf"
+    }
   }
 ]
