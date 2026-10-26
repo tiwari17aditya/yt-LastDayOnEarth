@@ -1734,5 +1734,37 @@
       "privacy_redacted": true,
       "md5_checksum": "e2cf7be908faf8752898c1ed3338baba"
     }
+  },
+  {
+    "job_id": "job_20261026_141130",
+    "timestamp": "2026-10-26T14:11:30.573548+00:00",
+    "input_filename": "ScreenRecording_10-25-2026 17-39-12_1.mp4",
+    "output_filename": "ScreenRecording_10-25-2026_17-39-12_1_Processed_26102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "BexqInDJLiY",
+    "youtube_url": "https://youtu.be/BexqInDJLiY",
+    "details": {
+      "video_id": "BexqInDJLiY",
+      "youtube_url": "https://youtu.be/BexqInDJLiY",
+      "video_output": "output/ScreenRecording_10-25-2026_17-39-12_1_Processed_26102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-25-2026_17-39-12_1_Processed_26102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-25-2026_17-39-12_1_Processed_26102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Base Storage Optimization! | LDoE Survival #60",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Organizing Storage & Chests Plus Inventory... #60",
+        "walkthrough": "Surviving Day 60: Entering Home Base And Organizing Storage & Chests Plus Inventory &... #60"
+      },
+      "duration_seconds": 1042.192812,
+      "soundtrack_tracks": [
+        "Constance",
+        "Carefree",
+        "Groove Grove",
+        "Clean Soul",
+        "Carefree"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "224b161779911a84999c23d72b667fe5"
+    }
   }
 ]
