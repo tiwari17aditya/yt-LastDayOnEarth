@@ -14,6 +14,7 @@ Features:
 """
 
 import re
+from pathlib import Path
 from typing import Dict, List, Optional, Any
 from src.logging_config import get_logger
 
@@ -354,3 +355,54 @@ class MetadataLocalizer:
         except Exception as e:
             logger.warning(f"Error calling Gemini for localization: {e}")
             return None
+
+    def localize_text(self, text: str, lang: str) -> str:
+        """Translates arbitrary gaming caption/event text into target language."""
+        if lang == "en":
+            return text
+        vocab = GAME_VOCABULARY.get(lang, {})
+        translated = text
+        for en_term, target_term in vocab.items():
+            pattern = re.compile(rf"\b{re.escape(en_term)}\b", re.IGNORECASE)
+            translated = pattern.sub(target_term, translated)
+        return translated
+
+    def generate_srt_captions(
+        self,
+        events: List[Any],
+        lang: str,
+        output_path: Path,
+        default_duration: float = 3.5,
+    ) -> Path:
+        """Generates a standard SubRip (.srt) subtitle file for YouTube closed captions."""
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        def format_srt_time(seconds: float) -> str:
+            hrs = int(seconds // 3600)
+            mins = int((seconds % 3600) // 60)
+            secs = int(seconds % 60)
+            millis = int(round((seconds - int(seconds)) * 1000))
+            return f"{hrs:02d}:{mins:02d}:{secs:02d},{millis:03d}"
+
+        srt_blocks = []
+        for idx, ev in enumerate(events, start=1):
+            st = float(getattr(ev, "start_time", 0.0))
+            et = float(getattr(ev, "end_time", st + default_duration))
+            if et <= st:
+                et = st + default_duration
+            if et - st < 2.5:
+                et = st + 2.5
+
+            raw_desc = getattr(ev, "description", "").strip()
+            clean_desc = re.sub(r"^[^\w\s]+", "", raw_desc).strip()
+            localized_desc = self.localize_text(clean_desc, lang)
+
+            srt_blocks.append(
+                f"{idx}\n"
+                f"{format_srt_time(st)} --> {format_srt_time(et)}\n"
+                f"{localized_desc}\n"
+            )
+
+        output_path.write_text("\n".join(srt_blocks), encoding="utf-8")
+        logger.info(f"Generated {lang.upper()} .srt closed caption file with {len(events)} cues at {output_path}")
+        return output_path

@@ -102,3 +102,79 @@ def test_youtube_client_generate_metadata_includes_localizations(monkeypatch):
     assert "pt" in metadata.localizations
     assert "es" in metadata.localizations
     assert len(metadata.localizations["ru"]["title"]) <= 100
+
+
+def test_metadata_localizer_generate_srt_captions(tmp_path):
+    localizer = MetadataLocalizer()
+
+    class DummyEv:
+        def __init__(self, desc, st, et):
+            self.description = desc
+            self.start_time = st
+            self.end_time = et
+
+    events = [
+        DummyEv("Bunker Alfa Floor 2 Clearing", 0.0, 3.0),
+        DummyEv("Smelting Iron & Furnaces", 5.0, 8.5),
+    ]
+
+    # Test Russian SRT
+    ru_path = tmp_path / "test_ru.srt"
+    localizer.generate_srt_captions(events=events, lang="ru", output_path=ru_path)
+    assert ru_path.exists()
+    ru_content = ru_path.read_text(encoding="utf-8")
+    assert "00:00:00,000 --> 00:00:03,000" in ru_content
+    assert "Бункер Альфа" in ru_content
+    assert "00:00:05,000 --> 00:00:08,500" in ru_content
+    assert "Плавильная печь" in ru_content
+
+    # Test Portuguese SRT
+    pt_path = tmp_path / "test_pt.srt"
+    localizer.generate_srt_captions(events=events, lang="pt", output_path=pt_path)
+    assert pt_path.exists()
+    pt_content = pt_path.read_text(encoding="utf-8")
+    assert "Bunker Alfa" in pt_content
+    assert "Fornalha" in pt_content
+
+
+def test_youtube_client_upload_captions(tmp_path):
+    client = YouTubeClient()
+
+    class DummyEv:
+        def __init__(self, desc, st, et):
+            self.description = desc
+            self.start_time = st
+            self.end_time = et
+
+    events = [DummyEv("Base Building", 0.0, 4.0)]
+
+    inserted_captions = []
+
+    class FakeCaptions:
+        def insert(self, part, body, media_body):
+            inserted_captions.append(body["snippet"])
+            class Exec:
+                def execute(self):
+                    return {"id": f"caption_{body['snippet']['language']}"}
+            return Exec()
+
+    class FakeYouTube:
+        def captions(self):
+            return FakeCaptions()
+
+    fake_yt = FakeYouTube()
+    result = client.upload_captions(
+        youtube=fake_yt,
+        video_id="TEST_VID",
+        events=events,
+        languages=["en", "ru", "pt"],
+    )
+
+    assert "en" in result
+    assert "ru" in result
+    assert "pt" in result
+    assert len(inserted_captions) == 3
+    langs = [c["language"] for c in inserted_captions]
+    assert "en" in langs
+    assert "ru" in langs
+    assert "pt" in langs

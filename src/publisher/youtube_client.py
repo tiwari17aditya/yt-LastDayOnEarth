@@ -41,9 +41,20 @@ class VideoPublishMetadata:
     episode_number: Optional[int] = None
     localizations: Optional[Dict[str, Dict[str, str]]] = None
     default_language: str = "en"
+    events: Optional[List[Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        if self.events:
+            d["events"] = [
+                {
+                    "description": getattr(e, "description", str(e)),
+                    "start_time": getattr(e, "start_time", 0.0),
+                    "end_time": getattr(e, "end_time", 0.0),
+                }
+                for e in self.events
+            ]
+        return d
 
 
 class BasePublisher(ABC):
@@ -223,6 +234,7 @@ class YouTubeClient(BasePublisher):
             episode_number=title_pkg.episode_number,
             localizations=localizations,
             default_language="en",
+            events=events,
         )
 
     def export_metadata_json(self, metadata: VideoPublishMetadata, output_json_path: Path) -> Path:
@@ -369,6 +381,69 @@ class YouTubeClient(BasePublisher):
         except Exception as ce:
             logger.warning(f"Could not post engagement comment on video {video_id}: {ce}")
             return None
+
+    def upload_captions(
+        self,
+        youtube: Any,
+        video_id: str,
+        events: List[Any],
+        languages: Optional[List[str]] = None,
+    ) -> Dict[str, str]:
+        """Uploads multi-language Closed Caption tracks (.srt) to YouTube via Data API v3."""
+        if not events:
+            return {}
+
+        from googleapiclient.http import MediaFileUpload
+
+        langs = languages or ["en", "ru", "pt", "es"]
+        track_names = {
+            "en": "English (Gameplay Cues)",
+            "ru": "Русский (Игровые подсказки)",
+            "pt": "Português (Dicas de Sobrevivência)",
+            "es": "Español (Guía de Supervivencia)",
+        }
+
+        uploaded: Dict[str, str] = {}
+        captions_temp_dir = Path("temp/captions")
+        captions_temp_dir.mkdir(parents=True, exist_ok=True)
+
+        for lang in langs:
+            try:
+                srt_path = captions_temp_dir / f"{video_id}_{lang}.srt"
+                self.localizer.generate_srt_captions(
+                    events=events,
+                    lang=lang,
+                    output_path=srt_path,
+                )
+
+                media = MediaFileUpload(
+                    str(srt_path),
+                    mimetype="application/x-subrip",
+                    resumable=True,
+                )
+                body = {
+                    "snippet": {
+                        "videoId": video_id,
+                        "language": lang,
+                        "name": track_names.get(lang, lang.upper()),
+                        "isDraft": False,
+                    }
+                }
+                logger.info(f"Uploading {lang.upper()} Closed Caption track to video {video_id}...")
+                resp = youtube.captions().insert(
+                    part="snippet",
+                    body=body,
+                    media_body=media,
+                ).execute()
+
+                caption_id = resp.get("id")
+                uploaded[lang] = caption_id
+                logger.info(f"Closed Caption track ({lang}) uploaded successfully (ID: {caption_id})")
+
+            except Exception as e:
+                logger.warning(f"Could not upload {lang} caption track to video {video_id}: {e}")
+
+        return uploaded
 
     def upload_video(self, video_path: Path, metadata: VideoPublishMetadata) -> str:
         logger.info("Initiating YouTube video upload", extra_data={"title": metadata.title, "path": str(video_path)})
@@ -581,6 +656,17 @@ class YouTubeClient(BasePublisher):
             except Exception as pe:
                 logger.error(f"STRICT COMPLIANCE ALERT: Playlist auto-assignment encountered error: {pe}")
 
+            # Upload multi-language Closed Caption tracks (.srt) to YouTube player
+            if getattr(metadata, "events", None):
+                try:
+                    self.upload_captions(
+                        youtube=youtube,
+                        video_id=video_id,
+                        events=metadata.events,
+                    )
+                except Exception as cap_err:
+                    logger.warning(f"Closed Captions upload skipped: {cap_err}")
+
             # Post automated creator first comment with playlist link & discussion prompt
             try:
                 playlist_url = f"https://www.youtube.com/playlist?list={playlist_id}" if playlist_id else None
@@ -589,6 +675,7 @@ class YouTubeClient(BasePublisher):
                     video_id=video_id,
                     episode_number=metadata.episode_number,
                     playlist_url=playlist_url,
+                    events=getattr(metadata, "events", None),
                 )
             except Exception as ce:
                 logger.warning(f"Creator engagement comment auto-posting skipped: {ce}")
