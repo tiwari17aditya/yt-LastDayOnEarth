@@ -1702,5 +1702,37 @@
       "privacy_redacted": true,
       "md5_checksum": "590821c59b588756015f23958643aea7"
     }
+  },
+  {
+    "job_id": "job_20261026_074041",
+    "timestamp": "2026-10-26T07:40:41.712552+00:00",
+    "input_filename": "ScreenRecording_10-25-2026 16-46-22_1.mp4",
+    "output_filename": "ScreenRecording_10-25-2026_16-46-22_1_Processed_26102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "irv8JSnaQQs",
+    "youtube_url": "https://youtu.be/irv8JSnaQQs",
+    "details": {
+      "video_id": "irv8JSnaQQs",
+      "youtube_url": "https://youtu.be/irv8JSnaQQs",
+      "video_output": "output/ScreenRecording_10-25-2026_16-46-22_1_Processed_26102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-25-2026_16-46-22_1_Processed_26102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-25-2026_16-46-22_1_Processed_26102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Entering Home Base! | LDoE Survival #59",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Entering Home Base Plus Base Defense &... #59",
+        "walkthrough": "Surviving Day 59: Home Base Operations And Entering Home Base Plus Base Defense & Maintenance | LDoE"
+      },
+      "duration_seconds": 758.046644,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Volatile Reaction",
+        "Monkeys Spinning Monkeys",
+        "Fretless",
+        "Electro Cabello"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "e2cf7be908faf8752898c1ed3338baba"
+    }
   }
 ]
