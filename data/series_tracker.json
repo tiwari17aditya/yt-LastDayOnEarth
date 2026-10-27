@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 64,
+  "current_episode": 65,
   "completed_episodes": [
     {
       "episode": 1,
@@ -432,6 +432,13 @@
       "video_id": "juvhMfJOofw",
       "youtube_url": "https://youtu.be/juvhMfJOofw",
       "job_id": "juvhMfJOofw"
+    },
+    {
+      "episode": 64,
+      "title": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #64",
+      "video_id": "1DjmoT1dTmI",
+      "youtube_url": "https://youtu.be/1DjmoT1dTmI",
+      "job_id": "1DjmoT1dTmI"
     }
   ]
 }
