@@ -135,6 +135,12 @@ python scripts/generate_channel_digest.py --email
 python scripts/post_engagement_comments.py --video-id <ID> --episode <NUM>
 python scripts/post_engagement_comments.py --all-episodes
 
+# Multi-Language Closed Captions (.srt) Uploader (EN, RU, PT, ES)
+python scripts/upload_video_captions.py --video-id <ID>
+
+# Publish Reach-Maximized Sample Demonstration Video
+python scripts/publish_sample_reach_video.py --privacy unlisted
+
 # High-CTR Cinematic Grunge Thumbnail Engine
 python scripts/generate_thumbnail.py --episode 13 --upload --video-id <ID>
 ```

@@ -7,6 +7,8 @@ from src.publisher.peertube_client import PeerTubeClient
 from src.publisher.fediverse_broadcaster import FediverseBroadcaster
 from src.publisher.multi_publisher import MultiPlatformPublisher, MultiPlatformPublishResult
 
+from src.publisher.localization import MetadataLocalizer
+
 __all__ = [
     "BasePublisher",
     "YouTubeClient",
@@ -14,6 +16,7 @@ __all__ = [
     "TitleManager",
     "TitlePackage",
     "DynamicTagGenerator",
+    "MetadataLocalizer",
     "PeerTubeClient",
     "FediverseBroadcaster",
     "MultiPlatformPublisher",

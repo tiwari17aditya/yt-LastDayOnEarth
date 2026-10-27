@@ -39,9 +39,22 @@ class VideoPublishMetadata:
     thumbnail_path: Optional[str] = None
     title_candidates: Optional[Dict[str, str]] = None
     episode_number: Optional[int] = None
+    localizations: Optional[Dict[str, Dict[str, str]]] = None
+    default_language: str = "en"
+    events: Optional[List[Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        if self.events:
+            d["events"] = [
+                {
+                    "description": getattr(e, "description", str(e)),
+                    "start_time": getattr(e, "start_time", 0.0),
+                    "end_time": getattr(e, "end_time", 0.0),
+                }
+                for e in self.events
+            ]
+        return d
 
 
 class BasePublisher(ABC):
@@ -75,6 +88,7 @@ class BasePublisher(ABC):
 
 from src.publisher.metadata_generator import DynamicTagGenerator
 from src.publisher.playlist_manager import PlaylistManager
+from src.publisher.localization import MetadataLocalizer
 
 
 class YouTubeClient(BasePublisher):
@@ -100,6 +114,10 @@ class YouTubeClient(BasePublisher):
             gemini_api_key=gemini_api_key,
             gemini_model=gemini_model,
             target_hashtag_count=50,
+        )
+        self.localizer = MetadataLocalizer(
+            gemini_api_key=gemini_api_key,
+            gemini_model=gemini_model,
         )
 
     def generate_metadata(
@@ -188,21 +206,35 @@ class YouTubeClient(BasePublisher):
             hashtags=trending_hashtags,
         )
 
+        full_description = "\n".join(description_lines)
+
+        # Generate multi-language localized titles and descriptions (RU, PT, ES)
+        localizations = self.localizer.generate_localizations(
+            primary_title=selected_title,
+            primary_description=full_description,
+            episode_number=title_pkg.episode_number,
+            events=events,
+        )
+
         title_candidates = {
             "action_hook": title_pkg.action_hook,
             "curiosity": title_pkg.curiosity,
             "walkthrough": title_pkg.walkthrough,
+            "search_guide": title_pkg.search_guide,
         }
 
         return VideoPublishMetadata(
             title=selected_title[:100],
-            description="\n".join(description_lines),
+            description=full_description,
             tags=tags,
             category_id="20",
             privacy_status=self.privacy_status,
             thumbnail_path=str(thumbnail_path) if thumbnail_path else None,
             title_candidates=title_candidates,
             episode_number=title_pkg.episode_number,
+            localizations=localizations,
+            default_language="en",
+            events=events,
         )
 
     def export_metadata_json(self, metadata: VideoPublishMetadata, output_json_path: Path) -> Path:
@@ -293,20 +325,33 @@ class YouTubeClient(BasePublisher):
         episode_number: Optional[int] = None,
         playlist_url: Optional[str] = None,
         custom_question: Optional[str] = None,
+        events: Optional[List[Any]] = None,
     ) -> Optional[str]:
         """Post a high-engagement creator comment immediately after publish to drive algorithmic engagement."""
         try:
             if not custom_question:
                 next_ep_str = f"Episode #{episode_number + 1}" if episode_number else "the next episode"
-                ep_prompts = [
-                    f"Survivor checkpoint! 🧟‍♂️ What base upgrade or weapon craft should we tackle in {next_ep_str}?",
-                    f"Drop your best survival strategies below! What zone should we raid next in {next_ep_str}?",
-                    f"How would you rate our defense setup? What would you change before {next_ep_str}?",
-                    f"Drop a comment: What's the rarest loot you've pulled from a red zone crate? 🎒📦",
-                    f"Surviving the zombie wasteland day by day! What blueprint should we prioritize next? 🔨",
-                ]
-                idx = (episode_number or 1) % len(ep_prompts)
-                custom_question = ep_prompts[idx]
+                event_text = " ".join([getattr(ev, "description", "") for ev in (events or [])]).lower()
+
+                # Context-aware high-converting prompt selection
+                if any(k in event_text for k in ["chopper", "bike", "motorcycle"]):
+                    custom_question = "Survivor progress check! 🏍️ What level is your Chopper right now, and what parts are you still hunting for?"
+                elif any(k in event_text for k in ["bunker", "alfa", "bravo", "farm", "crooked"]):
+                    custom_question = "Combat survey! ⚔️ What's your go-to budget weapon for clearing Bunker Alfa and the Farm? Melee or guns?"
+                elif any(k in event_text for k in ["smelt", "furnace", "titanium", "steel", "iron"]):
+                    custom_question = "The resource grind is real! ⛏️ How long did it take you guys to farm your first stack of steel/titanium? Drop your stats below!"
+                else:
+                    # Rotational high-engagement prompts targeting community discussion & grind empathy
+                    ep_prompts = [
+                        "Survivor survey! 🏍️ What level is your Chopper right now, and what engine parts are you still hunting for?",
+                        "Combat question! ⚔️ What's your absolute favorite budget weapon for clearing the Spooky Farm and Bunker Alfa?",
+                        "The grind is real! 🎒📦 How many red crates or bunker runs did it take you to find your first ATV transmission or engine part?",
+                        f"Survivor checkpoint! 🧟‍♂️ What base upgrade or weapon craft should we tackle in {next_ep_str}?",
+                        "Loot flex check! 🏆 What is the rarest single item you've pulled from a red zone run so far? Drop your stories below!",
+                        "Defense audit! 🔨 How would you rate our base layout? What would you change before the zombie horde arrives?",
+                    ]
+                    idx = (episode_number or 1) % len(ep_prompts)
+                    custom_question = ep_prompts[idx]
 
             comment_lines = [
                 f"🔥 {custom_question}",
@@ -336,6 +381,69 @@ class YouTubeClient(BasePublisher):
         except Exception as ce:
             logger.warning(f"Could not post engagement comment on video {video_id}: {ce}")
             return None
+
+    def upload_captions(
+        self,
+        youtube: Any,
+        video_id: str,
+        events: List[Any],
+        languages: Optional[List[str]] = None,
+    ) -> Dict[str, str]:
+        """Uploads multi-language Closed Caption tracks (.srt) to YouTube via Data API v3."""
+        if not events:
+            return {}
+
+        from googleapiclient.http import MediaFileUpload
+
+        langs = languages or ["en", "ru", "pt", "es"]
+        track_names = {
+            "en": "English (Gameplay Cues)",
+            "ru": "Русский (Игровые подсказки)",
+            "pt": "Português (Dicas de Sobrevivência)",
+            "es": "Español (Guía de Supervivencia)",
+        }
+
+        uploaded: Dict[str, str] = {}
+        captions_temp_dir = Path("temp/captions")
+        captions_temp_dir.mkdir(parents=True, exist_ok=True)
+
+        for lang in langs:
+            try:
+                srt_path = captions_temp_dir / f"{video_id}_{lang}.srt"
+                self.localizer.generate_srt_captions(
+                    events=events,
+                    lang=lang,
+                    output_path=srt_path,
+                )
+
+                media = MediaFileUpload(
+                    str(srt_path),
+                    mimetype="application/x-subrip",
+                    resumable=True,
+                )
+                body = {
+                    "snippet": {
+                        "videoId": video_id,
+                        "language": lang,
+                        "name": track_names.get(lang, lang.upper()),
+                        "isDraft": False,
+                    }
+                }
+                logger.info(f"Uploading {lang.upper()} Closed Caption track to video {video_id}...")
+                resp = youtube.captions().insert(
+                    part="snippet",
+                    body=body,
+                    media_body=media,
+                ).execute()
+
+                caption_id = resp.get("id")
+                uploaded[lang] = caption_id
+                logger.info(f"Closed Caption track ({lang}) uploaded successfully (ID: {caption_id})")
+
+            except Exception as e:
+                logger.warning(f"Could not upload {lang} caption track to video {video_id}: {e}")
+
+        return uploaded
 
     def upload_video(self, video_path: Path, metadata: VideoPublishMetadata) -> str:
         logger.info("Initiating YouTube video upload", extra_data={"title": metadata.title, "path": str(video_path)})
@@ -405,12 +513,14 @@ class YouTubeClient(BasePublisher):
                 safe_tags.append(clean_tag)
                 running_len += cost
 
+            insert_parts = ["snippet", "status"]
             body = {
                 "snippet": {
                     "title": metadata.title,
                     "description": metadata.description,
                     "tags": safe_tags,
                     "categoryId": metadata.category_id,
+                    "defaultLanguage": getattr(metadata, "default_language", "en") or "en",
                 },
                 "status": {
                     "privacyStatus": metadata.privacy_status,
@@ -418,7 +528,11 @@ class YouTubeClient(BasePublisher):
                 },
             }
 
-            def _execute_upload(upload_body: dict):
+            if getattr(metadata, "localizations", None):
+                body["localizations"] = metadata.localizations
+                insert_parts.append("localizations")
+
+            def _execute_upload(upload_body: dict, parts: List[str]):
                 media = MediaFileUpload(
                     str(video_path),
                     chunksize=10 * 1024 * 1024,
@@ -426,7 +540,7 @@ class YouTubeClient(BasePublisher):
                     mimetype="video/mp4",
                 )
                 req = youtube.videos().insert(
-                    part="snippet,status",
+                    part=",".join(parts),
                     body=upload_body,
                     media_body=media,
                 )
@@ -438,7 +552,7 @@ class YouTubeClient(BasePublisher):
                 return resp
 
             try:
-                response = _execute_upload(body)
+                response = _execute_upload(body, insert_parts)
             except Exception as upload_err:
                 err_str = str(upload_err)
                 content_bytes = getattr(upload_err, "content", b"")
@@ -446,7 +560,15 @@ class YouTubeClient(BasePublisher):
                 details_str = str(getattr(upload_err, "error_details", ""))
                 combined_err = f"{err_str} {content_str} {details_str}".lower()
 
-                if "invalidtags" in combined_err or "invalid video keywords" in combined_err:
+                if "localizations" in insert_parts and any(k in combined_err for k in ["localization", "language", "invalidvalue"]):
+                    logger.warning(
+                        "YouTube rejected localization metadata. Retrying upload without localizations...",
+                        extra_data={"error": err_str},
+                    )
+                    clean_body = dict(body)
+                    clean_body.pop("localizations", None)
+                    response = _execute_upload(clean_body, ["snippet", "status"])
+                elif "invalidtags" in combined_err or "invalid video keywords" in combined_err:
                     logger.warning(
                         "YouTube rejected tags with 'invalidTags' error. "
                         "Retrying upload with minimal safe core tags...",
@@ -460,7 +582,7 @@ class YouTubeClient(BasePublisher):
                         "LDoE Gameplay",
                         "Zombie Survival",
                     ]
-                    response = _execute_upload(fallback_body)
+                    response = _execute_upload(fallback_body, insert_parts)
                 else:
                     raise upload_err
 
@@ -534,6 +656,17 @@ class YouTubeClient(BasePublisher):
             except Exception as pe:
                 logger.error(f"STRICT COMPLIANCE ALERT: Playlist auto-assignment encountered error: {pe}")
 
+            # Upload multi-language Closed Caption tracks (.srt) to YouTube player
+            if getattr(metadata, "events", None):
+                try:
+                    self.upload_captions(
+                        youtube=youtube,
+                        video_id=video_id,
+                        events=metadata.events,
+                    )
+                except Exception as cap_err:
+                    logger.warning(f"Closed Captions upload skipped: {cap_err}")
+
             # Post automated creator first comment with playlist link & discussion prompt
             try:
                 playlist_url = f"https://www.youtube.com/playlist?list={playlist_id}" if playlist_id else None
@@ -542,6 +675,7 @@ class YouTubeClient(BasePublisher):
                     video_id=video_id,
                     episode_number=metadata.episode_number,
                     playlist_url=playlist_url,
+                    events=getattr(metadata, "events", None),
                 )
             except Exception as ce:
                 logger.warning(f"Creator engagement comment auto-posting skipped: {ce}")

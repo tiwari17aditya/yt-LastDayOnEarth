@@ -138,6 +138,60 @@ class ShortsGenerator:
 
         return min_start
 
+    def auto_detect_viral_moment(
+        self,
+        events: List[Any],
+        min_start: float = 30.0,
+        default_duration: float = 35.0,
+    ) -> Dict[str, Any]:
+        """Detects high-emotion viral moments (fails, near-death escapes, rare crate openings)."""
+        if not events:
+            return {
+                "start_time": min_start,
+                "duration": default_duration,
+                "headline": "LAST DAY ON EARTH",
+                "subtitle": "SURVIVAL INTENSIFIES",
+                "hook_type": "standard_gameplay",
+            }
+
+        # Priority 1: High-stakes fail moments & intense combat panic
+        fail_keywords = ["death", "dying", "frenzy giant", "alarm", "toxic spitter", "horde", "boss", "ambush"]
+        for ev in events:
+            desc = getattr(ev, "description", "").lower()
+            st = getattr(ev, "start_time", 0.0)
+            if any(k in desc for k in fail_keywords) and st >= min_start:
+                return {
+                    "start_time": float(st),
+                    "duration": 30.0,
+                    "headline": "DISASTER MOMENT?!",
+                    "subtitle": "RED ZONE CLOSE CALL",
+                    "hook_type": "fail_panic",
+                }
+
+        # Priority 2: Rare loot unboxings and bunker raids
+        loot_keywords = ["red crate", "chest", "titanium", "transmission", "chopper gas tank", "c4", "alfa", "bunker"]
+        for ev in events:
+            desc = getattr(ev, "description", "").lower()
+            st = getattr(ev, "start_time", 0.0)
+            if any(k in desc for k in loot_keywords) and st >= min_start:
+                return {
+                    "start_time": float(st),
+                    "duration": 35.0,
+                    "headline": "RAREST LOOT DROP?!",
+                    "subtitle": "OPENING RED CHEST",
+                    "hook_type": "rare_loot",
+                }
+
+        # Priority 3: General highlight
+        st = self.auto_detect_highlight_start(events, min_start=min_start)
+        return {
+            "start_time": st,
+            "duration": default_duration,
+            "headline": "LAST DAY ON EARTH",
+            "subtitle": "EPIC SURVIVAL MOMENT",
+            "hook_type": "highlight",
+        }
+
     def generate_short(
         self,
         input_video: Path,
