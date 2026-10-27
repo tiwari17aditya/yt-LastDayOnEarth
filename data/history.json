@@ -1904,5 +1904,39 @@
       "privacy_redacted": true,
       "md5_checksum": "9f4cf4fe7cac10cb8fadafcf216eab52"
     }
+  },
+  {
+    "job_id": "job_20261027_155621",
+    "timestamp": "2026-10-27T15:56:21.097975+00:00",
+    "input_filename": "ScreenRecording_10-27-2026 01-28-43_1.mp4",
+    "output_filename": "ScreenRecording_10-27-2026_01-28-43_1_Processed_27102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "MdlpG7tiun4",
+    "youtube_url": "https://youtu.be/MdlpG7tiun4",
+    "details": {
+      "video_id": "MdlpG7tiun4",
+      "youtube_url": "https://youtu.be/MdlpG7tiun4",
+      "video_output": "output/ScreenRecording_10-27-2026_01-28-43_1_Processed_27102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-27-2026_01-28-43_1_Processed_27102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-27-2026_01-28-43_1_Processed_27102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Entering Home Base Part 2! | LDoE Survival #65",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Entering Home Base Part 2 Plus Workbench &... #65",
+        "walkthrough": "Surviving Day 65: Entering Home Base And Entering Home Base Part 2 Plus Workbench &... #65",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #65"
+      },
+      "duration_seconds": 1012.261224,
+      "soundtrack_tracks": [
+        "Pamgaea",
+        "Electro Cabello",
+        "Groove Grove",
+        "Somewhere Sunny",
+        "Groove Grove",
+        "Shores of Avalon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "5a5295592b9ed78d78cf4398aec34b28"
+    }
   }
 ]
