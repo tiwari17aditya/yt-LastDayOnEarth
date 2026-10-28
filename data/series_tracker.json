@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 67,
+  "current_episode": 70,
   "completed_episodes": [
     {
       "episode": 1,
@@ -453,6 +453,27 @@
       "video_id": "Z9J49uoNAJQ",
       "youtube_url": "https://youtu.be/Z9J49uoNAJQ",
       "job_id": "Z9J49uoNAJQ"
+    },
+    {
+      "episode": 67,
+      "title": "Blueprint Upgrades + Workshop & Smelting! | LDoE Survival #67",
+      "video_id": "vAtLOpPky8Q",
+      "youtube_url": "https://youtu.be/vAtLOpPky8Q",
+      "job_id": "vAtLOpPky8Q"
+    },
+    {
+      "episode": 68,
+      "title": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #68",
+      "video_id": "lSnbCM9ig6Y",
+      "youtube_url": "https://youtu.be/lSnbCM9ig6Y",
+      "job_id": "lSnbCM9ig6Y"
+    },
+    {
+      "episode": 69,
+      "title": "Home Base Operations & Blueprint Upgrades! | LDoE Survival #69",
+      "video_id": "tzvGXtsQauo",
+      "youtube_url": "https://youtu.be/tzvGXtsQauo",
+      "job_id": "tzvGXtsQauo"
     }
   ]
 }

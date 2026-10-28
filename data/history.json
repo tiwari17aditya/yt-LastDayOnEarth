@@ -1971,5 +1971,108 @@
       "privacy_redacted": true,
       "md5_checksum": "48e2b48f543cb23c4ad90c72caf6c5f5"
     }
+  },
+  {
+    "job_id": "job_20261028_164523",
+    "timestamp": "2026-10-28T16:45:23.239715+00:00",
+    "input_filename": "ScreenRecording_10-26-2026 19-48-13_1.mp4",
+    "output_filename": "ScreenRecording_10-26-2026_19-48-13_1_Processed_28102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "vAtLOpPky8Q",
+    "youtube_url": "https://youtu.be/vAtLOpPky8Q",
+    "details": {
+      "video_id": "vAtLOpPky8Q",
+      "youtube_url": "https://youtu.be/vAtLOpPky8Q",
+      "video_output": "output/ScreenRecording_10-26-2026_19-48-13_1_Processed_28102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-26-2026_19-48-13_1_Processed_28102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-26-2026_19-48-13_1_Processed_28102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Workshop & Smelting! | LDoE Survival #67",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Workshop & Smelting Furnaces Plus Home... #67",
+        "walkthrough": "Surviving Day 67: Workbench & Blueprints And Workshop & Smelting Furnaces Plus Home Base... #67",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #67"
+      },
+      "duration_seconds": 1958.612132,
+      "soundtrack_tracks": [
+        "Urban Gauntlet",
+        "Electro Cabello",
+        "Clean Soul",
+        "Clear Waters",
+        "Volatile Reaction",
+        "Urban Gauntlet",
+        "Life of Riley",
+        "Constance",
+        "Wallpaper",
+        "Somewhere Sunny",
+        "Local Forecast"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "21c6d3f339596a30baeaf08be61ddd0f"
+    }
+  },
+  {
+    "job_id": "job_20261028_165226",
+    "timestamp": "2026-10-28T16:52:26.409679+00:00",
+    "input_filename": "ScreenRecording_10-27-2026 19-41-05_1.mp4",
+    "output_filename": "ScreenRecording_10-27-2026_19-41-05_1_Processed_28102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "lSnbCM9ig6Y",
+    "youtube_url": "https://youtu.be/lSnbCM9ig6Y",
+    "details": {
+      "video_id": "lSnbCM9ig6Y",
+      "youtube_url": "https://youtu.be/lSnbCM9ig6Y",
+      "video_output": "output/ScreenRecording_10-27-2026_19-41-05_1_Processed_28102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-27-2026_19-41-05_1_Processed_28102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-27-2026_19-41-05_1_Processed_28102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #68",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Base Defense & Maintenance Plus Workshop... #68",
+        "walkthrough": "Surviving Day 68: Home Base Operations And Base Defense & Maintenance Plus Workshop &... #68",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #68"
+      },
+      "duration_seconds": 396.26669,
+      "soundtrack_tracks": [
+        "Carefree",
+        "Constance",
+        "Decisions"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "dc1a7b8e1ad4b6faeac00127cd29da7e"
+    }
+  },
+  {
+    "job_id": "job_20261028_170201",
+    "timestamp": "2026-10-28T17:02:01.091277+00:00",
+    "input_filename": "ScreenRecording_10-27-2026 23-19-19_1.mp4",
+    "output_filename": "ScreenRecording_10-27-2026_23-19-19_1_Processed_28102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "tzvGXtsQauo",
+    "youtube_url": "https://youtu.be/tzvGXtsQauo",
+    "details": {
+      "video_id": "tzvGXtsQauo",
+      "youtube_url": "https://youtu.be/tzvGXtsQauo",
+      "video_output": "output/ScreenRecording_10-27-2026_23-19-19_1_Processed_28102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-27-2026_23-19-19_1_Processed_28102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-27-2026_23-19-19_1_Processed_28102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Blueprint Upgrades! | LDoE Survival #69",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Workbench & Blueprints Plus Crafting... #69",
+        "walkthrough": "Surviving Day 69: Home Base Operations And Workbench & Blueprints Plus Crafting Planks &... #69",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #69"
+      },
+      "duration_seconds": 672.003855,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Pamgaea",
+        "Life of Riley",
+        "Volatile Reaction",
+        "Carefree"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "b20b5c8d34964005420811b40b6f9922"
+    }
   }
 ]
