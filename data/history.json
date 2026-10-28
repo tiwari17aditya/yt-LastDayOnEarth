@@ -2074,5 +2074,45 @@
       "privacy_redacted": true,
       "md5_checksum": "b20b5c8d34964005420811b40b6f9922"
     }
+  },
+  {
+    "job_id": "job_20261028_220913",
+    "timestamp": "2026-10-28T22:09:13.214610+00:00",
+    "input_filename": "ScreenRecording_10-28-2026 00-17-05_1.mp4",
+    "output_filename": "ScreenRecording_10-28-2026_00-17-05_1_Processed_28102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "TOVPr4WRDSU",
+    "youtube_url": "https://youtu.be/TOVPr4WRDSU",
+    "details": {
+      "video_id": "TOVPr4WRDSU",
+      "youtube_url": "https://youtu.be/TOVPr4WRDSU",
+      "video_output": "output/ScreenRecording_10-28-2026_00-17-05_1_Processed_28102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-28-2026_00-17-05_1_Processed_28102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-28-2026_00-17-05_1_Processed_28102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #71",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #71",
+        "walkthrough": "Surviving Day 71: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #71",
+        "search_guide": "How to Farm & Master Blueprint Upgrades & Home Base Operations Fast | LDoE #71"
+      },
+      "duration_seconds": 2109.84576,
+      "soundtrack_tracks": [
+        "Carefree",
+        "Groove Grove",
+        "Sneaky Snitch",
+        "Wallpaper",
+        "Decisions",
+        "Wallpaper",
+        "Bossa Antigua",
+        "Electro Cabello",
+        "Monkeys Spinning Monkeys",
+        "Bossa Antigua",
+        "Decisions",
+        "Shores of Avalon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "a8f803e82c00bd8b5d53deaf448bce31"
+    }
   }
 ]

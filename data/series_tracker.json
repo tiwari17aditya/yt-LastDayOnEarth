@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 70,
+  "current_episode": 72,
   "completed_episodes": [
     {
       "episode": 1,
@@ -474,6 +474,13 @@
       "video_id": "tzvGXtsQauo",
       "youtube_url": "https://youtu.be/tzvGXtsQauo",
       "job_id": "tzvGXtsQauo"
+    },
+    {
+      "episode": 71,
+      "title": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #71",
+      "video_id": "TOVPr4WRDSU",
+      "youtube_url": "https://youtu.be/TOVPr4WRDSU",
+      "job_id": "TOVPr4WRDSU"
     }
   ]
 }
