@@ -1938,5 +1938,38 @@
       "privacy_redacted": true,
       "md5_checksum": "5a5295592b9ed78d78cf4398aec34b28"
     }
+  },
+  {
+    "job_id": "job_20261028_160842",
+    "timestamp": "2026-10-28T16:08:42.826682+00:00",
+    "input_filename": "ScreenRecording_10-26-2026 20-22-57_1.mp4",
+    "output_filename": "ScreenRecording_10-26-2026_20-22-57_1_Processed_28102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "Z9J49uoNAJQ",
+    "youtube_url": "https://youtu.be/Z9J49uoNAJQ",
+    "details": {
+      "video_id": "Z9J49uoNAJQ",
+      "youtube_url": "https://youtu.be/Z9J49uoNAJQ",
+      "video_output": "output/ScreenRecording_10-26-2026_20-22-57_1_Processed_28102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-26-2026_20-22-57_1_Processed_28102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-26-2026_20-22-57_1_Processed_28102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #66",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #66",
+        "walkthrough": "Surviving Day 66: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #66",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #66"
+      },
+      "duration_seconds": 1001.026463,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Wallpaper",
+        "Clean Soul",
+        "Fretless",
+        "Carefree"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "48e2b48f543cb23c4ad90c72caf6c5f5"
+    }
   }
 ]
