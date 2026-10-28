@@ -680,8 +680,12 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                     # Run full video pipeline (delete_input=False because temp file cleanup is managed explicitly below)
                     rendered_output = run_pipeline(local_download_path, local_only=not upload, force=force, delete_input=False)
 
-                    # STRICT CONFIRMATION: NEVER delete raw video from Google Drive Input until confirmed uploaded to YouTube
+                    # STRICT CONFIRMATION: NEVER delete raw video from Google Drive Input until confirmed uploaded to YouTube,
+                    # UNLESS it is verified as already published in history (prevents head-of-line deadlock)
                     is_uploaded = upload and getattr(rendered_output, "uploaded_to_youtube", False)
+                    tracker = HistoryTracker(history_file=settings.processing.history_file)
+                    is_already_published = tracker.is_duplicate(file_name, md5_checksum=video.get("md5Checksum"))
+
                     if is_uploaded:
                         logger.info(
                             f"Video confirmed uploaded to YouTube ({getattr(rendered_output, 'youtube_url', '')}). "
@@ -692,6 +696,16 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                             logger.info(f"Confirmed: raw video '{file_name}' ({file_id}) deleted from Google Drive Input after verified YouTube upload.")
                         except Exception as de:
                             logger.error(f"Failed to delete video from Drive Input: {de}", extra_data={"file_id": file_id})
+                    elif is_already_published and not force:
+                        logger.info(
+                            f"Duplicate detected: Raw video '{file_name}' ({file_id}) is confirmed already processed & published in history. "
+                            f"Cleaning up duplicate from Google Drive Input to prevent queue blockage..."
+                        )
+                        try:
+                            drive_client.delete_video(file_id)
+                            logger.info(f"Confirmed: duplicate video '{file_name}' ({file_id}) deleted from Google Drive Input.")
+                        except Exception as de:
+                            logger.error(f"Failed to delete duplicate video from Drive Input: {de}", extra_data={"file_id": file_id})
                     else:
                         logger.warning(
                             f"SAFETY LOCK: Preserving raw video '{file_name}' ({file_id}) in Google Drive Input. "
@@ -699,15 +713,16 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                         )
 
                     # Upload processed video & metadata to Google Drive Output (Year -> Month -> video_ddmmyyyy)
-                    try:
-                        meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
-                        logger.info("Uploading processed video to Google Drive Output organized by Year/Month...")
-                        drive_client.upload_processed_video(
-                            local_video_path=rendered_output,
-                            metadata_path=meta_json if meta_json.exists() else None,
-                        )
-                    except Exception as ue:
-                        logger.error(f"Google Drive Output upload failed: {ue}. (YouTube upload was already completed successfully).")
+                    if is_uploaded and hasattr(rendered_output, "exists") and rendered_output.exists():
+                        try:
+                            meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
+                            logger.info("Uploading processed video to Google Drive Output organized by Year/Month...")
+                            drive_client.upload_processed_video(
+                                local_video_path=rendered_output,
+                                metadata_path=meta_json if meta_json.exists() else None,
+                            )
+                        except Exception as ue:
+                            logger.error(f"Google Drive Output upload failed: {ue}. (YouTube upload was already completed successfully).")
 
                     # Clean up local raw download to save runner disk space
                     if local_download_path.exists():

@@ -208,6 +208,17 @@ class GoogleDriveClient(BaseIngestionClient):
             # Retrieve checksums of already processed videos to prevent duplicate processing
             processed_md5s = set()
             try:
+                from src.storage.history_tracker import HistoryTracker
+                tracker = HistoryTracker()
+                for rec in tracker.load_records():
+                    if rec.get("status") == "SUCCESS":
+                        rec_md5 = rec.get("details", {}).get("md5_checksum")
+                        if rec_md5:
+                            processed_md5s.add(rec_md5)
+            except Exception as he:
+                logger.warning(f"Could not load local history for deduplication: {he}")
+
+            try:
                 proc_query = f"'{self.processed_folder_id}' in parents and trashed = false"
                 proc_results = self.service.files().list(
                     q=proc_query,
@@ -251,10 +262,17 @@ class GoogleDriveClient(BaseIngestionClient):
                         continue
 
                     # Check 1: Duplicate of an already processed recording
-                    if md5 and md5 in processed_md5s:
+                    is_dup_history = False
+                    try:
+                        from src.storage.history_tracker import HistoryTracker
+                        is_dup_history = HistoryTracker().is_duplicate(input_filename=name, md5_checksum=md5)
+                    except Exception:
+                        pass
+
+                    if (md5 and md5 in processed_md5s) or is_dup_history:
                         logger.warning(
-                            f"Input video '{name}' (MD5: {md5}) is a duplicate of an already processed file. "
-                            f"Auto-deleting duplicate directly from Input."
+                            f"Input video '{name}' (MD5: {md5}) is a duplicate of an already processed file in history/Drive. "
+                            f"Auto-deleting duplicate directly from Input to avoid queue blocking."
                         )
                         self.delete_video(file_id)
                         continue

@@ -80,3 +80,53 @@ def test_video_processor_build_ffmpeg_command_without_outro(tmp_path):
     assert "-filter_complex" in cmd_str
     assert "concat=n=2" not in cmd_str
     assert str(music) in cmd_str
+
+
+def test_drive_client_deduplication_against_history(tmp_path, monkeypatch):
+    from unittest.mock import MagicMock
+    from src.ingestion.drive_client import GoogleDriveClient
+    from src.storage.history_tracker import HistoryTracker
+
+    history_file = tmp_path / "history.json"
+    tracker = HistoryTracker(history_file=history_file)
+    tracker.record_job(
+        job_id="job_test_01",
+        input_filename="old_video.mp4",
+        output_filename="old_video_processed.mp4",
+        status="SUCCESS",
+        youtube_url="https://youtu.be/test123",
+        md5_checksum="md5_old_123",
+    )
+
+    client = GoogleDriveClient(input_folder_name="Input", processed_folder_name="Processed")
+    client.input_folder_id = "folder_in"
+    client.processed_folder_id = "folder_proc"
+    client.service = MagicMock()
+
+    mock_input_files = [
+        {"id": "file_old", "name": "old_video.mp4", "size": "10000000", "mimeType": "video/mp4", "md5Checksum": "md5_old_123"},
+        {"id": "file_new", "name": "new_video.mp4", "size": "20000000", "mimeType": "video/mp4", "md5Checksum": "md5_new_456"},
+    ]
+    mock_proc_files = []
+
+    def mock_list(q, **kwargs):
+        mock_req = MagicMock()
+        if "folder_in" in q:
+            mock_req.execute.return_value = {"files": mock_input_files}
+        else:
+            mock_req.execute.return_value = {"files": mock_proc_files}
+        return mock_req
+
+    client.service.files().list.side_effect = mock_list
+    client.delete_video = MagicMock()
+
+    monkeypatch.setattr(
+        "src.storage.history_tracker.HistoryTracker.__init__",
+        lambda self, history_file=history_file: setattr(self, "history_file", history_file) or self._ensure_file_exists()
+    )
+
+    pending = client.list_pending_videos()
+    assert len(pending) == 1
+    assert pending[0]["name"] == "new_video.mp4"
+    client.delete_video.assert_called_once_with("file_old")
+

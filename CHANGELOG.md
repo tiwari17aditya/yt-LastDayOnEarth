@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-10-28
+
+### Fixed
+- **Google Drive Queue Head-of-Line Blocking Deadlock**:
+  - Resolved issue where an already processed video (e.g. `ScreenRecording_10-13-2026 13-29-29_1.mp4`, published as Episode #44) remaining in Google Drive `Input` caused subsequent cron runs to select it repeatedly, skip it as duplicate, leave it in `Input`, and starve all newer pending recordings from being processed.
+  - Upgraded `GoogleDriveClient.list_pending_videos()` (`src/ingestion/drive_client.py`) to query `HistoryTracker` records by MD5 checksum and filename in addition to Drive's `Processed` folder. Confirmed duplicates are automatically purged from `Input` directly upon discovery.
+  - Upgraded `run_drive_cron()` (`src/main.py`) to safely delete confirmed duplicate recordings from Google Drive `Input` if `tracker.is_duplicate()` returns `True`, preventing queue lockup while strictly maintaining the safety lock for unverified uploads.
+  - Added unit test `test_drive_client_deduplication_against_history` in `tests/test_processor_and_config.py` (18/18 tests passing).
+
 ## [1.8.0] - 2026-10-27
+
 
 ### Added
 - **Multi-Language Metadata Localization Engine (`src/publisher/localization.py`)**:
