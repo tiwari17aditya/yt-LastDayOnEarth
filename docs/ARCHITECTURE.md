@@ -46,9 +46,9 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 ### 3.1 Ingestion (`src/ingestion/`)
 - **Responsibility**: Detect, download, and delete/archive candidate gameplay files from Google Drive.
 - **Interface**: `BaseIngestionClient`
-  - `list_pending_videos() -> List[RemoteFile]`
+  - `list_pending_videos() -> List[RemoteFile]` *(Cross-references `HistoryTracker` and Drive records to detect and auto-delete already-published duplicates, preventing head-of-line queue deadlock)*
   - `download_video(file_id: str, dest_path: Path) -> Path`
-  - `delete_video(file_id: str) -> None` *(Strict Safety Guard: called only after verified confirmation of YouTube publishing)*
+  - `delete_video(file_id: str) -> None` *(Strict Safety Guard: called after verified confirmation of YouTube publishing or upon identifying verified historical duplicates)*
   - `mark_as_processed(file_id: str) -> None`
   - `cleanup_processed_folder() -> int`
   - `cleanup_old_output_videos(retention_days: int = 7) -> int`
