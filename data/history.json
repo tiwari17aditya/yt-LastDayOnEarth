@@ -2114,5 +2114,51 @@
       "privacy_redacted": true,
       "md5_checksum": "a8f803e82c00bd8b5d53deaf448bce31"
     }
+  },
+  {
+    "job_id": "job_20261029_014913",
+    "timestamp": "2026-10-29T01:49:13.055923+00:00",
+    "input_filename": "ScreenRecording_10-28-2026 00-52-24_1.mp4",
+    "output_filename": "ScreenRecording_10-28-2026_00-52-24_1_Processed_29102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "gTVVCbjZ4p8",
+    "youtube_url": "https://youtu.be/gTVVCbjZ4p8",
+    "details": {
+      "video_id": "gTVVCbjZ4p8",
+      "youtube_url": "https://youtu.be/gTVVCbjZ4p8",
+      "video_output": "output/ScreenRecording_10-28-2026_00-52-24_1_Processed_29102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-28-2026_00-52-24_1_Processed_29102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-28-2026_00-52-24_1_Processed_29102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Entering Home Base Part 2! | LDoE Survival #72",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Entering Home Base Part 2 Plus Home Base... #72",
+        "walkthrough": "Surviving Day 72: Entering Home Base And Entering Home Base Part 2 Plus Home Base Operations | LDoE",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #72"
+      },
+      "duration_seconds": 3127.156961,
+      "soundtrack_tracks": [
+        "Shores of Avalon",
+        "Life of Riley",
+        "Fretless",
+        "Monkeys Spinning Monkeys",
+        "Volatile Reaction",
+        "Fretless",
+        "Decisions",
+        "Monkeys Spinning Monkeys",
+        "Groove Grove",
+        "Constance",
+        "Monkeys Spinning Monkeys",
+        "Somewhere Sunny",
+        "Electro Cabello",
+        "Groove Grove",
+        "Decisions",
+        "Sneaky Snitch",
+        "Daily Beetle",
+        "Constance"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "252abb73b44d0359a520f6e4997786e0"
+    }
   }
 ]

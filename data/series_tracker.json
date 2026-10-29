@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 72,
+  "current_episode": 73,
   "completed_episodes": [
     {
       "episode": 1,
@@ -481,6 +481,13 @@
       "video_id": "TOVPr4WRDSU",
       "youtube_url": "https://youtu.be/TOVPr4WRDSU",
       "job_id": "TOVPr4WRDSU"
+    },
+    {
+      "episode": 72,
+      "title": "Entering Home Base & Entering Home Base Part 2! | LDoE Survival #72",
+      "video_id": "gTVVCbjZ4p8",
+      "youtube_url": "https://youtu.be/gTVVCbjZ4p8",
+      "job_id": "gTVVCbjZ4p8"
     }
   ]
 }
