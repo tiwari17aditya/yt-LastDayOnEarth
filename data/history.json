@@ -2194,5 +2194,49 @@
       "privacy_redacted": true,
       "md5_checksum": "3546fb88a9fd46dbcf77d0b27049898b"
     }
+  },
+  {
+    "job_id": "job_20261029_152518",
+    "timestamp": "2026-10-29T15:25:18.400521+00:00",
+    "input_filename": "ScreenRecording_10-28-2026 13-58-51_1.mp4",
+    "output_filename": "ScreenRecording_10-28-2026_13-58-51_1_Processed_29102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "CWDqvRX2pM0",
+    "youtube_url": "https://youtu.be/CWDqvRX2pM0",
+    "details": {
+      "video_id": "CWDqvRX2pM0",
+      "youtube_url": "https://youtu.be/CWDqvRX2pM0",
+      "video_output": "output/ScreenRecording_10-28-2026_13-58-51_1_Processed_29102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-28-2026_13-58-51_1_Processed_29102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-28-2026_13-58-51_1_Processed_29102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Home Base Operations! | LDoE Survival #74",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Home Base Operations Plus... #74",
+        "walkthrough": "Surviving Day 74: Workshop & Smelting Furnaces And Home Base Operations Plus Organizing... #74",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #74"
+      },
+      "duration_seconds": 2663.059183,
+      "soundtrack_tracks": [
+        "Urban Gauntlet",
+        "Somewhere Sunny",
+        "Carefree",
+        "Wallpaper",
+        "Local Forecast",
+        "Groove Grove",
+        "Carefree",
+        "Groove Grove",
+        "Sneaky Snitch",
+        "Carefree",
+        "Somewhere Sunny",
+        "Monkeys Spinning Monkeys",
+        "Wallpaper",
+        "Urban Gauntlet",
+        "Volatile Reaction",
+        "Pamgaea"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "f5be988ed6a1d898da2a3691a9671fc8"
+    }
   }
 ]

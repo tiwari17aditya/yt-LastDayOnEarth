@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 74,
+  "current_episode": 75,
   "completed_episodes": [
     {
       "episode": 1,
@@ -495,6 +495,13 @@
       "video_id": "A41iA3nVdTw",
       "youtube_url": "https://youtu.be/A41iA3nVdTw",
       "job_id": "A41iA3nVdTw"
+    },
+    {
+      "episode": 74,
+      "title": "Workshop & Smelting + Home Base Operations! | LDoE Survival #74",
+      "video_id": "CWDqvRX2pM0",
+      "youtube_url": "https://youtu.be/CWDqvRX2pM0",
+      "job_id": "CWDqvRX2pM0"
     }
   ]
 }
