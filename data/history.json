@@ -2160,5 +2160,39 @@
       "privacy_redacted": true,
       "md5_checksum": "252abb73b44d0359a520f6e4997786e0"
     }
+  },
+  {
+    "job_id": "job_20261029_074650",
+    "timestamp": "2026-10-29T07:46:50.825235+00:00",
+    "input_filename": "ScreenRecording_10-28-2026 13-42-11_1.mp4",
+    "output_filename": "ScreenRecording_10-28-2026_13-42-11_1_Processed_29102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "A41iA3nVdTw",
+    "youtube_url": "https://youtu.be/A41iA3nVdTw",
+    "details": {
+      "video_id": "A41iA3nVdTw",
+      "youtube_url": "https://youtu.be/A41iA3nVdTw",
+      "video_output": "output/ScreenRecording_10-28-2026_13-42-11_1_Processed_29102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-28-2026_13-42-11_1_Processed_29102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-28-2026_13-42-11_1_Processed_29102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Base Storage Optimization! | LDoE Survival #73",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Organizing Storage & Chests Plus Home... #73",
+        "walkthrough": "Surviving Day 73: Workbench & Blueprints And Organizing Storage & Chests Plus Home Base... #73",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #73"
+      },
+      "duration_seconds": 992.227347,
+      "soundtrack_tracks": [
+        "Carefree",
+        "Monkeys Spinning Monkeys",
+        "Shores of Avalon",
+        "Constance",
+        "Local Forecast",
+        "Bossa Antigua"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "3546fb88a9fd46dbcf77d0b27049898b"
+    }
   }
 ]
