@@ -20,7 +20,7 @@ class MockEvent:
 def test_companion_shorts_config_defaults():
     settings = ProcessingSettings()
     assert settings.generate_companion_shorts is True
-    assert settings.upload_companion_shorts is False
+    assert settings.upload_companion_shorts is True
     assert settings.shorts_dir == Path("data/shorts")
 
 
@@ -170,3 +170,26 @@ def test_upload_companion_short_quota_handling(tmp_path):
                 title="EPIC CLASH",
                 description="desc",
             )
+
+
+def test_drive_upload_processed_short(tmp_path):
+    from src.ingestion.drive_client import GoogleDriveClient
+    client = GoogleDriveClient()
+    client.output_folder_id = "folder_root_123"
+    client.service = MagicMock()
+
+    dummy_short = tmp_path / "short.mp4"
+    dummy_short.write_bytes(b"dummy_short")
+
+    with patch.object(client, "_ensure_folder", side_effect=["shorts_root_id", "year_id", "month_id"]), \
+         patch("googleapiclient.http.MediaFileUpload"):
+
+        mock_req = MagicMock()
+        mock_req.next_chunk.return_value = (None, {"id": "drive_short_file_123"})
+        client.service.files().create.return_value = mock_req
+        client.service.files().list().execute.return_value = {"files": []}
+
+        res = client.upload_processed_short(dummy_short)
+        assert res["short_id"] == "drive_short_file_123"
+        assert "short_" in res["short_name"]
+        assert "Output/shorts" in res["short_folder"]

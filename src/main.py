@@ -768,8 +768,8 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
 
                     # Upload processed video & metadata to Google Drive Output (Year -> Month -> video_ddmmyyyy)
                     if is_uploaded and hasattr(rendered_output, "exists") and rendered_output.exists():
+                        meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
                         try:
-                            meta_json = rendered_output.with_name(f"{rendered_output.stem}_metadata.json")
                             logger.info("Uploading processed video to Google Drive Output organized by Year/Month...")
                             drive_client.upload_processed_video(
                                 local_video_path=rendered_output,
@@ -777,6 +777,36 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                             )
                         except Exception as ue:
                             logger.error(f"Google Drive Output upload failed: {ue}. (YouTube upload was already completed successfully).")
+
+                        # Upload companion Short to Google Drive Output (shorts/Year/Month/short_ddmmyyyy.mp4)
+                        comp_short = getattr(rendered_output, "companion_short", None)
+                        if comp_short and "short_path" in comp_short:
+                            short_file = Path(comp_short["short_path"])
+                            if short_file.exists():
+                                try:
+                                    logger.info("Uploading companion Short to Google Drive Output organized by Year/Month...")
+                                    drive_client.upload_processed_short(local_short_path=short_file)
+                                except Exception as se:
+                                    logger.error(f"Google Drive Output companion Short upload failed: {se}")
+                                finally:
+                                    # Cloud-only mandate: Clean up local companion short immediately after cloud upload
+                                    if short_file.exists():
+                                        try:
+                                            short_file.unlink()
+                                            logger.info(f"Cleaned local companion Short file: {short_file}")
+                                        except Exception as de:
+                                            logger.warning(f"Could not remove local short file: {de}")
+
+                        # Cloud-only mandate: Clean up local processed video and metadata JSON
+                        try:
+                            if rendered_output.exists():
+                                rendered_output.unlink()
+                                logger.info(f"Cleaned local processed video file: {rendered_output}")
+                            if meta_json.exists():
+                                meta_json.unlink()
+                                logger.info(f"Cleaned local metadata JSON file: {meta_json}")
+                        except Exception as pe_clean:
+                            logger.warning(f"Could not purge local processed artifacts: {pe_clean}")
 
                     # Clean up local raw download to save runner disk space
                     if local_download_path.exists():

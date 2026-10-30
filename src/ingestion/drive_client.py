@@ -640,6 +640,86 @@ class GoogleDriveClient(BaseIngestionClient):
                 file_path=str(local_video_path),
             )
 
+    def upload_processed_short(
+        self,
+        local_short_path: Path,
+        processing_date: Optional[Any] = None,
+    ) -> Dict[str, Any]:
+        """Uploads the processed vertical companion short to Drive Output organized by Year -> Month -> short_ddmmyyyy."""
+        if not self.service or not self.output_folder_id:
+            self.connect()
+
+        from datetime import datetime
+        from googleapiclient.http import MediaFileUpload
+
+        date = processing_date or datetime.now()
+        year_str = date.strftime("%Y")
+        month_str = date.strftime("%m")
+        ddmmyyyy = date.strftime("%d%m%Y")
+
+        # Structure: Output -> shorts -> Year -> Month
+        shorts_root_id = self._ensure_folder("shorts", parent_id=self.output_folder_id)
+        short_year_id = self._ensure_folder(year_str, parent_id=shorts_root_id)
+        short_month_id = self._ensure_folder(month_str, parent_id=short_year_id)
+
+        drive_short_name = f"short_{ddmmyyyy}.mp4"
+
+        existing_shorts = set()
+        try:
+            q_shorts = f"'{short_month_id}' in parents and trashed = false"
+            res_shorts = self.service.files().list(q=q_shorts, spaces="drive", fields="files(name)").execute()
+            existing_shorts = {f["name"] for f in res_shorts.get("files", [])}
+        except Exception as e:
+            logger.warning(f"Could not list existing short files for collision check: {e}")
+
+        if drive_short_name in existing_shorts:
+            counter = 1
+            while f"short_{ddmmyyyy}_{counter}.mp4" in existing_shorts:
+                counter += 1
+            drive_short_name = f"short_{ddmmyyyy}_{counter}.mp4"
+
+        logger.info(
+            f"Uploading companion Short to Drive Output/shorts/{year_str}/{month_str}/{drive_short_name}",
+            extra_data={"local_path": str(local_short_path)},
+        )
+
+        try:
+            media = MediaFileUpload(
+                str(local_short_path),
+                mimetype="video/mp4",
+                chunksize=10 * 1024 * 1024,
+                resumable=True,
+            )
+
+            file_metadata = {
+                "name": drive_short_name,
+                "parents": [short_month_id],
+            }
+
+            request = self.service.files().create(body=file_metadata, media_body=media, fields="id, name, webViewLink")
+            response = None
+            while response is None:
+                status, response = request.next_chunk()
+                if status:
+                    logger.info(f"Drive output Short upload progress: {int(status.progress() * 100)}%")
+
+            uploaded_short_id = response.get("id")
+            logger.info(f"Successfully uploaded companion Short to Drive Output: {drive_short_name} (ID: {uploaded_short_id})")
+
+            return {
+                "short_id": uploaded_short_id,
+                "short_name": drive_short_name,
+                "short_folder": f"Output/shorts/{year_str}/{month_str}",
+            }
+        except Exception as e:
+            logger.error(f"Failed to upload companion Short to Google Drive Output: {e}")
+            raise IngestionError(
+                operation="upload_processed_short",
+                root_cause=str(e),
+                recovery_action="Check Google Drive storage quota and folder permissions.",
+                file_path=str(local_short_path),
+            )
+
     def download_file_by_id(self, file_id: str, destination_path: Path) -> Path:
         """Downloads any remote Google Drive file chunk-by-chunk to destination_path."""
         if not self.service:

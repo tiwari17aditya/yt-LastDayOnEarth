@@ -166,7 +166,7 @@ class ProcessingSettings(BaseModel):
         default_factory=lambda: os.getenv("GENERATE_COMPANION_SHORTS", "true").lower() == "true"
     )
     upload_companion_shorts: bool = Field(
-        default_factory=lambda: os.getenv("UPLOAD_COMPANION_SHORTS", "false").lower() == "true"
+        default_factory=lambda: os.getenv("UPLOAD_COMPANION_SHORTS", "true").lower() == "true"
     )
     shorts_dir: Path = Field(
         default_factory=lambda: Path(os.getenv("SHORTS_DIR", "data/shorts"))
