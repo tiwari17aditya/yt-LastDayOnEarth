@@ -2277,5 +2277,47 @@
       "privacy_redacted": true,
       "md5_checksum": "ea039d01a56d2b0d34286fbc33cee558"
     }
+  },
+  {
+    "job_id": "job_20261030_064737",
+    "timestamp": "2026-10-30T06:47:37.603181+00:00",
+    "input_filename": "ScreenRecording_10-29-2026 11-44-49_1.mp4",
+    "output_filename": "ScreenRecording_10-29-2026_11-44-49_1_Processed_30102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "nPGdEBhiw7A",
+    "youtube_url": "https://youtu.be/nPGdEBhiw7A",
+    "details": {
+      "video_id": "nPGdEBhiw7A",
+      "youtube_url": "https://youtu.be/nPGdEBhiw7A",
+      "video_output": "output/ScreenRecording_10-29-2026_11-44-49_1_Processed_30102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-29-2026_11-44-49_1_Processed_30102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-29-2026_11-44-49_1_Processed_30102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #76",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #76",
+        "walkthrough": "Surviving Day 76: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #76",
+        "search_guide": "How to Farm & Master Blueprint Upgrades & Home Base Operations Fast | LDoE #76"
+      },
+      "duration_seconds": 2450.691247,
+      "soundtrack_tracks": [
+        "Somewhere Sunny",
+        "Shores of Avalon",
+        "Sneaky Snitch",
+        "Wallpaper",
+        "Clean Soul",
+        "Somewhere Sunny",
+        "Life of Riley",
+        "Daily Beetle",
+        "Life of Riley",
+        "Shores of Avalon",
+        "Volatile Reaction",
+        "Sneaky Snitch",
+        "Somewhere Sunny",
+        "Wallpaper"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "8e70673c9e9272093aac4031365274a5"
+    }
   }
 ]
