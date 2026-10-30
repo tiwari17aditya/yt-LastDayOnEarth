@@ -12,7 +12,8 @@ The pipeline automates the end-to-end publishing journey:
 5. **FFmpeg Video Composite**: Hardcodes stylized subtitles and renders high-definition, YouTube-optimized video with standardized naming convention (`<Title>_Processed_<DDMMYYYY>.mp4`).
 6. **AI Metadata Generation**: Crafts tailored YouTube titles, structured descriptions with chapter timestamps, game tags, and music licensing attributions.
 7. **YouTube Publishing**: Uploads directly to YouTube via YouTube Data API v3.
-8. **Notifications & Periodic Reporting**: Delivers immediate email alerts upon completion/failure, plus automated weekly and monthly aggregation reports.
+8. **Automated Companion YouTube Shorts**: Automatically extracts peak viral moments (fail/panic, rare loot, combat, workshop) into vertical 9:16 (1080x1920) companion Shorts, publishes them to a dedicated separate Shorts playlist, and archives them into Google Drive with zero local retention.
+9. **Notifications & Periodic Reporting**: Delivers immediate email alerts upon completion/failure, plus automated weekly and monthly aggregation reports.
 
 ---
 

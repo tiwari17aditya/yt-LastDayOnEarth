@@ -52,6 +52,8 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `mark_as_processed(file_id: str) -> None`
   - `cleanup_processed_folder() -> int`
   - `cleanup_old_output_videos(retention_days: int = 7) -> int`
+  - `upload_processed_video(local_video_path: Path, ...) -> Dict[str, Any]` *(Uploads processed video to Drive Output/videos/{year}/{month})*
+  - `upload_processed_short(local_short_path: Path, ...) -> Dict[str, Any]` *(Uploads companion Short to Drive Output/shorts/{year}/{month})*
 
 ### 3.2 Privacy & PII Redaction (`src/privacy/`)
 - **Responsibility**: Detect personal identifiers (email addresses, phone push notifications, personal chat bubbles) in video frames and produce dynamic bounding boxes.
@@ -75,18 +77,19 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `build_audio_filter(video_audio_stream: str, music_track: MusicTrack, ducking_db: str) -> str`
 
 ### 3.5 Video Processor & Outro Animation Engine (`src/processor/`)
-- **Responsibility**: Assemble video streams, blur filters, burned-in styled subtitles, mixed audio, and animated brand outro tails using FFmpeg into a broadcast-standard YouTube-ready MP4.
+- **Responsibility**: Assemble video streams, blur filters, burned-in styled subtitles, mixed audio, animated brand outro tails, and vertical companion YouTube Shorts using FFmpeg into broadcast-standard video artifacts.
 - **Components**:
   - `VideoProcessor`: Single-pass composite FFmpeg rendering pipeline synthesizing resolution normalization, blur filters, subtitle burning, background music ducking, and outro tail concatenation in a single filter graph, with fallback to two-pass stitching (`append_outro_tail`).
+  - `ShortsGenerator` (`src/processor/shorts_generator.py`): Automatically detects peak gameplay moments (fails, rare loot, combat, workshop tips) and generates vertical 9:16 (`1080x1920`, 60fps) companion YouTube Shorts clips featuring an ambient blurred background, framed 16:9 gameplay center box, hook headers, episode badges, and footer CTAs.
   - `OutroTailGenerator` (`src/processor/outro_generator.py`): Generates 5–8 second high-energy 1080p animated outro videos featuring interactive dynamic buttons (Like, Share, Subscribe, Bell) with visual cursor interaction, neon pulse effects, and energetic audio stings.
   - `EndScreenGenerator` (`src/processor/endscreen_generator.py`): Visual template slate generator matching YouTube interactive card layout dimensions.
 - **Naming Rule**: `<Original_Title>_Processed_<DDMMYYYY>.mp4`
 
 ### 3.6 Publisher & Dynamic Metadata (`src/publisher/`)
-- **Responsibility**: Formulate engaging, SEO-optimized front-loaded titles, descriptions with chapter markers & ~50 dynamic trending hashtags, dynamic video tags, automated custom HD thumbnail generation, direct Public upload via YouTube Data API v3, dedicated playlist management, and automated decentralized cross-posting across open-source networks.
+- **Responsibility**: Formulate engaging, SEO-optimized front-loaded titles, descriptions with chapter markers & ~50 dynamic trending hashtags, dynamic video tags, automated custom HD thumbnail generation, direct Public upload via YouTube Data API v3, dedicated playlist management, companion Shorts publishing with separate playlist routing, and automated decentralized cross-posting across open-source networks.
 - **Components**:
-  - `BasePublisher`: Abstract base interface defining metadata generation and video uploading contracts.
-  - `YouTubeClient`: Handles OAuth upload, thumbnail upload, playlist management, and video assignment on YouTube.
+  - `BasePublisher`: Abstract base interface defining metadata generation, video uploading, and companion Short publishing contracts.
+  - `YouTubeClient`: Handles OAuth upload, thumbnail upload, main series playlist management, companion Short upload with dedicated Shorts playlist management (`Last Day on Earth: Survival — Official Gameplay Shorts`), and automated backlink comments.
   - `PeerTubeClient`: Open-source decentralized video hosting client implementing `BasePublisher` via PeerTube REST API v1 (federated across the global ActivityPub Fediverse).
   - `FediverseBroadcaster`: Cross-posts rich release announcements with custom thumbnails, video links, and dynamic hashtags to Mastodon and Lemmy communities.
   - `MultiPlatformPublisher`: Orchestrates primary publishing (YouTube) and non-blocking open-source mirrors and social broadcasts (PeerTube + Fediverse), preserving fail-safe pipeline semantics.

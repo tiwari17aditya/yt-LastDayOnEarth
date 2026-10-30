@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-10-30
+
+### Added
+- **Automated Companion YouTube Shorts Pipeline (`src/processor/shorts_generator.py`)**:
+  - Implemented `ShortsGenerator.generate_companion_short()` automatically extracting 30–35s vertical 9:16 (`1080x1920`) clips from peak gameplay moments.
+  - Multi-tiered moment recognition: Priority 1 (Fail & panic escapes), Priority 2 (Rare loot unboxing & Bunker Alfa), Priority 3 (Combat & base defense), Priority 4 (Workshop tricks & crafting), with dynamic duration clamping.
+  - Canvas layout: dual-split FFmpeg composition with ambient blurred background (`boxblur=2:2`), 16:9 gameplay center box (`y=656..1264`), bold hook title with episode badge (`EPISODE #N`), and CTA footer (`WATCH FULL EPISODE 🎬` + `🔴 SUBSCRIBE FOR DAILY SURVIVAL`).
+  - Packages complete Shorts metadata (title with `#Shorts`, descriptions, tags, and parent video links).
+- **Dedicated Separate Shorts Playlist Management (`src/publisher/youtube_client.py`)**:
+  - Added `upload_companion_short()` with auto-discovery and sequential addition into dedicated playlist `Last Day on Earth: Survival — Official Gameplay Shorts` (`YOUTUBE_SHORTS_PLAYLIST_TITLE`).
+  - Keeps the primary long-form episodic playlist (`PLJPzVNVZwaGY`) clean and chronological.
+  - Automatically posts top-level backlink engagement comments cross-linking viewers to both the uncut episode and both playlists.
+- **100% Cloud-Native Drive Archiving & Ephemeral Local Purging (`src/ingestion/drive_client.py`, `src/main.py`)**:
+  - Implemented `GoogleDriveClient.upload_processed_short()` archiving companion Shorts into Google Drive `Output/shorts/{year}/{month}/`.
+  - Upgraded `run_drive_cron()` in `src/main.py` with immediate post-upload cleanup: unlinks local raw downloads, rendered long-form videos, companion Shorts, and metadata JSON files once cloud uploads are confirmed. Zero local disk accumulation.
+- **Unit Test Suite for Companion Shorts & Cloud Archiving (`tests/test_companion_shorts.py`)**:
+  - Added 9 unit tests covering viral detection priority, duration clamping, metadata packaging, quota error handling, dedicated Shorts playlist assignment, and Drive upload (33/33 tests passing).
+
 ## [1.9.1] - 2026-10-30
 
 ### Fixed
