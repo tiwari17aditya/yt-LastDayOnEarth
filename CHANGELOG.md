@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-10-30
+
+### Fixed
+- **GitHub Actions Workflow Dispatch Float String CLI Argument Parsing**:
+  - Resolved `main.py drive-cron: error: argument --limit: invalid int value: '3.0'` in `.github/workflows/scheduled_pipeline.yml`.
+  - In GitHub Actions manual `workflow_dispatch`, inputs with `type: number` serialize as float strings (e.g. `'3.0'`), which broke standard Python `argparse(type=int)`.
+  - Added robust `_safe_int_arg(val)` converter in `src/main.py` using `int(float(val))` for `--limit`, `--interval`, and `--days`.
+  - Updated `_safe_int(val, default)` in `src/config.py` to gracefully handle float-formatted strings from environment variables.
+  - Hardened bash argument expansion in `.github/workflows/scheduled_pipeline.yml` (`LIMIT="${LIMIT%.*}"`) and `.github/workflows/weekly_report.yml` (`DAYS="${DAYS%.*}"`).
+  - Added unit test in `tests/test_processor_and_config.py` verifying float-string argument conversion (24/24 tests passing).
+
 ## [1.9.0] - 2026-10-30
 
 ### Added

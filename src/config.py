@@ -15,7 +15,7 @@ def _safe_int(val: Optional[str], default: int) -> int:
     if val is None or str(val).strip() == "":
         return default
     try:
-        return int(val)
+        return int(float(val))
     except (ValueError, TypeError):
         return default
 

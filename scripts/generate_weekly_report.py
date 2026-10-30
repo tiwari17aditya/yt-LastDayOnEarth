@@ -26,7 +26,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate Last Day on Earth Weekly Pipeline & Growth Report.")
-    parser.add_argument("--days", type=int, default=7, help="Number of past days to aggregate (default: 7)")
+    parser.add_argument("--days", type=lambda x: int(float(x)), default=7, help="Number of past days to aggregate (default: 7)")
     parser.add_argument("--output", type=str, help="Destination markdown path for report")
     parser.add_argument("--email", action="store_true", help="Send formatted HTML report via Gmail/SMTP")
 

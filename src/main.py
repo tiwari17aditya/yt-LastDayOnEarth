@@ -812,6 +812,14 @@ def run_watcher(interval: int = 60, limit: int = 1, upload: bool = True, force: 
             break
 
 
+def _safe_int_arg(val: str) -> int:
+    """Safely converts string or float inputs (such as '3.0' from GitHub Actions) to integer."""
+    try:
+        return int(float(val))
+    except (ValueError, TypeError):
+        raise argparse.ArgumentTypeError(f"Invalid integer value: {val}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Last Day on Earth Automated Video Pipeline")
     subparsers = parser.add_subparsers(dest="command")
@@ -828,21 +836,21 @@ def main() -> None:
     # Scheduled Google Drive CRON command
     cron_parser = subparsers.add_parser("drive-cron", help="Poll Google Drive for pending recordings and process")
     cron_parser.add_argument("--dry-run", action="store_true", help="Inspect Drive Input folder without processing")
-    cron_parser.add_argument("--limit", type=int, default=1, help="Max videos to process in this run (default: 1)")
+    cron_parser.add_argument("--limit", type=_safe_int_arg, default=1, help="Max videos to process in this run (default: 1)")
     cron_parser.add_argument("--no-upload", action="store_true", help="Do not upload to YouTube")
     cron_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
 
     # Continuous Watcher Daemon command
     watch_parser = subparsers.add_parser("watch", help="Run continuous background daemon watching Drive Input")
-    watch_parser.add_argument("--interval", type=int, default=60, help="Polling interval in seconds (default: 60)")
-    watch_parser.add_argument("--limit", type=int, default=1, help="Max videos to process per cycle")
+    watch_parser.add_argument("--interval", type=_safe_int_arg, default=60, help="Polling interval in seconds (default: 60)")
+    watch_parser.add_argument("--limit", type=_safe_int_arg, default=1, help="Max videos to process per cycle")
     watch_parser.add_argument("--no-upload", action="store_true", help="Do not upload to YouTube")
     watch_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
 
     # Weekly & Periodic Reporting command
     report_parser = subparsers.add_parser("report", help="Generate pipeline execution and channel growth reports")
     report_parser.add_argument("--weekly", action="store_true", default=True, help="Generate weekly report (default)")
-    report_parser.add_argument("--days", type=int, default=7, help="Number of past days to aggregate (default: 7)")
+    report_parser.add_argument("--days", type=_safe_int_arg, default=7, help="Number of past days to aggregate (default: 7)")
     report_parser.add_argument("--email", action="store_true", help="Send formatted HTML report via Gmail/SMTP")
     report_parser.add_argument("--output", type=str, help="Destination markdown path for report")
 

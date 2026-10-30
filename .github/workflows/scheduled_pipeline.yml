@@ -99,6 +99,9 @@ jobs:
           LIMIT="${{ github.event.inputs.limit }}"
           if [ -z "$LIMIT" ] || [ "$LIMIT" = "null" ]; then
             LIMIT="1"
+          else
+            # Strip decimal fraction if passed as float by GitHub Actions (e.g. '3.0' -> '3')
+            LIMIT="${LIMIT%.*}"
           fi
           EXTRA_ARGS="$EXTRA_ARGS --limit $LIMIT"
 

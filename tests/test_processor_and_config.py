@@ -8,12 +8,27 @@ def test_safe_int_and_float_parsers():
     assert _safe_int(None, 587) == 587
     assert _safe_int("invalid", 587) == 587
     assert _safe_int("465", 587) == 465
+    assert _safe_int("3.0", 1) == 3
+    assert _safe_int("14.0", 7) == 14
 
     assert _safe_float("", 9.5) == 9.5
     assert _safe_float("   ", 9.5) == 9.5
     assert _safe_float(None, 9.5) == 9.5
     assert _safe_float("invalid", 9.5) == 9.5
     assert _safe_float("8.0", 9.5) == 8.0
+
+
+def test_main_cli_safe_int_arg():
+    from src.main import _safe_int_arg
+    import pytest
+    import argparse
+
+    assert _safe_int_arg("3.0") == 3
+    assert _safe_int_arg("1.0") == 1
+    assert _safe_int_arg("10") == 10
+
+    with pytest.raises(argparse.ArgumentTypeError):
+        _safe_int_arg("invalid_number")
 
 
 def test_config_with_empty_env_variables(monkeypatch):

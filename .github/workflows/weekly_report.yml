@@ -63,6 +63,9 @@ jobs:
           DAYS="${{ github.event.inputs.days }}"
           if [ -z "$DAYS" ] || [ "$DAYS" = "null" ]; then
             DAYS="7"
+          else
+            # Strip decimal fraction if passed as float by GitHub Actions (e.g. '7.0' -> '7')
+            DAYS="${DAYS%.*}"
           fi
 
           echo "Generating weekly report for last $DAYS days (email=$EXTRA_ARGS)..."
