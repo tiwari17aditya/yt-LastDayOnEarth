@@ -74,6 +74,9 @@ class YouTubeSettings(BaseModel):
     playlist_title: str = Field(
         default_factory=lambda: os.getenv("YOUTUBE_PLAYLIST_TITLE", "Last Day on Earth: Survival — Official Gameplay Series")
     )
+    shorts_playlist_title: str = Field(
+        default_factory=lambda: os.getenv("YOUTUBE_SHORTS_PLAYLIST_TITLE", "Last Day on Earth: Survival — Official Gameplay Shorts")
+    )
     category_id: str = "20"  # Gaming category
     series_title: str = Field(
         default_factory=lambda: os.getenv("SERIES_TITLE", "Last Day on Earth: Survival")

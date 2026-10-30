@@ -170,6 +170,7 @@ def run_pipeline(
         token_file=settings.youtube.token_file,
         privacy_status=settings.youtube.privacy_status,
         playlist_title=settings.youtube.playlist_title,
+        shorts_playlist_title=settings.youtube.shorts_playlist_title,
         title_manager=title_mgr,
         gemini_api_key=settings.gemini.api_key,
         gemini_model=settings.gemini.model,

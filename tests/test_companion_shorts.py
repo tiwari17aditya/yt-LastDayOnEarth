@@ -118,6 +118,8 @@ def test_upload_companion_short_flow(tmp_path):
     mock_comment_thread.insert.return_value = mock_comment_insert
 
     with patch.object(client, "get_service", return_value=mock_service), \
+         patch.object(client, "get_or_create_playlist", return_value="PL_SHORTS_999") as mock_get_pl, \
+         patch.object(client, "add_video_to_playlist", return_value=True) as mock_add_pl, \
          patch("googleapiclient.http.MediaFileUpload"):
 
         url = client.upload_companion_short(
@@ -133,8 +135,20 @@ def test_upload_companion_short_flow(tmp_path):
         call_kwargs = mock_service.videos().insert.call_args[1]
         assert "#Shorts" in call_kwargs["body"]["snippet"]["title"]
         assert call_kwargs["body"]["snippet"]["categoryId"] == "20"
-        # Check backlink comment was triggered
+        # Check dedicated Shorts playlist was managed
+        mock_get_pl.assert_called_once()
+        assert mock_get_pl.call_args[1]["title"] == "Last Day on Earth: Survival — Official Gameplay Shorts"
+        mock_add_pl.assert_called_once_with(
+            youtube=mock_service,
+            video_id="short_vid_999",
+            playlist_id="PL_SHORTS_999",
+            episode_number=5,
+        )
+        # Check backlink comment was triggered and includes both playlists
         mock_comment_thread.insert.assert_called_once()
+        comment_body = mock_comment_thread.insert.call_args[1]["body"]["snippet"]["topLevelComment"]["snippet"]["textOriginal"]
+        assert "PL_SHORTS_999" in comment_body
+        assert "PLJPzVNVZwaGY" in comment_body
 
 
 def test_upload_companion_short_quota_handling(tmp_path):

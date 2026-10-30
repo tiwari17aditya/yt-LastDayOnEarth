@@ -112,6 +112,7 @@ class YouTubeClient(BasePublisher):
         token_file: str = "config/token.json",
         privacy_status: str = "public",
         playlist_title: str = "Last Day on Earth: Survival — Official Gameplay Series",
+        shorts_playlist_title: str = "Last Day on Earth: Survival — Official Gameplay Shorts",
         title_manager: Optional[TitleManager] = None,
         gemini_api_key: Optional[str] = None,
         gemini_model: str = "gemini-2.5-flash",
@@ -120,6 +121,7 @@ class YouTubeClient(BasePublisher):
         self.token_file = token_file
         self.privacy_status = privacy_status
         self.playlist_title = playlist_title
+        self.shorts_playlist_title = shorts_playlist_title
         self.title_manager = title_manager or TitleManager()
         self.playlist_manager = PlaylistManager(series_playlist_title=self.playlist_title)
         self.tag_generator = DynamicTagGenerator(
@@ -796,22 +798,62 @@ class YouTubeClient(BasePublisher):
             short_url = f"https://youtu.be/{short_video_id}"
             logger.info(f"Companion Short published successfully: {short_url}")
 
-            # Post creator comment directing viewers to the full episode
+            # Automatically manage dedicated separate playlist for YouTube Shorts
+            shorts_playlist_id = None
+            try:
+                shorts_playlist_id = self.get_or_create_playlist(
+                    youtube=youtube,
+                    title=self.shorts_playlist_title,
+                    description=(
+                        "Official vertical gameplay highlights, fast survival tips, and epic moments "
+                        "from the Last Day on Earth: Survival series! 🧟‍♂️🔥\n\n"
+                        "📌 In this playlist:\n"
+                        "• Viral fail & near-death bunker moments\n"
+                        "• Red crate unboxings & rare Chopper loot drops\n"
+                        "• Quick workshop, furnace smelting, and defense tips\n\n"
+                        "🔔 Subscribe and check back daily for new Shorts!\n\n"
+                        "#Shorts #LastDayOnEarth #LDoE #SurvivalGaming #ZombieSurvival"
+                    ),
+                    privacy_status=self.privacy_status,
+                )
+                if shorts_playlist_id:
+                    added_to_pl = self.add_video_to_playlist(
+                        youtube=youtube,
+                        video_id=short_video_id,
+                        playlist_id=shorts_playlist_id,
+                        episode_number=episode_number,
+                    )
+                    if added_to_pl:
+                        logger.info(
+                            f"Confirmed: Companion Short {short_video_id} added to dedicated Shorts playlist "
+                            f"'{self.shorts_playlist_title}' (ID: {shorts_playlist_id})"
+                        )
+                    else:
+                        logger.warning(f"Could not add companion Short {short_video_id} to playlist {shorts_playlist_id}")
+            except Exception as pe:
+                logger.warning(f"Failed to manage dedicated Shorts playlist: {pe}")
+
+            # Post creator comment directing viewers to the full episode and playlists
             if parent_video_id:
                 try:
                     parent_url = f"https://youtu.be/{parent_video_id}"
                     ep_str = f"Episode #{episode_number}" if episode_number else "the full episode"
-                    comment_text = (
-                        f"🔥 Watch {ep_str} uncut here: {parent_url}\n\n"
-                        f"📺 Series Playlist: https://www.youtube.com/playlist?list=PLJPzVNVZwaGY\n"
-                        f"🔔 Subscribe for daily Last Day on Earth survival guides!"
-                    )
+                    comment_lines = [
+                        f"🔥 Watch {ep_str} uncut here: {parent_url}",
+                        "",
+                    ]
+                    if shorts_playlist_id:
+                        comment_lines.append(f"📱 Shorts Playlist: https://www.youtube.com/playlist?list={shorts_playlist_id}")
+                    comment_lines.extend([
+                        "📺 Full Series Playlist: https://www.youtube.com/playlist?list=PLJPzVNVZwaGY",
+                        "🔔 Subscribe for daily Last Day on Earth survival guides!",
+                    ])
                     c_body = {
                         "snippet": {
                             "videoId": short_video_id,
                             "topLevelComment": {
                                 "snippet": {
-                                    "textOriginal": comment_text
+                                    "textOriginal": "\n".join(comment_lines)
                                 }
                             }
                         }
