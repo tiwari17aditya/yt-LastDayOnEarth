@@ -159,6 +159,15 @@ class ProcessingSettings(BaseModel):
     outro_tail_duration: float = Field(
         default_factory=lambda: _safe_float(os.getenv("OUTRO_TAIL_DURATION"), 9.5)
     )
+    generate_companion_shorts: bool = Field(
+        default_factory=lambda: os.getenv("GENERATE_COMPANION_SHORTS", "true").lower() == "true"
+    )
+    upload_companion_shorts: bool = Field(
+        default_factory=lambda: os.getenv("UPLOAD_COMPANION_SHORTS", "false").lower() == "true"
+    )
+    shorts_dir: Path = Field(
+        default_factory=lambda: Path(os.getenv("SHORTS_DIR", "data/shorts"))
+    )
 
 
 class PipelineSettings(BaseModel):

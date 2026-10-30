@@ -6,7 +6,7 @@ import json
 import sys
 from pathlib import Path
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any, List
 
 from src.config import get_settings
 from src.logging_config import get_logger
@@ -101,6 +101,7 @@ class RenderResult(type(Path())):
     youtube_url: str = ""
     uploaded_to_youtube: bool = False
     video_id: str = ""
+    companion_short: Optional[Dict[str, Any]] = None
 
 
 def get_notifier(settings):
@@ -501,6 +502,55 @@ def run_pipeline(
                     },
                 )
 
+        # Step 5.5: Automated Companion YouTube Shorts Pipeline
+        companion_short_data = None
+        if getattr(settings.processing, "generate_companion_shorts", False):
+            try:
+                from src.processor.shorts_generator import ShortsGenerator
+
+                logger.info("Generating automated 9:16 companion YouTube Short from peak gameplay moment")
+                shorts_gen = ShortsGenerator(output_dir=settings.processing.shorts_dir)
+                companion_short_data = shorts_gen.generate_companion_short(
+                    input_video=output_path,
+                    events=detected_events,
+                    episode_number=metadata.episode_number,
+                    parent_video_id=video_id if uploaded_to_youtube else None,
+                )
+                logger.info(
+                    f"Companion Short generated successfully: {companion_short_data['short_path']}",
+                    extra_data={
+                        "title": companion_short_data["title"],
+                        "duration": companion_short_data["duration"],
+                        "headline": companion_short_data["headline"],
+                    },
+                )
+
+                # Upload companion Short to YouTube if enabled and parent video was published
+                if uploaded_to_youtube and getattr(settings.processing, "upload_companion_shorts", False):
+                    logger.info("Uploading companion Short to YouTube...")
+                    short_url = publisher.upload_companion_short(
+                        short_path=companion_short_data["short_path"],
+                        title=companion_short_data["title"],
+                        description=companion_short_data["description"],
+                        tags=companion_short_data.get("tags"),
+                        parent_video_id=video_id,
+                        episode_number=metadata.episode_number,
+                    )
+                    if short_url:
+                        companion_short_data["youtube_url"] = short_url
+                        logger.info(f"Companion Short published to YouTube: {short_url}")
+            except Exception as se:
+                logger.warning(
+                    f"Companion Shorts generation/publishing encountered error (continuing main pipeline): {se}",
+                    extra_data={
+                        "operation": "generate_companion_short",
+                        "component": "ShortsGenerator",
+                        "root_cause": str(se),
+                        "recovery_action": "Check FFmpeg installation and video output file.",
+                        "status": "DEGRADED",
+                    },
+                )
+
         # Step 6: History Logging & Notifications
         logger.info("Step 6/6: Recording job execution to history")
         if not video_id and youtube_url and "youtu" in youtube_url:
@@ -528,6 +578,8 @@ def run_pipeline(
                     "soundtrack_tracks": [t["title"] for t in track_sequence],
                     "subtitles_burned": sub_path is not None,
                     "privacy_redacted": blur_filter is not None,
+                    "companion_short": str(companion_short_data["short_path"]) if companion_short_data else None,
+                    "companion_short_url": companion_short_data.get("youtube_url") if companion_short_data else None,
                 },
             )
         except Exception as he:
@@ -589,6 +641,7 @@ def run_pipeline(
         result.youtube_url = youtube_url
         result.uploaded_to_youtube = uploaded_to_youtube
         result.video_id = video_id
+        result.companion_short = companion_short_data
         return result
 
     except PipelineError as pe:

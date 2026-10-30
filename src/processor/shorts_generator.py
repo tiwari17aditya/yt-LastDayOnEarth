@@ -117,6 +117,24 @@ class ShortsGenerator:
         logger.info(f"Generated Shorts overlay image at {output_png_path}")
         return output_png_path
 
+    def get_video_duration(self, video_path: Path) -> float:
+        """Probes true video duration in seconds via ffprobe."""
+        if not video_path.exists():
+            return 35.0
+        cmd = [
+            "ffprobe",
+            "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            str(video_path),
+        ]
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            return max(5.0, float(res.stdout.strip()))
+        except Exception as e:
+            logger.debug(f"Could not probe duration for {video_path}: {e}")
+            return 35.0
+
     def auto_detect_highlight_start(self, events: List[Any], min_start: float = 30.0) -> float:
         """Finds the most intense gameplay event timestamp from detected game events."""
         if not events:
@@ -141,52 +159,99 @@ class ShortsGenerator:
     def auto_detect_viral_moment(
         self,
         events: List[Any],
-        min_start: float = 30.0,
+        video_duration: float = 180.0,
+        min_start: float = 20.0,
         default_duration: float = 35.0,
     ) -> Dict[str, Any]:
         """Detects high-emotion viral moments (fails, near-death escapes, rare crate openings)."""
+        # If video is shorter than standard thresholds, adjust dynamically
+        if video_duration < 45.0:
+            effective_min = 0.0
+            clip_len = min(video_duration, default_duration)
+        else:
+            effective_min = min(min_start, max(0.0, video_duration - default_duration))
+            clip_len = min(default_duration, video_duration)
+
         if not events:
             return {
-                "start_time": min_start,
-                "duration": default_duration,
+                "start_time": effective_min,
+                "duration": clip_len,
                 "headline": "LAST DAY ON EARTH",
                 "subtitle": "SURVIVAL INTENSIFIES",
                 "hook_type": "standard_gameplay",
             }
 
+        def _clamp(start: float, dur: float) -> tuple[float, float]:
+            if start + dur > video_duration:
+                start = max(0.0, video_duration - dur)
+            return round(start, 1), round(dur, 1)
+
         # Priority 1: High-stakes fail moments & intense combat panic
-        fail_keywords = ["death", "dying", "frenzy giant", "alarm", "toxic spitter", "horde", "boss", "ambush"]
+        fail_keywords = ["death", "dying", "frenzy", "giant", "alarm", "toxic spitter", "horde", "boss", "ambush", "blind one", "panic"]
         for ev in events:
             desc = getattr(ev, "description", "").lower()
             st = getattr(ev, "start_time", 0.0)
-            if any(k in desc for k in fail_keywords) and st >= min_start:
+            if any(k in desc for k in fail_keywords) and st >= effective_min:
+                s, d = _clamp(float(st), 30.0)
                 return {
-                    "start_time": float(st),
-                    "duration": 30.0,
+                    "start_time": s,
+                    "duration": d,
                     "headline": "DISASTER MOMENT?!",
                     "subtitle": "RED ZONE CLOSE CALL",
                     "hook_type": "fail_panic",
                 }
 
         # Priority 2: Rare loot unboxings and bunker raids
-        loot_keywords = ["red crate", "chest", "titanium", "transmission", "chopper gas tank", "c4", "alfa", "bunker"]
+        loot_keywords = ["red crate", "chest", "coupon", "titanium", "transmission", "chopper gas tank", "tank", "c4", "c-4", "alfa", "bunker"]
         for ev in events:
             desc = getattr(ev, "description", "").lower()
             st = getattr(ev, "start_time", 0.0)
-            if any(k in desc for k in loot_keywords) and st >= min_start:
+            if any(k in desc for k in loot_keywords) and st >= effective_min:
+                s, d = _clamp(float(st), 35.0)
                 return {
-                    "start_time": float(st),
-                    "duration": 35.0,
+                    "start_time": s,
+                    "duration": d,
                     "headline": "RAREST LOOT DROP?!",
                     "subtitle": "OPENING RED CHEST",
                     "hook_type": "rare_loot",
                 }
 
-        # Priority 3: General highlight
-        st = self.auto_detect_highlight_start(events, min_start=min_start)
+        # Priority 3: Intense combat or base defense
+        combat_keywords = ["combat", "clearing", "raid", "defense", "farm", "attack", "wall trick"]
+        for ev in events:
+            desc = getattr(ev, "description", "").lower()
+            st = getattr(ev, "start_time", 0.0)
+            if any(k in desc for k in combat_keywords) and st >= effective_min:
+                s, d = _clamp(float(st), clip_len)
+                return {
+                    "start_time": s,
+                    "duration": d,
+                    "headline": "BASE UNDER ATTACK!",
+                    "subtitle": "ZOMBIE HORDE AMBUSH",
+                    "hook_type": "combat_defense",
+                }
+
+        # Priority 4: Workshop tricks & blueprints
+        craft_keywords = ["craft", "blueprints", "smelt", "storage", "workshop", "planks"]
+        for ev in events:
+            desc = getattr(ev, "description", "").lower()
+            st = getattr(ev, "start_time", 0.0)
+            if any(k in desc for k in craft_keywords) and st >= effective_min:
+                s, d = _clamp(float(st), clip_len)
+                return {
+                    "start_time": s,
+                    "duration": d,
+                    "headline": "PRO SURVIVAL TRICK!",
+                    "subtitle": "BASE WORKSHOP GUIDE",
+                    "hook_type": "pro_craft",
+                }
+
+        # Fallback to general highlight
+        st = self.auto_detect_highlight_start(events, min_start=effective_min)
+        s, d = _clamp(st, clip_len)
         return {
-            "start_time": st,
-            "duration": default_duration,
+            "start_time": s,
+            "duration": d,
             "headline": "LAST DAY ON EARTH",
             "subtitle": "EPIC SURVIVAL MOMENT",
             "hook_type": "highlight",
@@ -267,3 +332,70 @@ class ShortsGenerator:
 
         logger.info(f"Successfully generated YouTube Short: {output_path}")
         return output_path
+
+    def generate_companion_short(
+        self,
+        input_video: Path,
+        events: Optional[List[Any]] = None,
+        episode_number: Optional[int] = None,
+        parent_video_id: Optional[str] = None,
+        output_dir: Optional[Path] = None,
+    ) -> Dict[str, Any]:
+        """High-level companion Shorts generator automatically extracting peak moments and packaging metadata."""
+        target_dir = output_dir or self.output_dir
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        video_duration = self.get_video_duration(input_video)
+        viral_data = self.auto_detect_viral_moment(events or [], video_duration=video_duration)
+
+        start_time = viral_data["start_time"]
+        duration = viral_data["duration"]
+        headline = viral_data["headline"]
+        subtitle = viral_data["subtitle"]
+
+        ep_tag = f"_ep{episode_number}" if episode_number else ""
+        short_filename = f"short{ep_tag}_{input_video.stem}.mp4"
+        short_output_path = target_dir / short_filename
+
+        rendered_path = self.generate_short(
+            input_video=input_video,
+            output_path=short_output_path,
+            start_time=start_time,
+            duration=duration,
+            headline=headline,
+            subtitle=subtitle,
+            episode_number=episode_number,
+        )
+
+        ep_suffix = f" | LDoE Survival #{episode_number}" if episode_number else " | Last Day on Earth"
+        title = f"{headline}{ep_suffix} #Shorts"
+        if len(title) > 100:
+            title = title[:92] + "... #Shorts"
+
+        parent_url = f"https://youtu.be/{parent_video_id}" if parent_video_id else ""
+        desc_lines = [
+            f"🔥 Episode #{episode_number or ''} highlight! Watch the full uncut survival episode:",
+        ]
+        if parent_url:
+            desc_lines.append(f"👉 Full Video: {parent_url}")
+        desc_lines.extend([
+            "📺 Official Series Playlist: https://www.youtube.com/playlist?list=PLJPzVNVZwaGY",
+            "",
+            "🔴 Subscribe for daily Last Day on Earth survival gameplay!",
+            "",
+            "#Shorts #LastDayOnEarth #LDoE #SurvivalGaming #ZombieSurvival #GamingShorts",
+        ])
+
+        return {
+            "short_path": rendered_path,
+            "title": title,
+            "description": "\n".join(desc_lines),
+            "start_time": start_time,
+            "duration": duration,
+            "headline": headline,
+            "subtitle": subtitle,
+            "episode_number": episode_number,
+            "parent_video_id": parent_video_id,
+            "hook_type": viral_data.get("hook_type", "standard_gameplay"),
+            "tags": ["Shorts", "LastDayOnEarth", "LDoE", "SurvivalGaming", "ZombieSurvival", "LDoESurvival"],
+        }

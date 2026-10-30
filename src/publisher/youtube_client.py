@@ -77,6 +77,18 @@ class BasePublisher(ABC):
         """Upload video to YouTube and return the video URL."""
         pass
 
+    def upload_companion_short(
+        self,
+        short_path: Path,
+        title: str,
+        description: str,
+        tags: Optional[List[str]] = None,
+        parent_video_id: Optional[str] = None,
+        episode_number: Optional[int] = None,
+    ) -> Optional[str]:
+        """Optional method to upload a companion vertical Short."""
+        return None
+
     def export_metadata_json(self, metadata: VideoPublishMetadata, output_json_path: Path) -> Path:
         """Saves generated metadata to JSON file alongside processed video."""
         output_json_path.parent.mkdir(parents=True, exist_ok=True)
@@ -445,6 +457,25 @@ class YouTubeClient(BasePublisher):
 
         return uploaded
 
+    def get_service(self) -> Optional[Any]:
+        """Builds and returns an authenticated YouTube Data API v3 service resource."""
+        try:
+            from googleapiclient.discovery import build
+            from src.google_auth import get_google_credentials
+
+            creds = get_google_credentials(
+                scopes=[
+                    "https://www.googleapis.com/auth/youtube.upload",
+                    "https://www.googleapis.com/auth/youtube.force-ssl",
+                ]
+            )
+            if not creds:
+                return None
+            return build("youtube", "v3", credentials=creds, cache_discovery=False)
+        except Exception as e:
+            logger.debug(f"Could not build YouTube service resource: {e}")
+            return None
+
     def upload_video(self, video_path: Path, metadata: VideoPublishMetadata) -> str:
         logger.info("Initiating YouTube video upload", extra_data={"title": metadata.title, "path": str(video_path)})
         if not video_path.exists():
@@ -456,25 +487,16 @@ class YouTubeClient(BasePublisher):
             )
 
         try:
-            from googleapiclient.discovery import build
             from googleapiclient.http import MediaFileUpload
-            from src.google_auth import get_google_credentials
 
-            creds = get_google_credentials(
-                scopes=[
-                    "https://www.googleapis.com/auth/youtube.upload",
-                    "https://www.googleapis.com/auth/youtube.force-ssl",
-                ]
-            )
-            if not creds:
+            youtube = self.get_service()
+            if not youtube:
                 raise PublishingError(
                     operation="upload_video",
                     root_cause="Missing YouTube OAuth credentials. Set GCP_CLIENT_ID, GCP_CLIENT_SECRET, and GCP_REFRESH_TOKEN (or GDRIVE_REFRESH_TOKEN).",
                     recovery_action="Configure YouTube OAuth credentials in .env before initiating YouTube upload.",
                     file_path=str(video_path),
                 )
-
-            youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
 
             # Check if video with identical title was already uploaded recently (prevent duplicates)
             try:
@@ -697,6 +719,120 @@ class YouTubeClient(BasePublisher):
                 recovery_action="Check YouTube API quota, channel status, or re-run scripts/setup_google_auth.py.",
                 file_path=str(video_path),
             )
+
+    def upload_companion_short(
+        self,
+        short_path: Path,
+        title: str,
+        description: str,
+        tags: Optional[List[str]] = None,
+        parent_video_id: Optional[str] = None,
+        episode_number: Optional[int] = None,
+    ) -> Optional[str]:
+        """Uploads a companion 9:16 vertical Short to YouTube and pins/posts an engagement comment linking to the full episode."""
+        if not short_path.exists():
+            logger.error(f"Cannot upload companion short: File not found at {short_path}")
+            return None
+
+        youtube = self.get_service()
+        if not youtube:
+            logger.warning("YouTube service not available. Skipping companion short upload.")
+            return None
+
+        try:
+            from googleapiclient.http import MediaFileUpload
+
+            # Enforce #Shorts in title
+            short_title = title.strip()
+            if "#Shorts" not in short_title and "#shorts" not in short_title:
+                short_title = f"{short_title} #Shorts"
+            if len(short_title) > 100:
+                short_title = short_title[:91] + "... #Shorts"
+
+            safe_tags = ["Shorts", "LastDayOnEarth", "LDoE", "GamingShorts", "SurvivalGaming"]
+            if tags:
+                for t in tags:
+                    clean_t = re.sub(r'[<>,"]', "", str(t)).strip()
+                    if clean_t and clean_t not in safe_tags and len(clean_t) <= 40:
+                        safe_tags.append(clean_t)
+
+            body = {
+                "snippet": {
+                    "title": short_title,
+                    "description": description,
+                    "tags": safe_tags[:15],
+                    "categoryId": "20",
+                    "defaultLanguage": "en",
+                },
+                "status": {
+                    "privacyStatus": self.privacy_status,
+                    "selfDeclaredMadeForKids": False,
+                },
+            }
+
+            logger.info(f"Initiating companion Short upload: '{short_title}' ({short_path})")
+            media = MediaFileUpload(
+                str(short_path),
+                chunksize=5 * 1024 * 1024,
+                resumable=True,
+                mimetype="video/mp4",
+            )
+            req = youtube.videos().insert(
+                part="snippet,status",
+                body=body,
+                media_body=media,
+            )
+            resp = None
+            while resp is None:
+                status, resp = req.next_chunk()
+                if status:
+                    logger.info(f"Companion Short upload progress: {int(status.progress() * 100)}%")
+
+            short_video_id = resp.get("id")
+            if not short_video_id:
+                logger.error("Companion Short upload completed without returning video ID.")
+                return None
+
+            short_url = f"https://youtu.be/{short_video_id}"
+            logger.info(f"Companion Short published successfully: {short_url}")
+
+            # Post creator comment directing viewers to the full episode
+            if parent_video_id:
+                try:
+                    parent_url = f"https://youtu.be/{parent_video_id}"
+                    ep_str = f"Episode #{episode_number}" if episode_number else "the full episode"
+                    comment_text = (
+                        f"🔥 Watch {ep_str} uncut here: {parent_url}\n\n"
+                        f"📺 Series Playlist: https://www.youtube.com/playlist?list=PLJPzVNVZwaGY\n"
+                        f"🔔 Subscribe for daily Last Day on Earth survival guides!"
+                    )
+                    c_body = {
+                        "snippet": {
+                            "videoId": short_video_id,
+                            "topLevelComment": {
+                                "snippet": {
+                                    "textOriginal": comment_text
+                                }
+                            }
+                        }
+                    }
+                    c_resp = youtube.commentThreads().insert(part="snippet", body=c_body).execute()
+                    logger.info(f"Posted backlink comment on companion Short {short_video_id} (ID: {c_resp.get('id')})")
+                except Exception as ce:
+                    logger.warning(f"Could not post backlink comment on companion Short: {ce}")
+
+            return short_url
+
+        except Exception as e:
+            logger.error(f"Failed to upload companion Short: {e}")
+            if is_quota_exceeded_error(e):
+                raise QuotaExceededError(
+                    operation="upload_companion_short",
+                    root_cause=str(e),
+                    recovery_action="Daily YouTube quota exhausted. Companion short saved locally in data/shorts/.",
+                    file_path=str(short_path),
+                )
+            return None
 
     def check_quota_available(self) -> bool:
         """Pre-flight check: calls lightweight channels.list (costs only 1 quota unit).
