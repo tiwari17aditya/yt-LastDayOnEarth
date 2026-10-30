@@ -19,6 +19,9 @@ class TitlePackage:
     episode_number: int = 1
     summary: str = ""
     search_guide: str = ""
+    anti_repetition_applied: bool = False
+    similarity_score: float = 0.0
+    avoided_recent_title: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -355,6 +358,59 @@ class TitleManager:
         else:
             primary = action_hook
 
+        # Anti-Repetition Guard: Cross-reference against recent episodes
+        recent_titles = self.get_recent_published_titles(limit=10)
+        anti_rep_applied = False
+        similarity_score = 0.0
+        avoided_title = ""
+
+        is_rep, matched_recent, score = self.is_title_repetitive(primary, recent_titles, threshold=0.50)
+        if is_rep:
+            logger.info(
+                f"Anti-Repetition Guard triggered for Episode #{ep}: primary title '{primary}' "
+                f"is too similar to recent episode '{matched_recent}' (similarity: {score:.2f})"
+            )
+            anti_rep_applied = True
+            similarity_score = score
+            avoided_title = matched_recent
+
+            # Check alternative formulas in order
+            candidates = [search_guide, curiosity, walkthrough, action_hook]
+            chosen_candidate = None
+
+            for alt in candidates:
+                if alt != primary:
+                    alt_rep, _, _ = self.is_title_repetitive(alt, recent_titles, threshold=0.50)
+                    if not alt_rep:
+                        chosen_candidate = alt
+                        logger.info(f"Anti-Repetition Guard selected non-repetitive alternative formula: '{alt}'")
+                        break
+
+            if chosen_candidate:
+                primary = chosen_candidate
+            else:
+                thematic_rotations = [
+                    "Bunker Alfa Infiltration & Red Crate Run",
+                    "Crooked Creek Farm Clearing & Combat",
+                    "High-Value Resource Scavenge & Smelting",
+                    "Zombie Horde Survival & Base Fortification",
+                    "Chopper Motorcycle Assembly & Fuel Run",
+                    "Rare Blueprint & Workshop Blueprint Upgrades",
+                ]
+                used_texts = " ".join(recent_titles[:5]).lower()
+                chosen_theme = None
+                for theme in thematic_rotations:
+                    if not any(k in used_texts for k in theme.lower().split()[:2]):
+                        chosen_theme = theme
+                        break
+                chosen_theme = chosen_theme or thematic_rotations[ep % len(thematic_rotations)]
+
+                if ep_tag:
+                    primary = self._fit_title_length(f"{chosen_theme}! | {self.series_prefix} Survival {ep_tag}", ep_tag)
+                else:
+                    primary = self._fit_title_length(f"{chosen_theme}! | {self.series_name}", ep_tag)
+                logger.info(f"Anti-Repetition Guard synthesized fresh thematic hook: '{primary}'")
+
         logger.info(
             f"Generated high-CTR title package for Episode #{ep}",
             extra_data={
@@ -363,6 +419,9 @@ class TitleManager:
                 "curiosity": curiosity,
                 "walkthrough": walkthrough,
                 "search_guide": search_guide,
+                "anti_repetition_applied": anti_rep_applied,
+                "similarity_score": similarity_score,
+                "avoided_recent_title": avoided_title,
             },
         )
 
@@ -374,7 +433,60 @@ class TitleManager:
             episode_number=ep,
             summary=sub_summary,
             search_guide=search_guide,
+            anti_repetition_applied=anti_rep_applied,
+            similarity_score=similarity_score,
+            avoided_recent_title=avoided_title,
         )
+
+    def get_recent_published_titles(self, limit: int = 10) -> List[str]:
+        """Fetches the titles of the most recent N completed episodes from tracker file."""
+        if not self.tracker_file.exists():
+            return []
+        try:
+            data = json.loads(self.tracker_file.read_text(encoding="utf-8"))
+            completed = data.get("completed_episodes", [])
+            recent = [ep.get("title", "") for ep in completed if ep.get("title")]
+            return list(reversed(recent[-limit:]))
+        except Exception as e:
+            logger.warning(f"Could not read recent titles for anti-repetition check: {e}")
+            return []
+
+    def clean_title_for_comparison(self, title: str) -> str:
+        """Strips series prefixes, episode numbers, and formatting to isolate core hook keywords."""
+        if not title:
+            return ""
+        cleaned = re.sub(r"\|\s*(LDoE|Last Day on Earth).*$", "", title, flags=re.IGNORECASE)
+        cleaned = re.sub(r"#\d+", "", cleaned)
+        cleaned = re.sub(r"[^\w\s]", " ", cleaned).lower()
+        return " ".join(cleaned.split())
+
+    def calculate_title_similarity(self, title_a: str, title_b: str) -> float:
+        """Calculates token-overlap similarity between two titles (excluding boilerplate words)."""
+        stop_words = {"and", "the", "with", "for", "plus", "part", "to", "how", "fast", "guide", "survival", "ldoe"}
+        tokens_a = {w for w in self.clean_title_for_comparison(title_a).split() if len(w) > 2 and w not in stop_words}
+        tokens_b = {w for w in self.clean_title_for_comparison(title_b).split() if len(w) > 2 and w not in stop_words}
+
+        if not tokens_a or not tokens_b:
+            return 0.0
+
+        intersection = tokens_a & tokens_b
+        union = tokens_a | tokens_b
+        jaccard = len(intersection) / len(union)
+        containment = len(intersection) / min(len(tokens_a), len(tokens_b))
+        return max(jaccard, containment * 0.85)
+
+    def is_title_repetitive(
+        self,
+        candidate_title: str,
+        recent_titles: List[str],
+        threshold: float = 0.50,
+    ) -> tuple[bool, str, float]:
+        """Determines whether a candidate title is too repetitive against recently published episodes."""
+        for recent in recent_titles:
+            score = self.calculate_title_similarity(candidate_title, recent)
+            if score >= threshold:
+                return True, recent, score
+        return False, "", 0.0
 
     def _fit_title_length(self, title: str, ep_suffix: str) -> str:
         """Ensures title strictly fits under max_title_length while preserving suffix."""

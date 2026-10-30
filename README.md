@@ -7,7 +7,7 @@ An automated, modular, cloud-friendly workflow for processing and publishing *La
 The pipeline automates the end-to-end publishing journey:
 1. **Google Drive Ingestion**: Monitors incoming gameplay video uploads (`Input/Input 1`).
 2. **Privacy Protection & PII Obfuscation**: Scans video frames with OCR to detect and redact sensitive personal information (emails, notifications, phone IDs) while preserving game HUD.
-3. **Gameplay Context & Subtitles**: Generates synchronized in-game commentary and event captions using Gemini AI vision models grounded in *Last Day on Earth* lore and locations.
+3. **Gameplay Context & Subtitles**: Generates synchronized in-game commentary and authentic chapter markers using Gemini 2.5 Flash Vision multimodal keyframe analysis, backed by a Title History Anti-Repetition Guard preventing consecutive duplicate episode phrasings.
 4. **Royalty-Free Audio Engine**: Integrates a curated catalog of 20 royalty-free survival and gaming tracks, seamlessly looping and ducking background music.
 5. **FFmpeg Video Composite**: Hardcodes stylized subtitles and renders high-definition, YouTube-optimized video with standardized naming convention (`<Title>_Processed_<DDMMYYYY>.mp4`).
 6. **AI Metadata Generation**: Crafts tailored YouTube titles, structured descriptions with chapter timestamps, game tags, and music licensing attributions.

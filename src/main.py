@@ -152,7 +152,7 @@ def run_pipeline(
 
     # Initialize subsystems
     privacy_guard = PrivacyDetector()
-    subtitle_engine = SubtitleGenerator(gemini_api_key=settings.gemini.api_key or "")
+    subtitle_engine = SubtitleGenerator(gemini_api_key=settings.gemini.api_key or "", model_name=settings.gemini.model)
     audio_mixer = AudioMixer(library_path=settings.processing.music_library_file)
     processor = VideoProcessor(output_dir=settings.processing.output_dir)
     title_mgr = TitleManager(

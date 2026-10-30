@@ -1,10 +1,11 @@
 """Gameplay event recognition and dynamic subtitle/chapter generation for Last Day on Earth: Survival."""
 
+import os
 import subprocess
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 import numpy as np
 import cv2
 
@@ -17,7 +18,7 @@ logger = get_logger(component="SubtitleEngine")
 class GameplayEvent:
     start_time: float  # In seconds
     end_time: float    # In seconds
-    action_type: str   # e.g., "navigation", "crafting", "storage", "base", "combat"
+    action_type: str   # e.g., "navigation", "crafting", "storage", "base", "combat", "loot"
     description: str   # Clean in-game caption / chapter title
 
 
@@ -36,11 +37,11 @@ class BaseSubtitleGenerator(ABC):
 
 
 class SubtitleGenerator(BaseSubtitleGenerator):
-    """Dynamically analyzes video duration and visual frame contents to produce accurate chapters and styled ASS cues."""
+    """Dynamically analyzes video duration and visual frame contents using Gemini Vision & CV heuristics."""
 
     def __init__(self, gemini_api_key: str = "", model_name: str = "gemini-2.5-flash") -> None:
-        self.gemini_api_key = gemini_api_key
-        self.model_name = model_name
+        self.gemini_api_key = gemini_api_key or os.getenv("GEMINI_API_KEY", "")
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
     def get_video_duration(self, video_path: Path) -> float:
         """Probes true video duration in seconds via ffprobe."""
@@ -60,8 +61,8 @@ class SubtitleGenerator(BaseSubtitleGenerator):
             logger.warning(f"Could not probe duration for {video_path.name}: {e}, using default 180.0s")
             return 180.0
 
-    def analyze_frame_signature(self, video_path: Path, timestamp: float) -> tuple[str, str]:
-        """Extracts frame in-memory at timestamp and uses computer vision color/HUD metrics to classify activity."""
+    def extract_frame_bytes(self, video_path: Path, timestamp: float) -> Optional[bytes]:
+        """Extracts JPEG image bytes at timestamp via ffmpeg stdout."""
         ff_cmd = [
             "ffmpeg",
             "-y",
@@ -73,12 +74,23 @@ class SubtitleGenerator(BaseSubtitleGenerator):
             "-",
         ]
         try:
-            p = subprocess.run(ff_cmd, capture_output=True, timeout=5)
-            if not p.stdout:
-                return "Base Operations", "base"
-            img = cv2.imdecode(np.frombuffer(p.stdout, dtype=np.uint8), cv2.IMREAD_COLOR)
+            p = subprocess.run(ff_cmd, capture_output=True, timeout=8)
+            if p.stdout and len(p.stdout) > 500:
+                return p.stdout
+            return None
+        except Exception as e:
+            logger.debug(f"Frame extraction failed at {timestamp}s: {e}")
+            return None
+
+    def analyze_frame_signature(self, video_path: Path, timestamp: float) -> tuple[str, str]:
+        """Extracts frame in-memory at timestamp and uses computer vision color/HUD metrics to classify activity."""
+        try:
+            frame_bytes = self.extract_frame_bytes(video_path, timestamp)
+            if not frame_bytes:
+                return "Home Base Operations", "base"
+            img = cv2.imdecode(np.frombuffer(frame_bytes, dtype=np.uint8), cv2.IMREAD_COLOR)
             if img is None:
-                return "Base Operations", "base"
+                return "Home Base Operations", "base"
 
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -104,6 +116,130 @@ class SubtitleGenerator(BaseSubtitleGenerator):
             logger.debug(f"Frame analysis fallback at {timestamp}s: {e}")
             return "Home Base Operations", "base"
 
+    def analyze_gameplay_with_gemini(
+        self,
+        video_path: Path,
+        sample_times: List[float],
+        duration: float,
+    ) -> Optional[List[GameplayEvent]]:
+        """Multimodal analysis using Google GenAI (Gemini 2.5 Flash) vision to recognize authentic LDoE events."""
+        api_key = self.gemini_api_key or os.getenv("GEMINI_API_KEY", "")
+        if not api_key:
+            logger.debug("No GEMINI_API_KEY available; skipping multimodal vision analysis")
+            return None
+
+        try:
+            from google import genai
+            from google.genai import types
+            import json
+
+            client = genai.Client(api_key=api_key)
+
+            # Sample up to 6 keyframes to stay within efficient token / latency limits
+            max_frames = min(len(sample_times), 6)
+            stride = max(1, len(sample_times) // max_frames)
+            selected_indices = list(range(0, len(sample_times), stride))[:max_frames]
+            selected_times = [sample_times[i] for i in selected_indices]
+
+            contents: List[Any] = []
+            extracted_meta = []
+
+            for idx, ts in enumerate(selected_times):
+                frame_bytes = self.extract_frame_bytes(video_path, ts)
+                if frame_bytes:
+                    contents.append(
+                        types.Part.from_bytes(data=frame_bytes, mime_type="image/jpeg")
+                    )
+                    extracted_meta.append((idx + 1, ts))
+
+            if not extracted_meta:
+                logger.warning("Could not extract any valid frames for Gemini Vision analysis")
+                return None
+
+            frame_list_text = ", ".join([f"Frame {idx} at {ts:.1f}s" for idx, ts in extracted_meta])
+
+            prompt = (
+                "You are an expert gameplay analyst and vision model for 'Last Day on Earth: Survival' (LDoE).\n"
+                f"I have provided {len(extracted_meta)} sequential in-game keyframes from gameplay footage ({frame_list_text}).\n\n"
+                "Analyze each frame carefully using authentic Last Day on Earth terminology:\n"
+                "- Locations: Home Base (Workshop, Storage Vault, Garden, Chopper Garage), Bunker Alfa (Lobby, Floor 1-4, Terminal Code Room), Crooked Creek Farm, Blackport PD Arena, Motel Basement, Port Sewers, Limestone Cliffs/Ridge, Pine Bushes/Grove/Woods, Crater.\n"
+                "- Combat & Enemies: Fast Biter, Floater Bloater, Toxic Abomination, Toxic Spitter, Frenzied Giant, The Blind One, Ravager, Acid Melter, Zombie Horde, or Wall Trick melee combat.\n"
+                "- Activities & Loot: Crafting Planks & Upgrades, Smelting Iron & Charcoal, Opening Red/Yellow Coupon Crate, Assembling Chopper Motorcycle, Weapon Bench Modding, Sorting Chest Inventory, Sneak Attack, Mining Iron Ore, Chopping Pine Logs, Perimeter Base Defense.\n\n"
+                "Return a strict JSON array of objects, one for each provided frame in matching order:\n"
+                "[\n"
+                "  {\n"
+                '    "frame_index": 1,\n'
+                f'    "timestamp": {extracted_meta[0][1]},\n'
+                '    "action_type": "<navigation|crafting|storage|base|combat|loot>",\n'
+                '    "description": "<Punchy 2-5 word Title Case name, e.g. \'Bunker Alfa Terminal Code\' or \'Opening Red Ticket Crate\' or \'Workshop Smelting & Blueprints\'>"\n'
+                "  }\n"
+                "]\n\n"
+                "Rules:\n"
+                "- Every description must be authentic, high-impact, and distinct.\n"
+                "- Do NOT return generic repeated descriptions like 'Home Base Operations Part 2'.\n"
+                "- Return ONLY the raw JSON array. No markdown fences, no conversational prose."
+            )
+            contents.append(prompt)
+
+            logger.info(
+                f"Dispatching {len(extracted_meta)} keyframes to Gemini Vision ({self.model_name}) for gameplay analysis"
+            )
+            response = client.models.generate_content(
+                model=self.model_name,
+                contents=contents,
+            )
+
+            raw_text = response.text.strip() if hasattr(response, "text") and response.text else ""
+            if not raw_text:
+                return None
+
+            # Clean markdown code block wraps if present
+            if raw_text.startswith("```"):
+                raw_text = raw_text.split("```")[1]
+                if raw_text.startswith("json"):
+                    raw_text = raw_text[4:].strip()
+
+            data = json.loads(raw_text)
+            if not isinstance(data, list) or not data:
+                return None
+
+            gemini_events: List[GameplayEvent] = []
+            for item in data:
+                ts = float(item.get("timestamp", 0.0))
+                act = str(item.get("action_type", "base")).lower()
+                desc = str(item.get("description", "Home Base Operations")).strip()
+                if not desc:
+                    desc = "Home Base Operations"
+                end_t = min(duration, round(ts + 1.2, 1))
+                gemini_events.append(GameplayEvent(
+                    start_time=ts,
+                    end_time=end_t,
+                    action_type=act,
+                    description=desc,
+                ))
+
+            if gemini_events:
+                logger.info(
+                    f"Gemini Vision successfully recognized {len(gemini_events)} distinct LDoE events",
+                    extra_data={"events": [(round(e.start_time, 1), e.description) for e in gemini_events]},
+                )
+                return gemini_events
+
+            return None
+
+        except Exception as e:
+            logger.warning(
+                f"Gemini Vision analysis degraded: {e}. Falling back to visual frame signature engine.",
+                extra_data={
+                    "operation": "analyze_gameplay_with_gemini",
+                    "component": "SubtitleEngine",
+                    "root_cause": str(e),
+                    "recovery_action": "Falling back to OpenCV heuristic signatures.",
+                    "status": "DEGRADED",
+                },
+            )
+            return None
+
     def analyze_events(self, video_path: Path) -> List[GameplayEvent]:
         """Dynamically detects gameplay events and timestamps spanning the full video duration."""
         logger.info("Dynamically analyzing gameplay timeline and events", extra_data={"video": str(video_path)})
@@ -123,8 +259,50 @@ class SubtitleGenerator(BaseSubtitleGenerator):
         step = duration / count
         sample_times = [0.0] + [round(i * step, 1) for i in range(1, count)]
 
+        # 1. Attempt Gemini 2.5 Flash Vision Multimodal analysis if video exists
+        if video_path.exists() and (self.gemini_api_key or os.getenv("GEMINI_API_KEY")):
+            gemini_events = self.analyze_gameplay_with_gemini(video_path, sample_times, duration)
+            if gemini_events:
+                return gemini_events
+
+        # 2. Resilient Fallback: OpenCV Color/HUD signature or Procedural generator
         events: List[GameplayEvent] = []
         seen_descriptions: List[str] = []
+
+        fallback_rotations = {
+            "crafting": [
+                "Crafting Planks & Upgrades",
+                "Smelting Iron & Charcoal",
+                "Workbench Blueprint Research",
+                "Tool & Weapon Assembly",
+            ],
+            "storage": [
+                "Inventory & Resource Sorting",
+                "Organizing Storage Vault",
+                "Chest Reorganization",
+                "Resource Stockpiling",
+            ],
+            "base": [
+                "Base Defense & Maintenance",
+                "Shelter Fortification",
+                "Workshop Expansion",
+                "Perimeter Patrol",
+            ],
+            "navigation": [
+                "Global Map Route",
+                "Wasteland Transit",
+                "Zone Scouting",
+            ],
+            "combat": [
+                "Perimeter Zombie Defense",
+                "Melee Engagement",
+                "Survival Combat Run",
+            ],
+            "loot": [
+                "Chest Looting & Cache Scavenge",
+                "Resource Harvest & Collection",
+            ],
+        }
 
         for idx, ts in enumerate(sample_times):
             if video_path.exists():
@@ -142,16 +320,16 @@ class SubtitleGenerator(BaseSubtitleGenerator):
                 ]
                 desc, act = simulated[idx % len(simulated)]
 
-            # Prevent consecutive exact duplicate chapter names
+            # Prevent consecutive exact duplicate chapter names by rotating thematic alternatives
             if events and events[-1].description == desc:
-                if act == "crafting":
-                    desc = "Crafting Planks & Upgrades"
-                elif act == "storage":
-                    desc = "Inventory & Resource Sorting"
-                elif act == "base":
-                    desc = "Base Defense & Maintenance"
-                else:
-                    desc = f"{desc} Part {seen_descriptions.count(desc) + 1}"
+                candidates = fallback_rotations.get(act, ["Base Operations & Upgrades", "Survival Maintenance"])
+                used = [e.description for e in events]
+                chosen = None
+                for c in candidates:
+                    if c not in used:
+                        chosen = c
+                        break
+                desc = chosen or candidates[len(events) % len(candidates)]
 
             seen_descriptions.append(desc)
 

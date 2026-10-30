@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-30
+
+### Added
+- **Gemini 2.5 Flash Vision Multimodal Event Recognition (`src/subtitles/event_analyzer.py`)**:
+  - Implemented `SubtitleGenerator.analyze_gameplay_with_gemini()` using Google GenAI SDK (`google-genai`).
+  - Extracts sequential 1080p keyframes in-memory and prompts Gemini Vision with domain knowledge grounded in *Last Day on Earth: Survival* mechanics (Bunker Alfa terminals & floors, Crooked Creek Farm, Frenzied Giant combat, weapon bench modding, and rare ticket crates).
+  - Produces authentic, high-impact Title Case chapter names and synchronized ASS subtitle action cues.
+  - Includes diversified procedural fallback that completely eliminates repetitive `"Part 2" / "Part 3"` descriptions.
+  - Fully integrated with pipeline orchestrator (`src/main.py`) passing configured `settings.gemini.model`.
+
+- **Series Title History Anti-Repetition Guard (`src/publisher/title_manager.py`)**:
+  - Implemented `TitleManager.is_title_repetitive()`, `calculate_title_similarity()`, and `get_recent_published_titles()`.
+  - Automatically cross-references candidate titles against the last 10 completed episodes in `data/series_tracker.json`.
+  - When similarity exceeds threshold (>= 50%), the guard automatically rotates formula priority (`search_guide`, `curiosity_story`, `walkthrough`) or synthesizes a fresh thematic LDoE hook to ensure 100% variety across consecutive uploads.
+  - Added `anti_repetition_applied`, `similarity_score`, and `avoided_recent_title` telemetry to `TitlePackage`.
+
+- **Unit Test Suite for Vision Analysis & Title Guard (`tests/test_vision_and_title_guard.py`)**:
+  - Added 5 comprehensive unit tests verifying multimodal event parsing, resilient degradation on API errors/offline mode, token similarity calculations, and anti-repetition title rotation (23/23 tests passing).
+
 ## [1.8.1] - 2026-10-28
 
 ### Fixed

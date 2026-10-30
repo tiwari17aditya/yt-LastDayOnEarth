@@ -62,9 +62,11 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 
 ### 3.3 Subtitles & Context Engine (`src/subtitles/`)
 - **Responsibility**: Identify game locations (Motel, Bunker Alfa, Farm, Home Base) and actions (looting, sneak attack, zombie engagement) and format synchronized captions.
+- **Components**:
+  - `SubtitleGenerator`: Integrates Gemini 2.5 Flash Vision (`google-genai` multimodal keyframe analysis) with fallback OpenCV color/HUD signature heuristics and diversified non-repeating procedural event rotation.
 - **Interface**: `BaseSubtitleGenerator`
   - `analyze_events(video_path: Path) -> List[GameplayEvent]`
-  - `render_subtitles(events: List[GameplayEvent], output_format: str = "ass") -> Path`
+  - `generate_subtitles(events: List[GameplayEvent], output_path: Path) -> Path`
 
 ### 3.4 Audio Engine (`src/audio/`)
 - **Responsibility**: Select appropriate music track from the 20 royalty-free catalog, loop seamlessly, and duck audio under gameplay sound effects.
@@ -88,7 +90,7 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `PeerTubeClient`: Open-source decentralized video hosting client implementing `BasePublisher` via PeerTube REST API v1 (federated across the global ActivityPub Fediverse).
   - `FediverseBroadcaster`: Cross-posts rich release announcements with custom thumbnails, video links, and dynamic hashtags to Mastodon and Lemmy communities.
   - `MultiPlatformPublisher`: Orchestrates primary publishing (YouTube) and non-blocking open-source mirrors and social broadcasts (PeerTube + Fediverse), preserving fail-safe pipeline semantics.
-  - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, search-intent tutorial formula (`search_guide`, +37% viewer retention), persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`).
+  - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, search-intent tutorial formula (`search_guide`, +37% viewer retention), Title History Anti-Repetition Guard (`is_title_repetitive` vs last 10 episodes in `data/series_tracker.json`), persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`).
   - `MetadataLocalizer` (`src/publisher/localization.py`): Multi-language translation engine producing YouTube Data API v3 `localizations` payloads and synchronized `.srt` Closed Caption tracks for key player regions: Russian (`ru`), Portuguese (`pt`), and Spanish (`es`).
   - `DynamicTagGenerator` (`src/publisher/metadata_generator.py`): Dynamically analyzes gameplay events and titles to synthesize ~50 trending hashtags via Gemini AI or multi-cluster contextual algorithmic selection with seeded rotation.
 - **Interface**: `BasePublisher`
