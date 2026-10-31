@@ -2663,5 +2663,38 @@
       "privacy_redacted": true,
       "md5_checksum": "b8bfd18ef7ac32efe97a0bddf273f3cd"
     }
+  },
+  {
+    "job_id": "job_20261031_230057",
+    "timestamp": "2026-10-31T23:00:57.618655+00:00",
+    "input_filename": "ScreenRecording_10-30-2026 17-33-09_1.mp4",
+    "output_filename": "ScreenRecording_10-30-2026_17-33-09_1_Processed_31102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "bYkAAhebukY",
+    "youtube_url": "https://youtu.be/bYkAAhebukY",
+    "details": {
+      "video_id": "bYkAAhebukY",
+      "youtube_url": "https://youtu.be/bYkAAhebukY",
+      "video_output": "output/ScreenRecording_10-30-2026_17-33-09_1_Processed_31102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-30-2026_17-33-09_1_Processed_31102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-30-2026_17-33-09_1_Processed_31102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Base Storage Optimization! | LDoE Survival #87",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Organizing Storage & Chests Plus... #87",
+        "walkthrough": "Surviving Day 87: Workbench & Blueprints And Organizing Storage & Chests Plus Entering Home... #87",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #87"
+      },
+      "duration_seconds": 1053.895601,
+      "soundtrack_tracks": [
+        "Pamgaea",
+        "Life of Riley",
+        "Carefree",
+        "Clean Soul",
+        "Wallpaper"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "2ec1bc6634df12c67ad56ebc856566ef"
+    }
   }
 ]

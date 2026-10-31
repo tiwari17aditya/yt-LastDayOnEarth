@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 87,
+  "current_episode": 88,
   "completed_episodes": [
     {
       "episode": 1,
@@ -579,6 +579,13 @@
       "video_id": "sZqF7cTpZ9o",
       "youtube_url": "https://youtu.be/sZqF7cTpZ9o",
       "job_id": "sZqF7cTpZ9o"
+    },
+    {
+      "episode": 87,
+      "title": "Surviving Day 87: Workbench & Blueprints And Organizing Storage & Chests Plus Entering Home... #87",
+      "video_id": "bYkAAhebukY",
+      "youtube_url": "https://youtu.be/bYkAAhebukY",
+      "job_id": "bYkAAhebukY"
     }
   ]
 }
