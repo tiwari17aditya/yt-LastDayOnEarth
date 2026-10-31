@@ -2620,5 +2620,48 @@
       "privacy_redacted": true,
       "md5_checksum": "8f469c2b95c02163619536a410403bb2"
     }
+  },
+  {
+    "job_id": "job_20261031_194814",
+    "timestamp": "2026-10-31T19:48:14.292762+00:00",
+    "input_filename": "ScreenRecording_10-30-2026 14-00-06_1.mp4",
+    "output_filename": "ScreenRecording_10-30-2026_14-00-06_1_Processed_31102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "sZqF7cTpZ9o",
+    "youtube_url": "https://youtu.be/sZqF7cTpZ9o",
+    "details": {
+      "video_id": "sZqF7cTpZ9o",
+      "youtube_url": "https://youtu.be/sZqF7cTpZ9o",
+      "video_output": "output/ScreenRecording_10-30-2026_14-00-06_1_Processed_31102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-30-2026_14-00-06_1_Processed_31102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-30-2026_14-00-06_1_Processed_31102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #86",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Entering... #86",
+        "walkthrough": "Surviving Day 86: Workbench & Blueprints And Home Base Operations Plus Entering Home Base | LDoE",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #86"
+      },
+      "duration_seconds": 2558.044694,
+      "soundtrack_tracks": [
+        "Clear Waters",
+        "Shores of Avalon",
+        "Electro Cabello",
+        "Monkeys Spinning Monkeys",
+        "Volatile Reaction",
+        "Local Forecast",
+        "Bossa Antigua",
+        "Decisions",
+        "Daily Beetle",
+        "Groove Grove",
+        "Somewhere Sunny",
+        "Carefree",
+        "Groove Grove",
+        "Clear Waters",
+        "Constance"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "b8bfd18ef7ac32efe97a0bddf273f3cd"
+    }
   }
 ]
