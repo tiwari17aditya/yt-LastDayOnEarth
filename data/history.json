@@ -2389,5 +2389,121 @@
       "privacy_redacted": true,
       "md5_checksum": "3f282592625560d86cb6c902817cb418"
     }
+  },
+  {
+    "job_id": "job_20261030_230035",
+    "timestamp": "2026-10-30T23:00:35.271787+00:00",
+    "input_filename": "ScreenRecording_10-29-2026 15-37-30_1.mp4",
+    "output_filename": "ScreenRecording_10-29-2026_15-37-30_1_Processed_30102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "TDVI099cnaw",
+    "youtube_url": "https://youtu.be/TDVI099cnaw",
+    "details": {
+      "video_id": "TDVI099cnaw",
+      "youtube_url": "https://youtu.be/TDVI099cnaw",
+      "video_output": "output/ScreenRecording_10-29-2026_15-37-30_1_Processed_30102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-29-2026_15-37-30_1_Processed_30102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-29-2026_15-37-30_1_Processed_30102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization + Inventory & Resource Sorting! | LDoE Survival #79",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Inventory & Resource Sorting Plus... #79",
+        "walkthrough": "Surviving Day 79: Organizing Storage & Chests And Inventory & Resource Sorting Plus Home... #79",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #79"
+      },
+      "duration_seconds": 2569.310658,
+      "soundtrack_tracks": [
+        "Clean Soul",
+        "Somewhere Sunny",
+        "Bossa Antigua",
+        "Clean Soul",
+        "Fretless",
+        "Clear Waters",
+        "Electro Cabello",
+        "Shores of Avalon",
+        "Bossa Antigua",
+        "Constance",
+        "Urban Gauntlet",
+        "Pamgaea"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "1089ab897b0469a73397de5915dd332e"
+    }
+  },
+  {
+    "job_id": "job_20261030_231201",
+    "timestamp": "2026-10-30T23:12:01.075849+00:00",
+    "input_filename": "ScreenRecording_10-29-2026 17-18-22_1.mp4",
+    "output_filename": "ScreenRecording_10-29-2026_17-18-22_1_Processed_30102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "WH_h5uD_QSE",
+    "youtube_url": "https://youtu.be/WH_h5uD_QSE",
+    "details": {
+      "video_id": "WH_h5uD_QSE",
+      "youtube_url": "https://youtu.be/WH_h5uD_QSE",
+      "video_output": "output/ScreenRecording_10-29-2026_17-18-22_1_Processed_30102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-29-2026_17-18-22_1_Processed_30102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-29-2026_17-18-22_1_Processed_30102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #80",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus Home... #80",
+        "walkthrough": "Surviving Day 80: Workbench & Blueprints And Crafting Planks & Upgrades Plus Home Base... #80",
+        "search_guide": "How to Farm & Master Blueprint Upgrades + Woodcraft & Planks Fast | LDoE #80"
+      },
+      "duration_seconds": 621.363016,
+      "soundtrack_tracks": [
+        "Sneaky Snitch",
+        "Constance",
+        "Decisions",
+        "Somewhere Sunny",
+        "Shores of Avalon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "730aced781a32e39172ba13229e40470"
+    }
+  },
+  {
+    "job_id": "job_20261031_000700",
+    "timestamp": "2026-10-31T00:07:00.804095+00:00",
+    "input_filename": "ScreenRecording_10-29-2026 16-20-32_1.mp4",
+    "output_filename": "ScreenRecording_10-29-2026_16-20-32_1_Processed_30102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "NC1cC6kDUJc",
+    "youtube_url": "https://youtu.be/NC1cC6kDUJc",
+    "details": {
+      "video_id": "NC1cC6kDUJc",
+      "youtube_url": "https://youtu.be/NC1cC6kDUJc",
+      "video_output": "output/ScreenRecording_10-29-2026_16-20-32_1_Processed_30102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-29-2026_16-20-32_1_Processed_30102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-29-2026_16-20-32_1_Processed_30102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #81",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #81",
+        "walkthrough": "Surviving Day 81: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #81",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #81"
+      },
+      "duration_seconds": 2915.112472,
+      "soundtrack_tracks": [
+        "Pamgaea",
+        "Volatile Reaction",
+        "Clean Soul",
+        "Shores of Avalon",
+        "Life of Riley",
+        "Somewhere Sunny",
+        "Bossa Antigua",
+        "Decisions",
+        "Wallpaper",
+        "Carefree",
+        "Groove Grove",
+        "Wallpaper",
+        "Pamgaea",
+        "Clean Soul",
+        "Urban Gauntlet"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "f56efe6b4db676bae0dbfab0047c93ee"
+    }
   }
 ]

@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 79,
+  "current_episode": 82,
   "completed_episodes": [
     {
       "episode": 1,
@@ -530,6 +530,27 @@
       "video_id": "NMzr3Vq56nQ",
       "youtube_url": "https://youtu.be/NMzr3Vq56nQ",
       "job_id": "NMzr3Vq56nQ"
+    },
+    {
+      "episode": 79,
+      "title": "Can We Survive & Upgrade? Organizing Storage & Chests And Inventory & Resource Sorting Plus... #79",
+      "video_id": "TDVI099cnaw",
+      "youtube_url": "https://youtu.be/TDVI099cnaw",
+      "job_id": "TDVI099cnaw"
+    },
+    {
+      "episode": 80,
+      "title": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus Home... #80",
+      "video_id": "WH_h5uD_QSE",
+      "youtube_url": "https://youtu.be/WH_h5uD_QSE",
+      "job_id": "WH_h5uD_QSE"
+    },
+    {
+      "episode": 81,
+      "title": "Bunker Alfa Infiltration & Red Crate Run! | LDoE Survival #81",
+      "video_id": "NC1cC6kDUJc",
+      "youtube_url": "https://youtu.be/NC1cC6kDUJc",
+      "job_id": "NC1cC6kDUJc"
     }
   ]
 }
