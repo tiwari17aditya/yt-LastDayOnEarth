@@ -2505,5 +2505,42 @@
       "privacy_redacted": true,
       "md5_checksum": "f56efe6b4db676bae0dbfab0047c93ee"
     }
+  },
+  {
+    "job_id": "job_20261031_022547",
+    "timestamp": "2026-10-31T02:25:47.210459+00:00",
+    "input_filename": "ScreenRecording_10-29-2026 22-35-23_1.mp4",
+    "output_filename": "ScreenRecording_10-29-2026_22-35-23_1_Processed_31102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "hiwqyCVD8rg",
+    "youtube_url": "https://youtu.be/hiwqyCVD8rg",
+    "details": {
+      "video_id": "hiwqyCVD8rg",
+      "youtube_url": "https://youtu.be/hiwqyCVD8rg",
+      "video_output": "output/ScreenRecording_10-29-2026_22-35-23_1_Processed_31102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-29-2026_22-35-23_1_Processed_31102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-29-2026_22-35-23_1_Processed_31102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Entering Home Base! | LDoE Survival #83",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Entering Home Base Plus Organizing... #83",
+        "walkthrough": "Surviving Day 83: Workbench & Blueprints And Entering Home Base Plus Organizing Storage &... #83",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #83"
+      },
+      "duration_seconds": 1727.415964,
+      "soundtrack_tracks": [
+        "Shores of Avalon",
+        "Wallpaper",
+        "Urban Gauntlet",
+        "Pamgaea",
+        "Shores of Avalon",
+        "Volatile Reaction",
+        "Monkeys Spinning Monkeys",
+        "Shores of Avalon",
+        "Volatile Reaction"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "1dabfc83fc1bb26500d76e255d80e05c"
+    }
   }
 ]
