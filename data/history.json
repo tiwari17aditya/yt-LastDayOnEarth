@@ -2583,5 +2583,42 @@
       "privacy_redacted": true,
       "md5_checksum": "af8f26ec580b2cde1ceef5ab7a67be7f"
     }
+  },
+  {
+    "job_id": "job_20261031_151507",
+    "timestamp": "2026-10-31T15:15:07.625825+00:00",
+    "input_filename": "ScreenRecording_10-30-2026 14-42-52_1.mp4",
+    "output_filename": "ScreenRecording_10-30-2026_14-42-52_1_Processed_31102026.mp4",
+    "status": "SUCCESS",
+    "video_id": "8g57dQ8QvP8",
+    "youtube_url": "https://youtu.be/8g57dQ8QvP8",
+    "details": {
+      "video_id": "8g57dQ8QvP8",
+      "youtube_url": "https://youtu.be/8g57dQ8QvP8",
+      "video_output": "output/ScreenRecording_10-30-2026_14-42-52_1_Processed_31102026.mp4",
+      "metadata_output": "output/ScreenRecording_10-30-2026_14-42-52_1_Processed_31102026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-30-2026_14-42-52_1_Processed_31102026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #85",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #85",
+        "walkthrough": "Surviving Day 85: Workbench & Blueprints And Crafting Planks & Upgrades Plus Organizing... #85",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #85"
+      },
+      "duration_seconds": 1781.181202,
+      "soundtrack_tracks": [
+        "Clean Soul",
+        "Urban Gauntlet",
+        "Pamgaea",
+        "Constance",
+        "Bossa Antigua",
+        "Local Forecast",
+        "Volatile Reaction",
+        "Urban Gauntlet",
+        "Daily Beetle"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "8f469c2b95c02163619536a410403bb2"
+    }
   }
 ]
