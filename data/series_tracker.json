@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 84,
+  "current_episode": 85,
   "completed_episodes": [
     {
       "episode": 1,
@@ -558,6 +558,13 @@
       "video_id": "hiwqyCVD8rg",
       "youtube_url": "https://youtu.be/hiwqyCVD8rg",
       "job_id": "hiwqyCVD8rg"
+    },
+    {
+      "episode": 84,
+      "title": "Zombie Horde Survival & Base Fortification! | LDoE Survival #84",
+      "video_id": "JOOUmu7sS6U",
+      "youtube_url": "https://youtu.be/JOOUmu7sS6U",
+      "job_id": "JOOUmu7sS6U"
     }
   ]
 }
