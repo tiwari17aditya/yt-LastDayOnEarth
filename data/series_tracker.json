@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 78,
+  "current_episode": 91,
   "completed_episodes": [
     {
       "episode": 1,
@@ -523,6 +523,90 @@
       "video_id": "f76QIuPBMhw",
       "youtube_url": "https://youtu.be/f76QIuPBMhw",
       "job_id": "f76QIuPBMhw"
+    },
+    {
+      "episode": 78,
+      "title": "Best Base Storage & Workshop Layout Guide | LDoE #78",
+      "video_id": "NMzr3Vq56nQ",
+      "youtube_url": "https://youtu.be/NMzr3Vq56nQ",
+      "job_id": "NMzr3Vq56nQ"
+    },
+    {
+      "episode": 79,
+      "title": "Can We Survive & Upgrade? Organizing Storage & Chests And Inventory & Resource Sorting Plus... #79",
+      "video_id": "TDVI099cnaw",
+      "youtube_url": "https://youtu.be/TDVI099cnaw",
+      "job_id": "TDVI099cnaw"
+    },
+    {
+      "episode": 80,
+      "title": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus Home... #80",
+      "video_id": "WH_h5uD_QSE",
+      "youtube_url": "https://youtu.be/WH_h5uD_QSE",
+      "job_id": "WH_h5uD_QSE"
+    },
+    {
+      "episode": 81,
+      "title": "Bunker Alfa Infiltration & Red Crate Run! | LDoE Survival #81",
+      "video_id": "NC1cC6kDUJc",
+      "youtube_url": "https://youtu.be/NC1cC6kDUJc",
+      "job_id": "NC1cC6kDUJc"
+    },
+    {
+      "episode": 83,
+      "title": "Crooked Creek Farm Clearing & Combat! | LDoE Survival #83",
+      "video_id": "hiwqyCVD8rg",
+      "youtube_url": "https://youtu.be/hiwqyCVD8rg",
+      "job_id": "hiwqyCVD8rg"
+    },
+    {
+      "episode": 84,
+      "title": "Zombie Horde Survival & Base Fortification! | LDoE Survival #84",
+      "video_id": "JOOUmu7sS6U",
+      "youtube_url": "https://youtu.be/JOOUmu7sS6U",
+      "job_id": "JOOUmu7sS6U"
+    },
+    {
+      "episode": 85,
+      "title": "Chopper Motorcycle Assembly & Fuel Run! | LDoE Survival #85",
+      "video_id": "8g57dQ8QvP8",
+      "youtube_url": "https://youtu.be/8g57dQ8QvP8",
+      "job_id": "8g57dQ8QvP8"
+    },
+    {
+      "episode": 86,
+      "title": "High-Value Resource Scavenge & Smelting! | LDoE Survival #86",
+      "video_id": "sZqF7cTpZ9o",
+      "youtube_url": "https://youtu.be/sZqF7cTpZ9o",
+      "job_id": "sZqF7cTpZ9o"
+    },
+    {
+      "episode": 87,
+      "title": "Surviving Day 87: Workbench & Blueprints And Organizing Storage & Chests Plus Entering Home... #87",
+      "video_id": "bYkAAhebukY",
+      "youtube_url": "https://youtu.be/bYkAAhebukY",
+      "job_id": "bYkAAhebukY"
+    },
+    {
+      "episode": 88,
+      "title": "Bunker Alfa Infiltration & Red Crate Run! | LDoE Survival #88",
+      "video_id": "wHI1egud9Lo",
+      "youtube_url": "https://youtu.be/wHI1egud9Lo",
+      "job_id": "wHI1egud9Lo"
+    },
+    {
+      "episode": 89,
+      "title": "Blueprint Upgrades & Entering Home Base! | LDoE Survival #89",
+      "video_id": "MfX4cBNcWrc",
+      "youtube_url": "https://youtu.be/MfX4cBNcWrc",
+      "job_id": "MfX4cBNcWrc"
+    },
+    {
+      "episode": 90,
+      "title": "Crooked Creek Farm Clearing & Combat! | LDoE Survival #90",
+      "video_id": "wcTLxpShrK0",
+      "youtube_url": "https://youtu.be/wcTLxpShrK0",
+      "job_id": "wcTLxpShrK0"
     }
   ]
 }
