@@ -2774,5 +2774,47 @@
       "privacy_redacted": true,
       "md5_checksum": "cac3d732c3495fbaf733499806e0a5c9"
     }
+  },
+  {
+    "job_id": "job_20261101_161430",
+    "timestamp": "2026-11-01T16:14:30.176450+00:00",
+    "input_filename": "ScreenRecording_10-31-2026 01-26-59_1.mp4",
+    "output_filename": "ScreenRecording_10-31-2026_01-26-59_1_Processed_01112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "wcTLxpShrK0",
+    "youtube_url": "https://youtu.be/wcTLxpShrK0",
+    "details": {
+      "video_id": "wcTLxpShrK0",
+      "youtube_url": "https://youtu.be/wcTLxpShrK0",
+      "video_output": "output/ScreenRecording_10-31-2026_01-26-59_1_Processed_01112026.mp4",
+      "metadata_output": "output/ScreenRecording_10-31-2026_01-26-59_1_Processed_01112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-31-2026_01-26-59_1_Processed_01112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #90",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #90",
+        "walkthrough": "Surviving Day 90: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #90",
+        "search_guide": "How to Farm & Master Blueprint Upgrades & Home Base Operations Fast | LDoE #90"
+      },
+      "duration_seconds": 2310.417302,
+      "soundtrack_tracks": [
+        "Pamgaea",
+        "Constance",
+        "Groove Grove",
+        "Monkeys Spinning Monkeys",
+        "Constance",
+        "Carefree",
+        "Urban Gauntlet",
+        "Clear Waters",
+        "Sneaky Snitch",
+        "Life of Riley",
+        "Urban Gauntlet",
+        "Constance",
+        "Carefree",
+        "Pamgaea"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "c4beb66ece97abf56c524334e533a08a"
+    }
   }
 ]
