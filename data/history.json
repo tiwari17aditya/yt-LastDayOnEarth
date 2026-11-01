@@ -2696,5 +2696,39 @@
       "privacy_redacted": true,
       "md5_checksum": "2ec1bc6634df12c67ad56ebc856566ef"
     }
+  },
+  {
+    "job_id": "job_20261101_021433",
+    "timestamp": "2026-11-01T02:14:33.953327+00:00",
+    "input_filename": "ScreenRecording_10-30-2026 17-09-54_1.mp4",
+    "output_filename": "ScreenRecording_10-30-2026_17-09-54_1_Processed_01112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "wHI1egud9Lo",
+    "youtube_url": "https://youtu.be/wHI1egud9Lo",
+    "details": {
+      "video_id": "wHI1egud9Lo",
+      "youtube_url": "https://youtu.be/wHI1egud9Lo",
+      "video_output": "output/ScreenRecording_10-30-2026_17-09-54_1_Processed_01112026.mp4",
+      "metadata_output": "output/ScreenRecording_10-30-2026_17-09-54_1_Processed_01112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-30-2026_17-09-54_1_Processed_01112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Home Base Operations! | LDoE Survival #88",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Home Base Operations Plus Base... #88",
+        "walkthrough": "Surviving Day 88: Organizing Storage & Chests And Home Base Operations Plus Base Defense &... #88",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #88"
+      },
+      "duration_seconds": 1309.488503,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Clean Soul",
+        "Shores of Avalon",
+        "Monkeys Spinning Monkeys",
+        "Fretless",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "4f3665ff772e9298ae78eb234764f4ba"
+    }
   }
 ]
