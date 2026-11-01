@@ -2730,5 +2730,49 @@
       "privacy_redacted": true,
       "md5_checksum": "4f3665ff772e9298ae78eb234764f4ba"
     }
+  },
+  {
+    "job_id": "job_20261101_093005",
+    "timestamp": "2026-11-01T09:30:05.333243+00:00",
+    "input_filename": "ScreenRecording_10-30-2026 16-23-37_1.mp4",
+    "output_filename": "ScreenRecording_10-30-2026_16-23-37_1_Processed_01112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "MfX4cBNcWrc",
+    "youtube_url": "https://youtu.be/MfX4cBNcWrc",
+    "details": {
+      "video_id": "MfX4cBNcWrc",
+      "youtube_url": "https://youtu.be/MfX4cBNcWrc",
+      "video_output": "output/ScreenRecording_10-30-2026_16-23-37_1_Processed_01112026.mp4",
+      "metadata_output": "output/ScreenRecording_10-30-2026_16-23-37_1_Processed_01112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-30-2026_16-23-37_1_Processed_01112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Entering Home Base! | LDoE Survival #89",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Entering Home Base Plus Crafting... #89",
+        "walkthrough": "Surviving Day 89: Workbench & Blueprints And Entering Home Base Plus Crafting Planks &... #89",
+        "search_guide": "How to Farm & Master Blueprint Upgrades & Entering Home Base Fast | LDoE #89"
+      },
+      "duration_seconds": 2765.851043,
+      "soundtrack_tracks": [
+        "Electro Cabello",
+        "Groove Grove",
+        "Shores of Avalon",
+        "Decisions",
+        "Somewhere Sunny",
+        "Electro Cabello",
+        "Clear Waters",
+        "Urban Gauntlet",
+        "Local Forecast",
+        "Volatile Reaction",
+        "Clean Soul",
+        "Sneaky Snitch",
+        "Clear Waters",
+        "Clean Soul",
+        "Monkeys Spinning Monkeys",
+        "Local Forecast"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "cac3d732c3495fbaf733499806e0a5c9"
+    }
   }
 ]
