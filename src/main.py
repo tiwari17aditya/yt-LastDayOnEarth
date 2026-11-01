@@ -77,6 +77,8 @@ def calculate_file_md5(file_path: Path) -> str:
             hasher.update(chunk)
     return hasher.hexdigest()
 from src.privacy.detector import PrivacyDetector
+from src.privacy.ad_detector import AdDetector, AdSegment
+from src.processor.ad_remover import AdRemover
 from src.subtitles.event_analyzer import SubtitleGenerator
 from src.audio.selector import AudioMixer
 from src.processor.video_processor import VideoProcessor
@@ -152,6 +154,13 @@ def run_pipeline(
 
     # Initialize subsystems
     privacy_guard = PrivacyDetector()
+    ad_detector = AdDetector(
+        gemini_api_key=settings.gemini.api_key or "",
+        gemini_model=settings.gemini.model,
+        min_ad_duration=getattr(settings.processing, "min_ad_duration", 4.0),
+        max_ad_duration=getattr(settings.processing, "max_ad_duration", 120.0),
+    )
+    ad_remover = AdRemover(output_dir=settings.processing.temp_dir)
     subtitle_engine = SubtitleGenerator(gemini_api_key=settings.gemini.api_key or "", model_name=settings.gemini.model)
     audio_mixer = AudioMixer(library_path=settings.processing.music_library_file)
     processor = VideoProcessor(output_dir=settings.processing.output_dir)
@@ -233,11 +242,40 @@ def run_pipeline(
         return output_path
 
     try:
+        # Step 0: In-Game Mobile Advertisement Detection & Excision
+        working_video_path = input_video_path
+        detected_ads = []
+        if getattr(settings.processing, "remove_ads", True):
+            try:
+                logger.info("Step 0/6: Scanning video for in-game advertisements...")
+                detected_ads = ad_detector.detect_ads(input_video_path)
+                if detected_ads:
+                    logger.info(f"Detected {len(detected_ads)} in-game advertisement(s). Excising commercials...")
+                    clean_output_path = settings.processing.temp_dir / f"{input_video_path.stem}_clean{input_video_path.suffix}"
+                    working_video_path = ad_remover.remove_ads(
+                        input_video=input_video_path,
+                        ad_segments=detected_ads,
+                        output_video=clean_output_path,
+                    )
+                    logger.info(f"Clean video ready for downstream processing: {working_video_path}")
+            except Exception as ade:
+                logger.warning(
+                    f"Ad detection/removal degraded: {ade}. Proceeding with original video.",
+                    extra_data={
+                        "operation": "remove_ads",
+                        "component": "AdDetector",
+                        "file": str(input_video_path),
+                        "root_cause": str(ade),
+                        "status": "DEGRADED",
+                    },
+                )
+                working_video_path = input_video_path
+
         # Step 1: Privacy Protection (Redacting sensitive popups, preserving username & chat)
         blur_filter = None
         try:
             logger.info("Step 1/6: Scanning for sensitive personal data")
-            bboxes = privacy_guard.scan_video(input_video_path)
+            bboxes = privacy_guard.scan_video(working_video_path)
             blur_filter = privacy_guard.generate_ffmpeg_blur_filter(bboxes)
             logger.info(f"Generated privacy filter: {blur_filter}")
         except Exception as pe:
@@ -246,7 +284,7 @@ def run_pipeline(
                 extra_data={
                     "operation": "privacy_scan",
                     "component": "PrivacyDetector",
-                    "file": str(input_video_path),
+                    "file": str(working_video_path),
                     "root_cause": str(pe),
                     "recovery_action": "Check easyocr dependencies; continuing execution without redaction.",
                     "status": "DEGRADED",
@@ -259,7 +297,7 @@ def run_pipeline(
         events = []
         try:
             logger.info("Step 2/6: Analyzing gameplay events and generating styled action cues")
-            events = subtitle_engine.analyze_events(input_video_path)
+            events = subtitle_engine.analyze_events(working_video_path)
             settings.processing.temp_dir.mkdir(parents=True, exist_ok=True)
             sub_path = settings.processing.temp_dir / f"{input_video_path.stem}.ass"
             subtitle_engine.generate_subtitles(events, sub_path)
@@ -270,7 +308,7 @@ def run_pipeline(
                 extra_data={
                     "operation": "subtitle_generation",
                     "component": "SubtitleEngine",
-                    "file": str(input_video_path),
+                    "file": str(working_video_path),
                     "root_cause": str(se),
                     "recovery_action": "Check Gemini API quota or network connection. Using default events.",
                     "status": "DEGRADED",
@@ -285,7 +323,7 @@ def run_pipeline(
             sub_path = None
 
         # Step 3: Soothing Royalty-Free Music Looping (Random tracks until video ends)
-        video_duration = processor.get_video_duration(input_video_path)
+        video_duration = processor.get_video_duration(working_video_path)
         music_file = None
         track_sequence = []
         try:
@@ -361,7 +399,7 @@ def run_pipeline(
 
         try:
             processor.render(
-                input_video=input_video_path,
+                input_video=working_video_path,
                 output_video=output_path,
                 subtitle_file=sub_path,
                 music_file=music_file,
@@ -528,6 +566,8 @@ def run_pipeline(
                     "soundtrack_tracks": [t["title"] for t in track_sequence],
                     "subtitles_burned": sub_path is not None,
                     "privacy_redacted": blur_filter is not None,
+                    "ads_removed_count": len(detected_ads),
+                    "ads_removed": [a.to_dict() for a in detected_ads],
                 },
             )
         except Exception as he:
@@ -584,6 +624,13 @@ def run_pipeline(
                             "status": "DEGRADED",
                         },
                     )
+
+        if working_video_path != input_video_path and working_video_path.exists():
+            try:
+                working_video_path.unlink()
+                logger.info(f"Cleaned temporary ad-excised working video: {working_video_path}")
+            except Exception as we:
+                logger.warning(f"Could not remove temporary ad-excised video: {we}")
 
         result = RenderResult(output_path)
         result.youtube_url = youtube_url
