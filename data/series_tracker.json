@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 91,
+  "current_episode": 92,
   "completed_episodes": [
     {
       "episode": 1,
@@ -607,6 +607,13 @@
       "video_id": "wcTLxpShrK0",
       "youtube_url": "https://youtu.be/wcTLxpShrK0",
       "job_id": "wcTLxpShrK0"
+    },
+    {
+      "episode": 91,
+      "title": "Workshop & Smelting + Home Base Operations! | LDoE Survival #91",
+      "video_id": "UVYxUdZzrfg",
+      "youtube_url": "https://youtu.be/UVYxUdZzrfg",
+      "job_id": "UVYxUdZzrfg"
     }
   ]
 }

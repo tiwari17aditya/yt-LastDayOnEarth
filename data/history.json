@@ -2816,5 +2816,47 @@
       "privacy_redacted": true,
       "md5_checksum": "c4beb66ece97abf56c524334e533a08a"
     }
+  },
+  {
+    "job_id": "job_20261101_210608",
+    "timestamp": "2026-11-01T21:06:08.724339+00:00",
+    "input_filename": "ScreenRecording_10-31-2026 03-42-47_1.mp4",
+    "output_filename": "ScreenRecording_10-31-2026_03-42-47_1_Processed_01112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "UVYxUdZzrfg",
+    "youtube_url": "https://youtu.be/UVYxUdZzrfg",
+    "details": {
+      "video_id": "UVYxUdZzrfg",
+      "youtube_url": "https://youtu.be/UVYxUdZzrfg",
+      "video_output": "output/ScreenRecording_10-31-2026_03-42-47_1_Processed_01112026.mp4",
+      "metadata_output": "output/ScreenRecording_10-31-2026_03-42-47_1_Processed_01112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-31-2026_03-42-47_1_Processed_01112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Home Base Operations! | LDoE Survival #91",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Home Base Operations Plus Base... #91",
+        "walkthrough": "Surviving Day 91: Workshop & Smelting Furnaces And Home Base Operations Plus Base Defense &... #91",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #91"
+      },
+      "duration_seconds": 3167.845057,
+      "soundtrack_tracks": [
+        "Shores of Avalon",
+        "Clean Soul",
+        "Urban Gauntlet",
+        "Daily Beetle",
+        "Clean Soul",
+        "Life of Riley",
+        "Fretless",
+        "Life of Riley",
+        "Constance",
+        "Fretless",
+        "Somewhere Sunny",
+        "Groove Grove",
+        "Constance",
+        "Groove Grove"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "md5_checksum": "136fa610e2dd664b98a09ea4a0e3674c"
+    }
   }
 ]
