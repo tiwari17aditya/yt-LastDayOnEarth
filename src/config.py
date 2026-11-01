@@ -159,6 +159,15 @@ class ProcessingSettings(BaseModel):
     outro_tail_duration: float = Field(
         default_factory=lambda: _safe_float(os.getenv("OUTRO_TAIL_DURATION"), 9.5)
     )
+    remove_ads: bool = Field(
+        default_factory=lambda: os.getenv("REMOVE_ADS", "true").lower() == "true"
+    )
+    min_ad_duration: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("MIN_AD_DURATION"), 4.0)
+    )
+    max_ad_duration: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("MAX_AD_DURATION"), 120.0)
+    )
 
 
 class PipelineSettings(BaseModel):

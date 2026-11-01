@@ -53,11 +53,16 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `cleanup_processed_folder() -> int`
   - `cleanup_old_output_videos(retention_days: int = 7) -> int`
 
-### 3.2 Privacy & PII Redaction (`src/privacy/`)
-- **Responsibility**: Detect personal identifiers (email addresses, phone push notifications, personal chat bubbles) in video frames and produce dynamic bounding boxes.
-- **Interface**: `BasePrivacyDetector`
-  - `detect_sensitive_regions(video_path: Path) -> List[BoundingBox]`
-  - `generate_ffmpeg_blur_filter(bboxes: List[BoundingBox]) -> str`
+### 3.2 Privacy, PII Redaction & In-Game Advertisement Excision (src/privacy/ and src/processor/)
+- **Responsibility**: Detect personal identifiers in video frames, and automatically identify and excise mobile in-game commercial advertisements (rewarded ads, countdown banners, install endcards) watched during gameplay.
+- **Components**:
+  - PrivacyDetector (src/privacy/detector.py): Scans video for sensitive notification popups while strictly preserving the player username, health bar, and in-game chat.
+  - AdDetector (src/privacy/ad_detector.py): Scans gameplay keyframes to detect commercial breaks via Gemini 2.5 Flash Vision multimodal analysis, with zero-dependency native Windows OCR (Windows.Media.Ocr), EasyOCR, and OpenCV HUD absence/pillarbox signature heuristics.
+  - AdRemover (src/processor/ad_remover.py): Computes keep intervals and performs FFmpeg sample-accurate stream trimming (	rim/trim) and concatenation (concat) to seamlessly excise advertisement segments with zero A/V desync, and shifts subsequent subtitle cues and chapter timestamps backwards to maintain perfect synchronization.
+- **Interface**:
+  - AdDetector.detect_ads(video_path: Path) -> List[AdSegment]
+  - AdRemover.remove_ads(input_video: Path, ad_segments: List[AdSegment], output_video: Optional[Path]) -> Path
+  - AdRemover.adjust_event_timestamps(events: List[GameplayEvent], ad_segments: List[AdSegment]) -> List[GameplayEvent]
 - **Safeguard**: Ignores fixed game HUD elements (character health bar, minimap, quick inventory, sneak button).
 
 ### 3.3 Subtitles & Context Engine (`src/subtitles/`)

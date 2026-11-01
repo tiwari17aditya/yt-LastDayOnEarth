@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-11-02
+
+### Added
+- **Automated In-Game Mobile Advertisement Detection & Excision Engine (src/privacy/ad_detector.py, src/processor/ad_remover.py)**:
+  - Implemented AdDetector supporting multimodal keyframe detection via Gemini 2.5 Flash Vision, zero-dependency native Windows OCR (Windows.Media.Ocr via src/privacy/windows_ocr.ps1), EasyOCR fallback, and OpenCV HUD/pillarbox signature heuristics.
+  - Implemented AdRemover calculating sample-accurate keep intervals and executing FFmpeg stream trimming and concatenation (	rim, trim, concat) with zero audio/video desync.
+  - Implemented dynamic event timestamp shifting (djust_event_timestamps) maintaining frame-accurate synchronization for downstream subtitles and YouTube chapters.
+  - Added pipeline integration in src/main.py (Step 0) routing clean excised gameplay video to privacy detector, subtitle generator, audio mixer, and renderer.
+  - Added configuration settings (REMOVE_ADS, MIN_AD_DURATION, MAX_AD_DURATION) in src/config.py and .env.example.
+  - Added unit test suite in 	ests/test_ad_remover.py (31/31 tests passing).
+  - Generated and uploaded sample demonstration comparison video to Google Drive cloud (Output/videos/2026/11/).
+
 ## [1.9.1] - 2026-10-30
 
 ### Fixed
