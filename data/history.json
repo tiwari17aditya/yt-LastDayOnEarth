@@ -2858,5 +2858,50 @@
       "privacy_redacted": true,
       "md5_checksum": "136fa610e2dd664b98a09ea4a0e3674c"
     }
+  },
+  {
+    "job_id": "job_20261102_003144",
+    "timestamp": "2026-11-02T00:31:44.603489+00:00",
+    "input_filename": "ScreenRecording_10-31-2026 12-19-32_1.mp4",
+    "output_filename": "ScreenRecording_10-31-2026_12-19-32_1_Processed_01112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "vKs_ycxdfXU",
+    "youtube_url": "https://youtu.be/vKs_ycxdfXU",
+    "details": {
+      "video_id": "vKs_ycxdfXU",
+      "youtube_url": "https://youtu.be/vKs_ycxdfXU",
+      "video_output": "output/ScreenRecording_10-31-2026_12-19-32_1_Processed_01112026.mp4",
+      "metadata_output": "output/ScreenRecording_10-31-2026_12-19-32_1_Processed_01112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-31-2026_12-19-32_1_Processed_01112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #92",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base Defense... #92",
+        "walkthrough": "Surviving Day 92: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #92",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #92"
+      },
+      "duration_seconds": 3052.795283,
+      "soundtrack_tracks": [
+        "Clean Soul",
+        "Life of Riley",
+        "Pamgaea",
+        "Local Forecast",
+        "Urban Gauntlet",
+        "Decisions",
+        "Somewhere Sunny",
+        "Constance",
+        "Fretless",
+        "Shores of Avalon",
+        "Life of Riley",
+        "Volatile Reaction",
+        "Local Forecast",
+        "Clean Soul",
+        "Fretless"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "930b36541b96109e826f9b5ee5f9a1ee"
+    }
   }
 ]
