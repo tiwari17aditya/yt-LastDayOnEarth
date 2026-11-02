@@ -2983,5 +2983,43 @@
       "ads_removed": [],
       "md5_checksum": "0515eab67a1f87b58c711d857f7a688e"
     }
+  },
+  {
+    "job_id": "job_20261102_224655",
+    "timestamp": "2026-11-02T22:46:55.084564+00:00",
+    "input_filename": "ScreenRecording_10-27-2026 22-52-50_1.mp4",
+    "output_filename": "ScreenRecording_10-27-2026_22-52-50_1_Processed_02112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "znYD9MKP2zA",
+    "youtube_url": "https://youtu.be/znYD9MKP2zA",
+    "details": {
+      "video_id": "znYD9MKP2zA",
+      "youtube_url": "https://youtu.be/znYD9MKP2zA",
+      "video_output": "output/ScreenRecording_10-27-2026_22-52-50_1_Processed_02112026.mp4",
+      "metadata_output": "output/ScreenRecording_10-27-2026_22-52-50_1_Processed_02112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_10-27-2026_22-52-50_1_Processed_02112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #96",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Base Defense & Maintenance Plus Entering... #96",
+        "walkthrough": "Surviving Day 96: Home Base Operations And Base Defense & Maintenance Plus Entering Home Base | LDoE",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #96"
+      },
+      "duration_seconds": 1394.026304,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Sneaky Snitch",
+        "Wallpaper",
+        "Groove Grove",
+        "Urban Gauntlet",
+        "Constance",
+        "Volatile Reaction",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "94283015c68010fa3291c86ad9fbf677"
+    }
   }
 ]
