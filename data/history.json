@@ -2938,5 +2938,50 @@
       "ads_removed": [],
       "md5_checksum": "8e6e5c5761c541df9068d01185e74557"
     }
+  },
+  {
+    "job_id": "job_20261102_131329",
+    "timestamp": "2026-11-02T13:13:29.480225+00:00",
+    "input_filename": "ScreenRecording_11-01-2026 00-14-11_1.mp4",
+    "output_filename": "ScreenRecording_11-01-2026_00-14-11_1_Processed_02112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "fPpCtjJ_bVk",
+    "youtube_url": "https://youtu.be/fPpCtjJ_bVk",
+    "details": {
+      "video_id": "fPpCtjJ_bVk",
+      "youtube_url": "https://youtu.be/fPpCtjJ_bVk",
+      "video_output": "output/ScreenRecording_11-01-2026_00-14-11_1_Processed_02112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-01-2026_00-14-11_1_Processed_02112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-01-2026_00-14-11_1_Processed_02112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Base Storage Optimization! | LDoE Survival #94",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Organizing Storage & Chests Plus... #94",
+        "walkthrough": "Surviving Day 94: Workbench & Blueprints And Organizing Storage & Chests Plus Inventory &... #94",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #94"
+      },
+      "duration_seconds": 2590.192902,
+      "soundtrack_tracks": [
+        "Constance",
+        "Life of Riley",
+        "Clean Soul",
+        "Electro Cabello",
+        "Monkeys Spinning Monkeys",
+        "Wallpaper",
+        "Somewhere Sunny",
+        "Monkeys Spinning Monkeys",
+        "Carefree",
+        "Clean Soul",
+        "Somewhere Sunny",
+        "Volatile Reaction",
+        "Clean Soul",
+        "Constance",
+        "Shores of Avalon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "0515eab67a1f87b58c711d857f7a688e"
+    }
   }
 ]
