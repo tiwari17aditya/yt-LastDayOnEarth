@@ -2903,5 +2903,40 @@
       "ads_removed": [],
       "md5_checksum": "930b36541b96109e826f9b5ee5f9a1ee"
     }
+  },
+  {
+    "job_id": "job_20261102_043242",
+    "timestamp": "2026-11-02T04:32:42.701459+00:00",
+    "input_filename": "ScreenRecording_11-01-2026 01-00-38_1.mp4",
+    "output_filename": "ScreenRecording_11-01-2026_01-00-38_1_Processed_02112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "B2oBFV9HVCs",
+    "youtube_url": "https://youtu.be/B2oBFV9HVCs",
+    "details": {
+      "video_id": "B2oBFV9HVCs",
+      "youtube_url": "https://youtu.be/B2oBFV9HVCs",
+      "video_output": "output/ScreenRecording_11-01-2026_01-00-38_1_Processed_02112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-01-2026_01-00-38_1_Processed_02112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-01-2026_01-00-38_1_Processed_02112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Home Base Operations! | LDoE Survival #93",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Home Base Operations Plus... #93",
+        "walkthrough": "Surviving Day 93: Workshop & Smelting Furnaces And Home Base Operations Plus Entering Home... #93",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #93"
+      },
+      "duration_seconds": 820.232222,
+      "soundtrack_tracks": [
+        "Daily Beetle",
+        "Sneaky Snitch",
+        "Pamgaea",
+        "Decisions",
+        "Life of Riley"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "8e6e5c5761c541df9068d01185e74557"
+    }
   }
 ]
