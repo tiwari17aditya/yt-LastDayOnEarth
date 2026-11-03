@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 98,
+  "current_episode": 99,
   "completed_episodes": [
     {
       "episode": 1,
@@ -649,6 +649,13 @@
       "video_id": "ELezRtrZ1JQ",
       "youtube_url": "https://youtu.be/ELezRtrZ1JQ",
       "job_id": "ELezRtrZ1JQ"
+    },
+    {
+      "episode": 98,
+      "title": "Chopper Motorcycle Assembly & Fuel Run! | LDoE Survival #98",
+      "video_id": "6FmvuEVOTs0",
+      "youtube_url": "https://youtu.be/6FmvuEVOTs0",
+      "job_id": "6FmvuEVOTs0"
     }
   ]
 }
