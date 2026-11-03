@@ -3088,5 +3088,76 @@
       "ads_removed": [],
       "md5_checksum": "3c81bee9fbbccaa4bf9520294b8a1e50"
     }
+  },
+  {
+    "job_id": "job_20261103_141928",
+    "timestamp": "2026-11-03T14:19:28.762048+00:00",
+    "input_filename": "ScreenRecording_11-02-2026 00-42-25_1.mp4",
+    "output_filename": "ScreenRecording_11-02-2026_00-42-25_1_Processed_03112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "UqxTw2pf60E",
+    "youtube_url": "https://youtu.be/UqxTw2pf60E",
+    "details": {
+      "video_id": "UqxTw2pf60E",
+      "youtube_url": "https://youtu.be/UqxTw2pf60E",
+      "video_output": "output/ScreenRecording_11-02-2026_00-42-25_1_Processed_03112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-02-2026_00-42-25_1_Processed_03112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-02-2026_00-42-25_1_Processed_03112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Home Base Operations! | LDoE Survival #99",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Home Base Operations Plus Organizing... #99",
+        "walkthrough": "Surviving Day 99: Entering Home Base And Home Base Operations Plus Organizing Storage &... #99",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #99"
+      },
+      "duration_seconds": 918.151769,
+      "soundtrack_tracks": [
+        "Pamgaea",
+        "Local Forecast",
+        "Somewhere Sunny",
+        "Groove Grove",
+        "Fretless"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "c065ab43542df529062508faa1120e85"
+    }
+  },
+  {
+    "job_id": "job_20261103_145345",
+    "timestamp": "2026-11-03T14:53:45.194405+00:00",
+    "input_filename": "ScreenRecording_11-01-2026 22-52-13_1.mp4",
+    "output_filename": "ScreenRecording_11-01-2026_22-52-13_1_Processed_03112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "MORdhYVHsao",
+    "youtube_url": "https://youtu.be/MORdhYVHsao",
+    "details": {
+      "video_id": "MORdhYVHsao",
+      "youtube_url": "https://youtu.be/MORdhYVHsao",
+      "video_output": "output/ScreenRecording_11-01-2026_22-52-13_1_Processed_03112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-01-2026_22-52-13_1_Processed_03112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-01-2026_22-52-13_1_Processed_03112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Home Base Operations! | LDoE Survival #100",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Home Base Operations Plus Base... #100",
+        "walkthrough": "Surviving Day 100: Organizing Storage & Chests And Home Base Operations Plus Base Defense... #100",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #100"
+      },
+      "duration_seconds": 944.399297,
+      "soundtrack_tracks": [
+        "Somewhere Sunny",
+        "Groove Grove",
+        "Sneaky Snitch",
+        "Wallpaper",
+        "Pamgaea",
+        "Carefree"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "5e898a8155391cf13e8351d64248dea3"
+    }
   }
 ]
