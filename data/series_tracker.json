@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 101,
+  "current_episode": 102,
   "completed_episodes": [
     {
       "episode": 1,
@@ -670,6 +670,13 @@
       "video_id": "MORdhYVHsao",
       "youtube_url": "https://youtu.be/MORdhYVHsao",
       "job_id": "MORdhYVHsao"
+    },
+    {
+      "episode": 101,
+      "title": "Entering Home Base & Blueprint Upgrades! | LDoE Survival #101",
+      "video_id": "AYTWyRyzfV8",
+      "youtube_url": "https://youtu.be/AYTWyRyzfV8",
+      "job_id": "AYTWyRyzfV8"
     }
   ]
 }

@@ -3159,5 +3159,46 @@
       "ads_removed": [],
       "md5_checksum": "5e898a8155391cf13e8351d64248dea3"
     }
+  },
+  {
+    "job_id": "job_20261103_200015",
+    "timestamp": "2026-11-03T20:00:15.506518+00:00",
+    "input_filename": "ScreenRecording_11-01-2026 22-22-52_1.mp4",
+    "output_filename": "ScreenRecording_11-01-2026_22-22-52_1_Processed_03112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "AYTWyRyzfV8",
+    "youtube_url": "https://youtu.be/AYTWyRyzfV8",
+    "details": {
+      "video_id": "AYTWyRyzfV8",
+      "youtube_url": "https://youtu.be/AYTWyRyzfV8",
+      "video_output": "output/ScreenRecording_11-01-2026_22-22-52_1_Processed_03112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-01-2026_22-22-52_1_Processed_03112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-01-2026_22-22-52_1_Processed_03112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Blueprint Upgrades! | LDoE Survival #101",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Workbench & Blueprints Plus Organizing... #101",
+        "walkthrough": "Surviving Day 101: Entering Home Base And Workbench & Blueprints Plus Organizing Storage &... #101",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #101"
+      },
+      "duration_seconds": 1753.842585,
+      "soundtrack_tracks": [
+        "Carefree",
+        "Pamgaea",
+        "Decisions",
+        "Groove Grove",
+        "Carefree",
+        "Decisions",
+        "Somewhere Sunny",
+        "Bossa Antigua",
+        "Constance",
+        "Local Forecast",
+        "Fretless"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "2c892a831eea49aa167ca06441bcb2d5"
+    }
   }
 ]
