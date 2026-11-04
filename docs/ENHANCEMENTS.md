@@ -96,12 +96,13 @@ This document outlines prioritized enhancements designed to maximize YouTube alg
   - Includes a teaser screenshot or thumbnail clip and an interactive poll (e.g., *"What should we build next in the base: Recycler or Gunsmith Bench?"*).
 * **Impact**: Re-engages non-active subscribers in the YouTube Home Feed.
 
-### Priority 10: Advanced SFX Dynamic Ducking
+### Priority 10: Advanced SFX Dynamic Ducking [CANCELLED / SKIPPED]
 * **Goal**: Preserve auditory clarity during loud in-game combat without sacrificing background music flow.
 * **Mechanism**:
   - Detect high RMS volume spikes from in-game gunshot and zombie horde audio.
   - Dynamically duck background soothing music by an additional -6dB during combat peaks, returning smoothly to -15dB during quiet base-building and sorting phases.
 * **Impact**: Professional studio broadcast sound quality; enhances viewer retention by eliminating audio fatigue.
+* **Status**: ❌ **Cancelled / Skipped** — Gameplay is recorded in silent mode (zero in-game sound effects / volume). The curated ambient soundtrack handles auditory pacing directly, rendering dynamic combat SFX ducking obsolete.
 
 ### Priority 11: YouTube Premiere Mode & Countdown Slate
 * **Goal**: Maximize concurrent viewer count and live chat interaction for milestone episodes (e.g., Episode #25, #50, #100).
@@ -116,7 +117,7 @@ This document outlines prioritized enhancements designed to maximize YouTube alg
 | **7. Animated Like/Share/Sub Outro Tail (5–8s)** | Phase 2 | Low/Med | +35% Subscriber Conversion | 🔥 High | ✅ Completed |
 | **8. Automated Shorts Pipeline & Scheduling** | Phase 2 | Medium | +50% Reach & Funnel | 🔥 High | 📋 Planned |
 | **9. Automated Community Posts & Polls** | Phase 3 | Low | +15% Return Viewers | ⚡ Medium | 📋 Planned |
-| **10. Dynamic Combat SFX Audio Ducking** | Phase 3 | Medium | +10% Watch Time | ⚡ Medium | 📋 Planned |
+| **10. Dynamic Combat SFX Audio Ducking** | Phase 3 | Medium | +10% Watch Time | ⚡ Medium | ❌ Cancelled (Silent Mode) |
 | **11. YouTube Premiere Milestone Automation** | Phase 3 | Low | +25% Day-1 Velocity | 💡 Strategic | 📋 Planned |
 
 
