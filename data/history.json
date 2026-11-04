@@ -3288,5 +3288,48 @@
       "ads_removed": [],
       "md5_checksum": "65ecd419d9a9a78109b1ceffe6ec5028"
     }
+  },
+  {
+    "job_id": "job_20261104_144727",
+    "timestamp": "2026-11-04T14:47:27.229954+00:00",
+    "input_filename": "ScreenRecording_11-02-2026 20-31-36_1.mp4",
+    "output_filename": "ScreenRecording_11-02-2026_20-31-36_1_Processed_04112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "i1NG_4Gk7jM",
+    "youtube_url": "https://youtu.be/i1NG_4Gk7jM",
+    "details": {
+      "video_id": "i1NG_4Gk7jM",
+      "youtube_url": "https://youtu.be/i1NG_4Gk7jM",
+      "video_output": "output/ScreenRecording_11-02-2026_20-31-36_1_Processed_04112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-02-2026_20-31-36_1_Processed_04112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-02-2026_20-31-36_1_Processed_04112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #104",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base... #104",
+        "walkthrough": "Surviving Day 104: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #104",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #104"
+      },
+      "duration_seconds": 2480.120181,
+      "soundtrack_tracks": [
+        "Daily Beetle",
+        "Sneaky Snitch",
+        "Clear Waters",
+        "Shores of Avalon",
+        "Local Forecast",
+        "Constance",
+        "Clean Soul",
+        "Monkeys Spinning Monkeys",
+        "Bossa Antigua",
+        "Groove Grove",
+        "Constance",
+        "Wallpaper",
+        "Life of Riley"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "da2d053be8f8a0ad1fbc50488a75b0d5"
+    }
   }
 ]
