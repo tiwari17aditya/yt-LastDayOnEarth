@@ -192,6 +192,116 @@ class ShortsGenerator:
             "hook_type": "highlight",
         }
 
+    def auto_detect_highlights(
+        self,
+        events: List[Any],
+        count: int = 1,
+        min_start: float = 30.0,
+        video_duration: Optional[float] = None,
+    ) -> List[Dict[str, Any]]:
+        """Detects up to `count` non-overlapping high-engagement highlight segments."""
+        count = max(1, min(count, 3))
+        selected: List[Dict[str, Any]] = []
+
+        # 1. First priority: High-emotion viral moment
+        first = self.auto_detect_viral_moment(events, min_start=min_start)
+        selected.append(first)
+
+        if count == 1:
+            return selected
+
+        # 2. Find subsequent distinct moments separated by at least 45 seconds
+        categories = [
+            (["craft", "smelt", "furnace", "workbench", "titanium", "steel"], "RAREST CRAFT UNLOCKED?!", "BASE WORKSHOP UPGRADE", "crafting"),
+            (["horde", "zombie", "bunker", "boss", "red zone", "farm"], "ZOMBIE HORDE ASSAULT?!", "DEFENDING THE PERIMETER", "combat"),
+            (["chest", "crate", "loot", "chopper", "weapon"], "JACKPOT LOOT DROP?!", "RED ZONE RUN CHECK", "loot"),
+        ]
+
+        def _is_overlapping(st: float) -> bool:
+            return any(abs(st - s["start_time"]) < 45.0 for s in selected)
+
+        # Search events matching other categories
+        for keywords, headline, subtitle, hook_type in categories:
+            if len(selected) >= count:
+                break
+            for ev in events:
+                desc = getattr(ev, "description", "").lower()
+                st = float(getattr(ev, "start_time", 0.0))
+                if st >= min_start and any(k in desc for k in keywords) and not _is_overlapping(st):
+                    selected.append({
+                        "start_time": st,
+                        "duration": 35.0,
+                        "headline": headline,
+                        "subtitle": subtitle,
+                        "hook_type": hook_type,
+                    })
+                    break
+
+        # Fallback if events were sparse: space intervals along video duration
+        if len(selected) < count and video_duration and video_duration > 90.0:
+            fallback_offsets = [video_duration * 0.35, video_duration * 0.70]
+            for offset in fallback_offsets:
+                if len(selected) >= count:
+                    break
+                if not _is_overlapping(offset) and offset + 35.0 <= video_duration:
+                    selected.append({
+                        "start_time": round(offset, 1),
+                        "duration": 35.0,
+                        "headline": "SURVIVAL HIGHLIGHT",
+                        "subtitle": "LAST DAY ON EARTH",
+                        "hook_type": "spaced_fallback",
+                    })
+
+        return selected[:count]
+
+    def generate_shorts_for_episode(
+        self,
+        input_video: Path,
+        events: List[Any],
+        episode_number: Optional[int] = None,
+        count: int = 1,
+        video_duration: Optional[float] = None,
+        output_dir: Optional[Path] = None,
+    ) -> List[Dict[str, Any]]:
+        """Extracts and renders multiple 9:16 Shorts from an episode video."""
+        target_dir = output_dir or self.output_dir
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        moments = self.auto_detect_highlights(
+            events=events,
+            count=count,
+            min_start=30.0,
+            video_duration=video_duration,
+        )
+
+        results: List[Dict[str, Any]] = []
+        for idx, m in enumerate(moments, start=1):
+            ep_tag = f"_ep{episode_number}" if episode_number else ""
+            out_filename = f"{input_video.stem}{ep_tag}_short_{idx}.mp4"
+            out_path = target_dir / out_filename
+
+            rendered = self.generate_short(
+                input_video=input_video,
+                output_path=out_path,
+                start_time=m["start_time"],
+                duration=m["duration"],
+                headline=m["headline"],
+                subtitle=m["subtitle"],
+                episode_number=episode_number,
+            )
+
+            results.append({
+                "video_path": rendered,
+                "start_time": m["start_time"],
+                "duration": m["duration"],
+                "headline": m["headline"],
+                "subtitle": m["subtitle"],
+                "hook_type": m["hook_type"],
+                "index": idx,
+            })
+
+        return results
+
     def generate_short(
         self,
         input_video: Path,

@@ -168,6 +168,18 @@ class ProcessingSettings(BaseModel):
     max_ad_duration: float = Field(
         default_factory=lambda: _safe_float(os.getenv("MAX_AD_DURATION"), 120.0)
     )
+    shorts_automation_enabled: bool = Field(
+        default_factory=lambda: os.getenv("SHORTS_AUTOMATION_ENABLED", "true").lower() == "true"
+    )
+    shorts_per_episode: int = Field(
+        default_factory=lambda: _safe_int(os.getenv("SHORTS_PER_EPISODE"), 1)
+    )
+    shorts_schedule_delay_hours: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("SHORTS_SCHEDULE_DELAY_HOURS"), 6.0)
+    )
+    shorts_privacy_status: str = Field(
+        default_factory=lambda: os.getenv("SHORTS_PRIVACY_STATUS", "scheduled")
+    )
 
 
 class PipelineSettings(BaseModel):

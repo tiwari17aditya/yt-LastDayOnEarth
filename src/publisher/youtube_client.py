@@ -698,6 +698,24 @@ class YouTubeClient(BasePublisher):
                 file_path=str(video_path),
             )
 
+    def get_service(self) -> Any:
+        """Builds and returns authenticated YouTube Data API v3 service."""
+        try:
+            from googleapiclient.discovery import build
+            from src.google_auth import get_google_credentials
+            creds = get_google_credentials(
+                scopes=[
+                    "https://www.googleapis.com/auth/youtube.upload",
+                    "https://www.googleapis.com/auth/youtube.force-ssl",
+                ]
+            )
+            if not creds:
+                return None
+            return build("youtube", "v3", credentials=creds, cache_discovery=False)
+        except Exception as e:
+            logger.warning(f"Could not build YouTube API service: {e}")
+            return None
+
     def check_quota_available(self) -> bool:
         """Pre-flight check: calls lightweight channels.list (costs only 1 quota unit).
 
@@ -718,4 +736,166 @@ class YouTubeClient(BasePublisher):
                 return False
             # For non-quota errors (e.g. mock or transient network), don't block
             return True
+
+    def upload_short(
+        self,
+        short_video_path: Path,
+        parent_video_title: str,
+        parent_video_id: str,
+        short_info: Dict[str, Any],
+        episode_number: Optional[int] = None,
+        schedule_time: Optional[Any] = None,
+        privacy_status: str = "scheduled",
+    ) -> Dict[str, Any]:
+        """Uploads and optionally schedules a 9:16 vertical YouTube Short linked to the main episode."""
+        if not short_video_path.exists():
+            raise PublishingError(
+                operation="upload_short",
+                root_cause=f"Shorts video file not found: {short_video_path}",
+                recovery_action="Ensure the Shorts generator successfully rendered the 9:16 video.",
+                file_path=str(short_video_path),
+            )
+
+        logger.info(
+            f"Initiating YouTube Short upload: {short_video_path.name}",
+            extra_data={"parent_id": parent_video_id, "headline": short_info.get("headline")},
+        )
+
+        try:
+            from googleapiclient.http import MediaFileUpload
+
+            youtube = self.get_service()
+            if not youtube:
+                raise PublishingError(
+                    operation="upload_short",
+                    root_cause="Missing YouTube OAuth credentials.",
+                    recovery_action="Configure YouTube credentials in .env.",
+                    file_path=str(short_video_path),
+                )
+
+            # Build short title ensuring it stays <= 100 chars and ends with #Shorts
+            headline = short_info.get("headline", "LAST DAY ON EARTH").strip()
+            ep_str = f"Ep #{episode_number}" if episode_number else "LDoE"
+            title_candidate = f"{headline} 😱 | {ep_str} #Shorts"
+            if len(title_candidate) > 100:
+                title_candidate = f"{headline[:75]} | {ep_str} #Shorts"
+
+            # Build short description linking back to the long-form episode
+            desc_lines = [
+                f"{title_candidate}",
+                "",
+                f"🎬 Watch the FULL Episode #{episode_number} here: https://youtu.be/{parent_video_id}" if parent_video_id else "",
+                f"📺 Full Series Playlist: https://www.youtube.com/playlist?list={self.playlist_title}",
+                "",
+                "Can we survive the apocalyptic wasteland? Subscribe for daily survival raids & bunker runs! 🧟‍♂️🔨",
+                "",
+                "#Shorts #LastDayOnEarth #LDoE #ZombieSurvival #SurvivalGame #LDoEGameplay",
+            ]
+            description = "\n".join([line for line in desc_lines if line is not None])
+
+            short_tags = [
+                "Shorts",
+                "YouTube Shorts",
+                "Last Day on Earth Shorts",
+                "LDoE Shorts",
+                "Last Day on Earth",
+                "LDoE",
+                "Zombie Survival",
+                "Mobile Gaming",
+            ]
+
+            # Configure scheduling or instant publishing
+            publish_at_iso = None
+            if schedule_time:
+                publish_at_iso = schedule_time.strftime("%Y-%m-%dT%H:%M:%SZ")
+                status = {
+                    "privacyStatus": "private",  # YouTube requires private for scheduled videos
+                    "publishAt": publish_at_iso,
+                    "selfDeclaredMadeForKids": False,
+                }
+            else:
+                effective_privacy = "public" if privacy_status in ("public", "scheduled") else privacy_status
+                status = {
+                    "privacyStatus": effective_privacy,
+                    "selfDeclaredMadeForKids": False,
+                }
+
+            body = {
+                "snippet": {
+                    "title": title_candidate,
+                    "description": description,
+                    "tags": short_tags,
+                    "categoryId": "20",  # Gaming
+                    "defaultLanguage": "en",
+                },
+                "status": status,
+            }
+
+            media = MediaFileUpload(
+                str(short_video_path),
+                chunksize=5 * 1024 * 1024,
+                resumable=True,
+                mimetype="video/mp4",
+            )
+
+            req = youtube.videos().insert(
+                part="snippet,status",
+                body=body,
+                media_body=media,
+            )
+
+            resp = None
+            while resp is None:
+                upload_status, resp = req.next_chunk()
+                if upload_status:
+                    logger.info(f"Shorts upload progress: {int(upload_status.progress() * 100)}%")
+
+            short_id = resp.get("id")
+            short_url = f"https://youtube.com/shorts/{short_id}"
+            logger.info(f"YouTube Short successfully uploaded: {short_url} (Scheduled: {publish_at_iso})")
+
+            # Post engagement pinned first comment linking to the full episode
+            try:
+                comment_text = (
+                    f"🎬 Watch the FULL Episode #{episode_number} raid here: https://youtu.be/{parent_video_id}\n\n"
+                    f"🔔 Subscribe and tap the notification bell so you never miss a survival run!"
+                )
+                comment_body = {
+                    "snippet": {
+                        "videoId": short_id,
+                        "topLevelComment": {
+                            "snippet": {
+                                "textOriginal": comment_text
+                            }
+                        }
+                    }
+                }
+                youtube.commentThreads().insert(part="snippet", body=comment_body).execute()
+                logger.info(f"Pinned engagement comment posted to Short {short_id}")
+            except Exception as ce:
+                logger.warning(f"Could not post engagement comment on Short {short_id}: {ce}")
+
+            return {
+                "video_id": short_id,
+                "url": short_url,
+                "title": title_candidate,
+                "scheduled_for": publish_at_iso,
+                "parent_video_id": parent_video_id,
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to upload Short to YouTube: {e}")
+            if is_quota_exceeded_error(e):
+                raise QuotaExceededError(
+                    operation="upload_short",
+                    root_cause=str(e),
+                    recovery_action="Wait for daily YouTube Data API quota to reset.",
+                    file_path=str(short_video_path),
+                )
+            raise PublishingError(
+                operation="upload_short",
+                root_cause=str(e),
+                recovery_action="Check YouTube API quota or credentials.",
+                file_path=str(short_video_path),
+            )
 

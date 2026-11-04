@@ -5,8 +5,8 @@ import hashlib
 import json
 import sys
 from pathlib import Path
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timedelta, timezone
+from typing import Optional, List, Dict, Any
 
 from src.config import get_settings
 from src.logging_config import get_logger
@@ -81,6 +81,7 @@ from src.privacy.ad_detector import AdDetector, AdSegment
 from src.processor.ad_remover import AdRemover
 from src.subtitles.event_analyzer import SubtitleGenerator
 from src.audio.selector import AudioMixer
+from src.processor.shorts_generator import ShortsGenerator
 from src.processor.video_processor import VideoProcessor
 from src.processor.thumbnail_generator import ThumbnailGenerator
 from src.publisher.youtube_client import YouTubeClient, is_quota_exceeded_error
@@ -103,6 +104,7 @@ class RenderResult(type(Path())):
     youtube_url: str = ""
     uploaded_to_youtube: bool = False
     video_id: str = ""
+    shorts: List[Dict[str, Any]] = []
 
 
 def get_notifier(settings):
@@ -127,6 +129,8 @@ def run_pipeline(
     local_only: bool = True,
     force: bool = False,
     delete_input: Optional[bool] = None,
+    skip_shorts: bool = False,
+    shorts_count: Optional[int] = None,
 ) -> RenderResult:
     """Executes the complete video processing workflow for a single video file."""
     settings = get_settings()
@@ -539,6 +543,71 @@ def run_pipeline(
                     },
                 )
 
+        # Step 5b: Automated YouTube Shorts Extraction & Scheduling (Priority 8)
+        generated_shorts: List[Dict[str, Any]] = []
+        should_run_shorts = settings.processing.shorts_automation_enabled and not skip_shorts
+        if should_run_shorts and output_path.exists():
+            try:
+                logger.info("Executing Priority 8: Extracting automated YouTube Shorts from episode footage...")
+                shorts_gen = ShortsGenerator(output_dir=settings.processing.temp_dir / "shorts")
+                target_shorts_count = shorts_count or settings.processing.shorts_per_episode
+
+                rendered_shorts = shorts_gen.generate_shorts_for_episode(
+                    input_video=output_path,
+                    events=events,
+                    episode_number=ep_num_for_publishing,
+                    count=target_shorts_count,
+                    video_duration=video_duration,
+                )
+
+                for idx, short_item in enumerate(rendered_shorts):
+                    short_record = {
+                        "video_path": str(short_item["video_path"]),
+                        "headline": short_item.get("headline", ""),
+                        "subtitle": short_item.get("subtitle", ""),
+                        "start_time": short_item.get("start_time", 0.0),
+                        "duration": short_item.get("duration", 0.0),
+                        "hook_type": short_item.get("hook_type", ""),
+                        "index": short_item.get("index", idx + 1),
+                    }
+
+                    if not local_only and uploaded_to_youtube and video_id:
+                        # Schedule Short for release 6 to 12 hours after the main episode
+                        delay_hours = settings.processing.shorts_schedule_delay_hours * (idx + 1)
+                        schedule_time = datetime.now(timezone.utc) + timedelta(hours=delay_hours)
+                        logger.info(
+                            f"Scheduling YouTube Short #{idx + 1} for release in {delay_hours:.1f} hours ({schedule_time.isoformat()})..."
+                        )
+
+                        try:
+                            upload_res = publisher.upload_short(
+                                short_video_path=short_item["video_path"],
+                                parent_video_title=metadata.title,
+                                parent_video_id=video_id,
+                                short_info=short_item,
+                                episode_number=ep_num_for_publishing,
+                                schedule_time=schedule_time,
+                                privacy_status=settings.processing.shorts_privacy_status,
+                            )
+                            short_record["upload"] = upload_res
+                            logger.info(f"Successfully uploaded and scheduled Short #{idx + 1}: {upload_res.get('url')}")
+                        except Exception as ue:
+                            logger.warning(f"Could not upload Short #{idx + 1} to YouTube: {ue}")
+                            short_record["upload_error"] = str(ue)
+
+                    generated_shorts.append(short_record)
+
+            except Exception as se:
+                logger.warning(
+                    f"Automated Shorts extraction skipped due to error: {se}",
+                    extra_data={
+                        "operation": "extract_and_schedule_shorts",
+                        "component": "ShortsGenerator",
+                        "root_cause": str(se),
+                        "status": "DEGRADED",
+                    },
+                )
+
         # Step 6: History Logging & Notifications
         logger.info("Step 6/6: Recording job execution to history")
         if not video_id and youtube_url and "youtu" in youtube_url:
@@ -568,6 +637,8 @@ def run_pipeline(
                     "privacy_redacted": blur_filter is not None,
                     "ads_removed_count": len(detected_ads),
                     "ads_removed": [a.to_dict() for a in detected_ads],
+                    "shorts_count": len(generated_shorts),
+                    "shorts": generated_shorts,
                 },
             )
         except Exception as he:
@@ -590,6 +661,7 @@ def run_pipeline(
                 details={
                     "duration_seconds": video_duration,
                     "soundtrack_tracks": [t["title"] for t in track_sequence],
+                    "shorts": generated_shorts,
                 },
             )
         except Exception as ne:
@@ -636,6 +708,7 @@ def run_pipeline(
         result.youtube_url = youtube_url
         result.uploaded_to_youtube = uploaded_to_youtube
         result.video_id = video_id
+        result.shorts = generated_shorts
         return result
 
     except PipelineError as pe:
@@ -879,6 +952,8 @@ def main() -> None:
     process_parser.add_argument("--force", action="store_true", help="Force processing even if duplicate is detected")
     process_parser.add_argument("--delete-input", dest="delete_input", action="store_true", default=None, help="Delete input video file after successful processing")
     process_parser.add_argument("--keep-input", dest="delete_input", action="store_false", help="Preserve input video file after processing")
+    process_parser.add_argument("--skip-shorts", action="store_true", help="Skip automated extraction and scheduling of Shorts")
+    process_parser.add_argument("--shorts-count", type=_safe_int_arg, default=None, help="Number of Shorts to extract (default from settings: 1)")
 
     # Scheduled Google Drive CRON command
     cron_parser = subparsers.add_parser("drive-cron", help="Poll Google Drive for pending recordings and process")
@@ -910,7 +985,14 @@ def main() -> None:
 
     if args.command == "process":
         local_flag = not args.upload
-        run_pipeline(Path(args.input), local_only=local_flag, force=args.force, delete_input=args.delete_input)
+        run_pipeline(
+            Path(args.input),
+            local_only=local_flag,
+            force=args.force,
+            delete_input=args.delete_input,
+            skip_shorts=args.skip_shorts,
+            shorts_count=args.shorts_count,
+        )
     elif args.command == "drive-cron":
         upload_flag = not args.no_upload
         exit_code = run_drive_cron(dry_run=args.dry_run, limit=args.limit, upload=upload_flag, force=args.force)
