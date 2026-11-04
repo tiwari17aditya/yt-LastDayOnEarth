@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 102,
+  "current_episode": 103,
   "completed_episodes": [
     {
       "episode": 1,
@@ -677,6 +677,13 @@
       "video_id": "AYTWyRyzfV8",
       "youtube_url": "https://youtu.be/AYTWyRyzfV8",
       "job_id": "AYTWyRyzfV8"
+    },
+    {
+      "episode": 102,
+      "title": "Can We Survive & Upgrade? Workbench & Blueprints And Organizing Storage & Chests Plus... #102",
+      "video_id": "hqSuuX5O6lk",
+      "youtube_url": "https://youtu.be/hqSuuX5O6lk",
+      "job_id": "hqSuuX5O6lk"
     }
   ]
 }
