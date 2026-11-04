@@ -1,5 +1,9 @@
 # Last Day on Earth: Survival — Roadmap & Pipeline Enhancements
 
+> [!IMPORTANT]
+> **NEXT SESSION REMINDER**:
+> Merge branch [`feature/priority-8-shorts-pipeline`](file:///d:/youtube-projects/LastDayOnEarth) into `main` to activate Priority 8 (Automated Shorts Pipeline Hook & Scheduling) in the primary pipeline. Everything is tested and ready to merge.
+
 This document outlines prioritized enhancements designed to maximize YouTube algorithmic velocity, viewer retention, subscriber conversions, and workflow automation.
 
 ---
