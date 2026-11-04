@@ -3246,5 +3246,47 @@
       "ads_removed": [],
       "md5_checksum": "3d5826b28144d4c4e771f739a5d01d37"
     }
+  },
+  {
+    "job_id": "job_20261104_061747",
+    "timestamp": "2026-11-04T06:17:47.096749+00:00",
+    "input_filename": "ScreenRecording_11-02-2026 21-13-04_1.mp4",
+    "output_filename": "ScreenRecording_11-02-2026_21-13-04_1_Processed_04112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "tDNIKmIsHX4",
+    "youtube_url": "https://youtu.be/tDNIKmIsHX4",
+    "details": {
+      "video_id": "tDNIKmIsHX4",
+      "youtube_url": "https://youtu.be/tDNIKmIsHX4",
+      "video_output": "output/ScreenRecording_11-02-2026_21-13-04_1_Processed_04112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-02-2026_21-13-04_1_Processed_04112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-02-2026_21-13-04_1_Processed_04112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Home Base Operations! | LDoE Survival #103",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Home Base Operations Plus Base Defense &... #103",
+        "walkthrough": "Surviving Day 103: Entering Home Base And Home Base Operations Plus Base Defense &... #103",
+        "search_guide": "How to Farm & Master Entering Home Base & Home Base Operations Fast | LDoE #103"
+      },
+      "duration_seconds": 2428.898186,
+      "soundtrack_tracks": [
+        "Bossa Antigua",
+        "Shores of Avalon",
+        "Bossa Antigua",
+        "Pamgaea",
+        "Groove Grove",
+        "Shores of Avalon",
+        "Monkeys Spinning Monkeys",
+        "Shores of Avalon",
+        "Somewhere Sunny",
+        "Electro Cabello",
+        "Life of Riley",
+        "Fretless"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "65ecd419d9a9a78109b1ceffe6ec5028"
+    }
   }
 ]
