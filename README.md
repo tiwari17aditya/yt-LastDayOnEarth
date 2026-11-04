@@ -13,6 +13,7 @@ The pipeline automates the end-to-end publishing journey:
 6. **AI Metadata Generation**: Crafts tailored YouTube titles, structured descriptions with chapter timestamps, game tags, and music licensing attributions.
 7. **YouTube Publishing**: Uploads directly to YouTube via YouTube Data API v3.
 8. **Notifications & Periodic Reporting**: Delivers immediate email alerts upon completion/failure, plus automated weekly and monthly aggregation reports.
+9. **Automated Companion Shorts**: Automatically extracts high-energy vertical 9:16 clips during every episode render and schedules them to release on YouTube 6–12 hours later with backlinks to the main video.
 
 ---
 

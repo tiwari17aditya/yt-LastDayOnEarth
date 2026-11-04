@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-11-04
+
+### Added
+- **Automated YouTube Shorts Extraction & Scheduled Publishing Pipeline (`src/processor/shorts_generator.py`, `src/publisher/youtube_client.py`, `src/main.py`)**:
+  - Implemented `ShortsGenerator.auto_detect_highlights()`: Multi-highlight detection selecting non-overlapping gameplay peaks (combat panic, rare crate unboxing, workshop upgrading) spaced >= 45 seconds apart.
+  - Implemented `ShortsGenerator.generate_shorts_for_episode()`: Extracts 9:16 vertical MP4s (1080x1920) with blurred background letterboxing and mobile CTA overlay.
+  - Implemented `YouTubeClient.upload_short()`: Uploads vertical clips to YouTube with `#Shorts` tags, scheduled release via `publishAt` (default 6–12h delay after main video), and automated pinned creator comments linking back to the full episode and series playlist.
+  - Added pipeline hook in `src/main.py` (Step 5b) with CLI controls (`--skip-shorts`, `--shorts-count`), history logging, and email notification summary.
+  - Added configuration in `src/config.py` and `.env.example` (`SHORTS_AUTOMATION_ENABLED`, `SHORTS_PER_EPISODE`, `SHORTS_SCHEDULE_DELAY_HOURS`, `SHORTS_PRIVACY_STATUS`).
+  - Added unit test suite in `tests/test_shorts_pipeline.py` (all 35 project tests passing).
+
+### Changed
+- **Roadmap Updates (`docs/ENHANCEMENTS.md`)**:
+  - Marked Priority 8 (Automated Shorts Pipeline & Scheduling) as ✅ Completed.
+  - Marked Priority 10 (Dynamic Combat SFX Audio Ducking) as ❌ Cancelled / Skipped (gameplay recorded in silent mode; ambient music handles pacing).
+  - Marked Priority 11 (YouTube Premiere Countdown Slates) as ❌ Cancelled / Excluded per creator preference for direct video releases.
+  - Added top-level Next Session Reminder banner to merge `feature/priority-8-shorts-pipeline` into `main`.
+
 ## [1.10.0] - 2026-11-02
 
 ### Added
