@@ -3331,5 +3331,39 @@
       "ads_removed": [],
       "md5_checksum": "da2d053be8f8a0ad1fbc50488a75b0d5"
     }
+  },
+  {
+    "job_id": "job_20261104_210458",
+    "timestamp": "2026-11-04T21:04:58.443106+00:00",
+    "input_filename": "ScreenRecording_11-02-2026 22-42-31_1.mp4",
+    "output_filename": "ScreenRecording_11-02-2026_22-42-31_1_Processed_04112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "LSFbLzc3tgk",
+    "youtube_url": "https://youtu.be/LSFbLzc3tgk",
+    "details": {
+      "video_id": "LSFbLzc3tgk",
+      "youtube_url": "https://youtu.be/LSFbLzc3tgk",
+      "video_output": "output/ScreenRecording_11-02-2026_22-42-31_1_Processed_04112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-02-2026_22-42-31_1_Processed_04112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-02-2026_22-42-31_1_Processed_04112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Home Base Operations! | LDoE Survival #105",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Home Base Operations Plus Base... #105",
+        "walkthrough": "Surviving Day 105: Organizing Storage & Chests And Home Base Operations Plus Base Defense... #105",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #105"
+      },
+      "duration_seconds": 763.885261,
+      "soundtrack_tracks": [
+        "Daily Beetle",
+        "Volatile Reaction",
+        "Shores of Avalon",
+        "Decisions"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "64c7cb4568a352747c380bafaf839c8d"
+    }
   }
 ]
