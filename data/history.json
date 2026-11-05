@@ -3436,5 +3436,43 @@
       "ads_removed": [],
       "md5_checksum": "bb6d803583af1e1d986e803ccb09f985"
     }
+  },
+  {
+    "job_id": "job_20261105_174327",
+    "timestamp": "2026-11-05T17:43:27.231754+00:00",
+    "input_filename": "ScreenRecording_11-03-2026 01-22-48_1.mp4",
+    "output_filename": "ScreenRecording_11-03-2026_01-22-48_1_Processed_05112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "56j1nQQSvAk",
+    "youtube_url": "https://youtu.be/56j1nQQSvAk",
+    "details": {
+      "video_id": "56j1nQQSvAk",
+      "youtube_url": "https://youtu.be/56j1nQQSvAk",
+      "video_output": "output/ScreenRecording_11-03-2026_01-22-48_1_Processed_05112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-03-2026_01-22-48_1_Processed_05112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-03-2026_01-22-48_1_Processed_05112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Base Storage Optimization! | LDoE Survival #108",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Organizing Storage & Chests Plus... #108",
+        "walkthrough": "Surviving Day 108: Entering Home Base And Organizing Storage & Chests Plus Workbench &... #108",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #108"
+      },
+      "duration_seconds": 1776.596236,
+      "soundtrack_tracks": [
+        "Groove Grove",
+        "Daily Beetle",
+        "Groove Grove",
+        "Life of Riley",
+        "Decisions",
+        "Daily Beetle",
+        "Urban Gauntlet",
+        "Shores of Avalon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "ef6f40b2aa1fd8ee4314db70e7afe548"
+    }
   }
 ]
