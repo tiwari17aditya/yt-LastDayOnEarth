@@ -139,6 +139,9 @@ class ProcessingSettings(BaseModel):
     resolution: str = Field(default_factory=lambda: os.getenv("VIDEO_RESOLUTION", "1920x1080"))
     target_fps: int = Field(default_factory=lambda: _safe_int(os.getenv("VIDEO_TARGET_FPS"), 60))
     audio_ducking_db: str = Field(default_factory=lambda: os.getenv("VIDEO_AUDIO_DUCKING_DB", "-15dB"))
+    mute_raw_audio: bool = Field(
+        default_factory=lambda: os.getenv("MUTE_RAW_AUDIO", "true").lower() == "true"
+    )
     video_preset: str = Field(default_factory=lambda: os.getenv("VIDEO_PRESET", "veryfast"))
     temp_dir: Path = Field(default_factory=lambda: Path(os.getenv("TEMP_PROCESSING_DIR", "temp")))
     output_dir: Path = Field(default_factory=lambda: Path(os.getenv("OUTPUT_DIR", "output")))

@@ -97,6 +97,56 @@ def test_video_processor_build_ffmpeg_command_without_outro(tmp_path):
     assert str(music) in cmd_str
 
 
+def test_video_processor_mute_raw_audio(tmp_path):
+    vp = VideoProcessor(output_dir=tmp_path)
+    input_v = tmp_path / "input.mp4"
+    output_v = tmp_path / "output.mp4"
+    music = tmp_path / "music.mp3"
+
+    input_v.touch()
+    music.touch()
+
+    # Mute raw audio enabled (clean isolated music stream)
+    cmd_muted = vp.build_ffmpeg_command(
+        input_video=input_v,
+        output_video=output_v,
+        music_file=music,
+        mute_raw_audio=True,
+    )
+    cmd_str_muted = " ".join(cmd_muted)
+    assert "[1:a]volume=0dB" in cmd_str_muted
+    assert "amix" not in cmd_str_muted
+
+    # Mute raw audio disabled (mixed audio)
+    cmd_unmuted = vp.build_ffmpeg_command(
+        input_video=input_v,
+        output_video=output_v,
+        music_file=music,
+        mute_raw_audio=False,
+    )
+    cmd_str_unmuted = " ".join(cmd_unmuted)
+    assert "amix=inputs=2" in cmd_str_unmuted
+
+
+def test_youtube_client_licensing_attribution():
+    from src.publisher.youtube_client import YouTubeClient
+
+    client = YouTubeClient()
+    meta = client.generate_metadata(
+        video_title="Bunker Alfa Infiltration",
+        events=[],
+        episode_number=110,
+        music_track=[{"title": "Bossa Antigua"}, {"title": "Sneaky Snitch"}],
+    )
+
+    desc = meta.description
+    assert "🎵 MUSIC & AUDIO LICENSING ATTRIBUTION:" in desc
+    assert "Kevin MacLeod (incompetech.com)" in desc
+    assert "Tracks Featured: Bossa Antigua, Sneaky Snitch" in desc
+    assert "⚖️ COPYRIGHT & FAIR USE DISCLAIMER:" in desc
+    assert "Kefir Games" in desc
+
+
 def test_drive_client_deduplication_against_history(tmp_path, monkeypatch):
     from unittest.mock import MagicMock
     from src.ingestion.drive_client import GoogleDriveClient

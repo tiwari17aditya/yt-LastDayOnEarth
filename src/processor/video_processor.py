@@ -68,6 +68,7 @@ class VideoProcessor:
         preset: str = "veryfast",
         outro_video: Optional[Path] = None,
         fade_duration: float = 0.7,
+        mute_raw_audio: bool = False,
     ) -> List[str]:
         """Assembles robust FFmpeg command for composite rendering in a single pass."""
         cmd = ["ffmpeg", "-y", "-nostdin", "-i", str(input_video)]
@@ -105,10 +106,16 @@ class VideoProcessor:
             ]
 
             if has_music:
-                audio_chain = (
-                    f"[1:a]volume={ducking_db}[bg];"
-                    f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo,afade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}[a0];"
-                )
+                if mute_raw_audio:
+                    # Clean isolated background soundtrack (zero mic noise / rogue audio leak from recording)
+                    audio_chain = (
+                        f"[1:a]volume=0dB,aformat=sample_rates=44100:channel_layouts=stereo,afade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}[a0];"
+                    )
+                else:
+                    audio_chain = (
+                        f"[1:a]volume={ducking_db}[bg];"
+                        f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo,afade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}[a0];"
+                    )
             else:
                 audio_chain = (
                     f"[0:a]aformat=sample_rates=44100:channel_layouts=stereo,afade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}[a0];"
@@ -130,11 +137,17 @@ class VideoProcessor:
 
         elif video_filters and has_music:
             vf_string = ",".join(video_filters)
-            filter_complex = (
-                f"[0:v]{vf_string}[vout];"
-                f"[1:a]volume={ducking_db}[bg];"
-                f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]"
-            )
+            if mute_raw_audio:
+                filter_complex = (
+                    f"[0:v]{vf_string}[vout];"
+                    f"[1:a]volume=0dB,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
+                )
+            else:
+                filter_complex = (
+                    f"[0:v]{vf_string}[vout];"
+                    f"[1:a]volume={ducking_db}[bg];"
+                    f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+                )
             cmd.extend([
                 "-filter_complex", filter_complex,
                 "-map", "[vout]",
@@ -144,10 +157,15 @@ class VideoProcessor:
             cmd.extend(["-vf", ",".join(video_filters)])
             cmd.extend(["-map", "0:v", "-map", "0:a?"])
         elif has_music:
-            filter_complex = (
-                f"[1:a]volume={ducking_db}[bg];"
-                f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]"
-            )
+            if mute_raw_audio:
+                filter_complex = (
+                    f"[1:a]volume=0dB,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
+                )
+            else:
+                filter_complex = (
+                    f"[1:a]volume={ducking_db}[bg];"
+                    f"[0:a][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+                )
             cmd.extend([
                 "-filter_complex", filter_complex,
                 "-map", "0:v",
@@ -254,6 +272,7 @@ class VideoProcessor:
         ducking_db: str = "-15dB",
         preset: str = "veryfast",
         outro_tail: Optional[Path] = None,
+        mute_raw_audio: bool = False,
     ) -> Path:
         """Executes FFmpeg composite render with high-efficiency single-pass pipeline."""
         has_outro = outro_tail is not None and Path(outro_tail).exists()
@@ -268,6 +287,7 @@ class VideoProcessor:
             ducking_db=ducking_db,
             preset=preset,
             outro_video=outro_path,
+            mute_raw_audio=mute_raw_audio,
         )
 
         logger.info(

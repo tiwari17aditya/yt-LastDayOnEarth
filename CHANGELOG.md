@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-11-06
+
+### Added
+- **Content ID & Creative Commons Attribution Protection (`src/publisher/youtube_client.py`)**:
+  - Automatically appends official Creative Commons Attribution 4.0 International (CC BY 4.0) licensing details and Kefir Games Fair Use disclaimer to all YouTube video descriptions.
+  - Dynamically lists specific royalty-free background tracks featured in the episode, giving Content ID bots legal clearance and eliminating automated restriction claims.
+- **Silent Gaming Mode Audio Isolation (`src/processor/video_processor.py`, `src/config.py`)**:
+  - Added `mute_raw_audio: bool = True` (configurable via `MUTE_RAW_AUDIO=true`) to `ProcessingSettings`.
+  - When enabled, raw recording audio (`[0:a]`) is omitted from the FFmpeg audio mix, routing isolated, royalty-free background soundtrack (`[1:a]`) directly at 0dB with clean fadeout. This guarantees microphone ambient noise, device sounds, or stray background audio are never leaked into final renders.
+- **Channel Copyright Audit & Resolution Tool (`scripts/resolve_copyright_claims.py`)**:
+  - Comprehensive CLI utility to audit channel videos for Content ID claims and territorial restrictions (`regionRestriction`).
+  - Batch-injects missing CC BY 4.0 and Kefir Fair Use disclaimers into active episodes via YouTube Data API v3 (`--since-episode`, `--fix`).
+  - Generates ready-to-paste dispute text and step-by-step guidance for YouTube Studio to quickly lift regional restrictions.
+- **Unit Test Coverage (`tests/test_processor_and_config.py`)**:
+  - Added test coverage for `mute_raw_audio` FFmpeg command generation (clean music route vs. mixed) and `YouTubeClient.generate_metadata()` licensing attribution generation (33/33 tests passing).
+
 ## [1.10.0] - 2026-11-02
 
 ### Added

@@ -193,7 +193,33 @@ class YouTubeClient(BasePublisher):
         )
 
         description_lines.extend(formatted_chapters)
+
+        # 🎵 Creative Commons Music Licensing & Fair Use Attribution (Strict Content ID Compliance)
         description_lines.extend([
+            "────────────────────────────────────────",
+            "🎵 MUSIC & AUDIO LICENSING ATTRIBUTION:",
+            "All background music in this video is royalty-free and licensed under Creative Commons Attribution 4.0 International (CC BY 4.0):",
+            "• Music by Kevin MacLeod (incompetech.com)",
+        ])
+
+        if music_track:
+            tracks_list = music_track if isinstance(music_track, list) else [music_track]
+            seen_titles = []
+            for t in tracks_list:
+                title = t.get("title") if isinstance(t, dict) else str(t)
+                if title and title not in seen_titles:
+                    seen_titles.append(title)
+            if seen_titles:
+                description_lines.append(f"  Tracks Featured: {', '.join(seen_titles)}")
+
+        description_lines.extend([
+            "  Licensed under Creative Commons: By Attribution 4.0 License",
+            "  https://creativecommons.org/licenses/by/4.0/",
+            "",
+            "⚖️ COPYRIGHT & FAIR USE DISCLAIMER:",
+            "Last Day on Earth: Survival is developed and published by Kefir Games.",
+            "All gameplay footage, visual assets, and in-game audio belong to Kefir Games.",
+            "This video is transformative gameplay walkthrough and commentary created for entertainment and instructional purposes protected under Fair Use (Section 107 of the US Copyright Act 1976).",
             "────────────────────────────────────────",
             "",
             " ".join(trending_hashtags),

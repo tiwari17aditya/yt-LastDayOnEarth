@@ -407,6 +407,7 @@ def run_pipeline(
                 ducking_db=settings.processing.audio_ducking_db,
                 preset=settings.processing.video_preset,
                 outro_tail=outro_tail_clip,
+                mute_raw_audio=settings.processing.mute_raw_audio,
             )
         except Exception as ve:
             raise VideoProcessingError(
