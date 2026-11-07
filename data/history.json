@@ -3796,5 +3796,39 @@
       "ads_removed": [],
       "md5_checksum": "13b64715d5987a2cffdf11c10574d23c"
     }
+  },
+  {
+    "job_id": "job_20261107_205655",
+    "timestamp": "2026-11-07T20:56:55.872794+00:00",
+    "input_filename": "ScreenRecording_11-03-2026 23-52-59_1.mp4",
+    "output_filename": "ScreenRecording_11-03-2026_23-52-59_1_Processed_07112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "KstUOUnjZCU",
+    "youtube_url": "https://youtu.be/KstUOUnjZCU",
+    "details": {
+      "video_id": "KstUOUnjZCU",
+      "youtube_url": "https://youtu.be/KstUOUnjZCU",
+      "video_output": "output/ScreenRecording_11-03-2026_23-52-59_1_Processed_07112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-03-2026_23-52-59_1_Processed_07112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-03-2026_23-52-59_1_Processed_07112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Home Base Operations! | LDoE Survival #117",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Home Base Operations Plus... #117",
+        "walkthrough": "Surviving Day 117: Organizing Storage & Chests And Home Base Operations Plus Entering Home... #117",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #117"
+      },
+      "duration_seconds": 797.296825,
+      "soundtrack_tracks": [
+        "Daily Beetle",
+        "Clear Waters",
+        "Life of Riley",
+        "Monkeys Spinning Monkeys"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "d1e430b200cd7559c19590850a2a1238"
+    }
   }
 ]
