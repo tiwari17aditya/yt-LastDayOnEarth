@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 116,
+  "current_episode": 117,
   "completed_episodes": [
     {
       "episode": 1,
@@ -775,6 +775,13 @@
       "video_id": "6wpeZgNEGCY",
       "youtube_url": "https://youtu.be/6wpeZgNEGCY",
       "job_id": "6wpeZgNEGCY"
+    },
+    {
+      "episode": 116,
+      "title": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Organizing Storage & Chests... #116",
+      "video_id": "7DehjfR5hJI",
+      "youtube_url": "https://youtu.be/7DehjfR5hJI",
+      "job_id": "7DehjfR5hJI"
     }
   ]
 }

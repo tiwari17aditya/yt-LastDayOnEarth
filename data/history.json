@@ -3756,5 +3756,45 @@
       "ads_removed": [],
       "md5_checksum": "16593b8bb6049e409a50263938e99d4a"
     }
+  },
+  {
+    "job_id": "job_20261107_164859",
+    "timestamp": "2026-11-07T16:48:59.475764+00:00",
+    "input_filename": "ScreenRecording_11-03-2026 18-48-54_1.mp4",
+    "output_filename": "ScreenRecording_11-03-2026_18-48-54_1_Processed_07112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "7DehjfR5hJI",
+    "youtube_url": "https://youtu.be/7DehjfR5hJI",
+    "details": {
+      "video_id": "7DehjfR5hJI",
+      "youtube_url": "https://youtu.be/7DehjfR5hJI",
+      "video_output": "output/ScreenRecording_11-03-2026_18-48-54_1_Processed_07112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-03-2026_18-48-54_1_Processed_07112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-03-2026_18-48-54_1_Processed_07112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Base Storage Optimization! | LDoE Survival #116",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Organizing Storage & Chests... #116",
+        "walkthrough": "Surviving Day 116: Workshop & Smelting Furnaces And Organizing Storage & Chests Plus Home... #116",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #116"
+      },
+      "duration_seconds": 1748.332608,
+      "soundtrack_tracks": [
+        "Daily Beetle",
+        "Sneaky Snitch",
+        "Constance",
+        "Sneaky Snitch",
+        "Volatile Reaction",
+        "Life of Riley",
+        "Clear Waters",
+        "Decisions",
+        "Life of Riley",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "13b64715d5987a2cffdf11c10574d23c"
+    }
   }
 ]
