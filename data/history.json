@@ -3644,5 +3644,45 @@
       "ads_removed": [],
       "md5_checksum": "67661159ca38b94b31e845b1b200524f"
     }
+  },
+  {
+    "job_id": "job_20261107_001821",
+    "timestamp": "2026-11-07T00:18:21.051159+00:00",
+    "input_filename": "ScreenRecording_11-03-2026 11-58-20_1.mp4",
+    "output_filename": "ScreenRecording_11-03-2026_11-58-20_1_Processed_06112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "wPC0sn2oQCw",
+    "youtube_url": "https://youtu.be/wPC0sn2oQCw",
+    "details": {
+      "video_id": "wPC0sn2oQCw",
+      "youtube_url": "https://youtu.be/wPC0sn2oQCw",
+      "video_output": "output/ScreenRecording_11-03-2026_11-58-20_1_Processed_06112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-03-2026_11-58-20_1_Processed_06112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-03-2026_11-58-20_1_Processed_06112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Entering Home Base! | LDoE Survival #113",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Entering Home Base Plus Home... #113",
+        "walkthrough": "Surviving Day 113: Workshop & Smelting Furnaces And Entering Home Base Plus Home Base... #113",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #113"
+      },
+      "duration_seconds": 1674.763628,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Life of Riley",
+        "Decisions",
+        "Monkeys Spinning Monkeys",
+        "Somewhere Sunny",
+        "Urban Gauntlet",
+        "Clean Soul",
+        "Daily Beetle",
+        "Pamgaea",
+        "Fretless"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "ea3dc2739e2a39e2a3375affb9c4b4e4"
+    }
   }
 ]
