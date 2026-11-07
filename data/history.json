@@ -3718,5 +3718,43 @@
       "ads_removed": [],
       "md5_checksum": "5a9ddf23b3fade3690c3e36540a5dbf3"
     }
+  },
+  {
+    "job_id": "job_20261107_104053",
+    "timestamp": "2026-11-07T10:40:53.508855+00:00",
+    "input_filename": "ScreenRecording_11-03-2026 18-02-34_1.mp4",
+    "output_filename": "ScreenRecording_11-03-2026_18-02-34_1_Processed_07112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "6wpeZgNEGCY",
+    "youtube_url": "https://youtu.be/6wpeZgNEGCY",
+    "details": {
+      "video_id": "6wpeZgNEGCY",
+      "youtube_url": "https://youtu.be/6wpeZgNEGCY",
+      "video_output": "output/ScreenRecording_11-03-2026_18-02-34_1_Processed_07112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-03-2026_18-02-34_1_Processed_07112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-03-2026_18-02-34_1_Processed_07112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization + Inventory & Resource Sorting! | LDoE Survival #115",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Inventory & Resource Sorting... #115",
+        "walkthrough": "Surviving Day 115: Organizing Storage & Chests And Inventory & Resource Sorting Plus... #115",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #115"
+      },
+      "duration_seconds": 1419.317483,
+      "soundtrack_tracks": [
+        "Electro Cabello",
+        "Carefree",
+        "Monkeys Spinning Monkeys",
+        "Electro Cabello",
+        "Urban Gauntlet",
+        "Sneaky Snitch",
+        "Clean Soul",
+        "Pamgaea"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "16593b8bb6049e409a50263938e99d4a"
+    }
   }
 ]
