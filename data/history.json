@@ -3868,5 +3868,37 @@
       "ads_removed": [],
       "md5_checksum": "1483e66fa6218bc9680f1604e2102b90"
     }
+  },
+  {
+    "job_id": "job_20261108_042831",
+    "timestamp": "2026-11-08T04:28:31.030022+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 11-16-10_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_11-16-10_1_Processed_08112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "UkVAqEj-d9M",
+    "youtube_url": "https://youtu.be/UkVAqEj-d9M",
+    "details": {
+      "video_id": "UkVAqEj-d9M",
+      "youtube_url": "https://youtu.be/UkVAqEj-d9M",
+      "video_output": "output/ScreenRecording_11-04-2026_11-16-10_1_Processed_08112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_11-16-10_1_Processed_08112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_11-16-10_1_Processed_08112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Wasteland Transit! | LDoE Survival #119",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Wasteland Transit | LDoE #119",
+        "walkthrough": "Surviving Day 119: Workbench & Blueprints And Wasteland Transit | LDoE",
+        "search_guide": "How to Farm & Master Blueprint Upgrades & Wasteland Transit Fast | LDoE #119"
+      },
+      "duration_seconds": 209.468333,
+      "soundtrack_tracks": [
+        "Monkeys Spinning Monkeys",
+        "Urban Gauntlet"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "a13c54766cdf9a0f67c8b75cba781780"
+    }
   }
 ]

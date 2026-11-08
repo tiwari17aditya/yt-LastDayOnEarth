@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 119,
+  "current_episode": 120,
   "completed_episodes": [
     {
       "episode": 1,
@@ -796,6 +796,13 @@
       "video_id": "M6xyptKzqxI",
       "youtube_url": "https://youtu.be/M6xyptKzqxI",
       "job_id": "M6xyptKzqxI"
+    },
+    {
+      "episode": 119,
+      "title": "Blueprint Upgrades & Wasteland Transit! | LDoE Survival #119",
+      "video_id": "UkVAqEj-d9M",
+      "youtube_url": "https://youtu.be/UkVAqEj-d9M",
+      "job_id": "UkVAqEj-d9M"
     }
   ]
 }
