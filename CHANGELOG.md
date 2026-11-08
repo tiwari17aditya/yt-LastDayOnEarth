@@ -29,6 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Unit Test Coverage (`tests/test_commentary.py`)**:
     - Added 13 comprehensive unit tests verifying persona profiles, script structure, event grounding, retry fail-safe isolation, and pipeline graceful degradation (46/46 tests passing across test suite).
 
+### Fixed
+- **Description Cleanliness & Attribution Removal (`src/publisher/youtube_client.py`)**:
+  - Permanently removed `MUSIC & AUDIO LICENSING ATTRIBUTION` and `COPYRIGHT & FAIR USE DISCLAIMER` sections from all generated YouTube descriptions per creator requirements.
+  - Executed retroactive cleanup across existing channel videos via YouTube Data API v3 (`scripts/clean_recent_youtube_descriptions.py`).
+- **CI/CD Commentary Dependencies in GitHub Actions (`requirements.txt`, `.github/workflows/scheduled_pipeline.yml`)**:
+  - Added `edge-tts>=6.1.12` to `requirements.txt` so GitHub Actions runner installs the necessary neural voice synthesis package, preventing `ModuleNotFoundError` during scheduled pipeline execution.
+  - Explicitly configured `ENABLE_VOICE_COMMENTARY="true"` and companion parameters in GitHub Actions workflow environment.
+
 ## [1.11.0] - 2026-11-06
 
 ### Added

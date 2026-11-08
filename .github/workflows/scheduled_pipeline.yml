@@ -88,6 +88,14 @@ jobs:
           VIDEO_PRESET: "veryfast"
           ENVIRONMENT: "production"
           LOG_LEVEL: "INFO"
+          ENABLE_VOICE_COMMENTARY: "true"
+          COMMENTARY_PERSONA: "casual"
+          COMMENTARY_VOICE: "en-US-GuyNeural"
+          COMMENTARY_VOLUME_BOOST_DB: "+4dB"
+          COMMENTARY_INCLUDE_BGM: "true"
+          COMMENTARY_BGM_VOLUME_DB: "-24dB"
+          COMMENTARY_DUCKING_RATIO: "5.0"
+          COMMENTARY_MIN_CUE_INTERVAL: "25.0"
         run: |
           EXTRA_ARGS=""
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then

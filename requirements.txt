@@ -21,6 +21,9 @@ numpy>=1.26.4
 # Subtitles & Media Metadata
 pysubs2>=1.7.1
 
+# AI Spoken Commentary (Neural Voice Walkthrough)
+edge-tts>=6.1.12
+
 # Code Quality & Formatting
 flake8>=7.0.0
 black>=24.4.2

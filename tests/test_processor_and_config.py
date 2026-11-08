@@ -128,7 +128,7 @@ def test_video_processor_mute_raw_audio(tmp_path):
     assert "amix=inputs=2" in cmd_str_unmuted
 
 
-def test_youtube_client_licensing_attribution():
+def test_youtube_client_clean_description():
     from src.publisher.youtube_client import YouTubeClient
 
     client = YouTubeClient()
@@ -140,11 +140,11 @@ def test_youtube_client_licensing_attribution():
     )
 
     desc = meta.description
-    assert "🎵 MUSIC & AUDIO LICENSING ATTRIBUTION:" in desc
-    assert "Kevin MacLeod (incompetech.com)" in desc
-    assert "Tracks Featured: Bossa Antigua, Sneaky Snitch" in desc
-    assert "⚖️ COPYRIGHT & FAIR USE DISCLAIMER:" in desc
-    assert "Kefir Games" in desc
+    assert "MUSIC & AUDIO LICENSING ATTRIBUTION" not in desc
+    assert "Kevin MacLeod (incompetech.com)" not in desc
+    assert "COPYRIGHT & FAIR USE DISCLAIMER" not in desc
+    assert "Kefir Games" not in desc
+    assert "TIMESTAMPS & CHAPTERS:" in desc
 
 
 def test_drive_client_deduplication_against_history(tmp_path, monkeypatch):
