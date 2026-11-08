@@ -3972,5 +3972,39 @@
       "ads_removed": [],
       "md5_checksum": "a74d6db21f68e8871553a43b604bf8ec"
     }
+  },
+  {
+    "job_id": "job_20261108_173534",
+    "timestamp": "2026-11-08T17:35:34.692619+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 14-05-52_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_14-05-52_1_Processed_08112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "w6PjPx8GlbY",
+    "youtube_url": "https://youtu.be/w6PjPx8GlbY",
+    "details": {
+      "video_id": "w6PjPx8GlbY",
+      "youtube_url": "https://youtu.be/w6PjPx8GlbY",
+      "video_output": "output/ScreenRecording_11-04-2026_14-05-52_1_Processed_08112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_14-05-52_1_Processed_08112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_14-05-52_1_Processed_08112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Base Storage Optimization! | LDoE Survival #122",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Organizing Storage & Chests Plus... #122",
+        "walkthrough": "Surviving Day 122: Workbench & Blueprints And Organizing Storage & Chests Plus Entering... #122",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #122"
+      },
+      "duration_seconds": 709.885034,
+      "soundtrack_tracks": [
+        "Decisions",
+        "Fretless",
+        "Monkeys Spinning Monkeys",
+        "Urban Gauntlet"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "b1a27ddf7b114c8c36b03cef59a6758d"
+    }
   }
 ]
