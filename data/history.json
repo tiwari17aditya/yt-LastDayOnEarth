@@ -4006,5 +4006,47 @@
       "ads_removed": [],
       "md5_checksum": "b1a27ddf7b114c8c36b03cef59a6758d"
     }
+  },
+  {
+    "job_id": "job_20261108_224156",
+    "timestamp": "2026-11-08T22:41:56.684427+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 12-32-57_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_12-32-57_1_Processed_08112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "_7a0lKMQ2iw",
+    "youtube_url": "https://youtu.be/_7a0lKMQ2iw",
+    "details": {
+      "video_id": "_7a0lKMQ2iw",
+      "youtube_url": "https://youtu.be/_7a0lKMQ2iw",
+      "video_output": "output/ScreenRecording_11-04-2026_12-32-57_1_Processed_08112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_12-32-57_1_Processed_08112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_12-32-57_1_Processed_08112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #123",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Base Defense & Maintenance Plus Shelter... #123",
+        "walkthrough": "Surviving Day 123: Home Base Operations And Base Defense & Maintenance Plus Shelter... #123",
+        "search_guide": "How to Farm & Master Home Base Operations & Zombie Horde Defense Fast | LDoE #123"
+      },
+      "duration_seconds": 2268.941791,
+      "soundtrack_tracks": [
+        "Shores of Avalon",
+        "Local Forecast",
+        "Volatile Reaction",
+        "Life of Riley",
+        "Fretless",
+        "Local Forecast",
+        "Pamgaea",
+        "Shores of Avalon",
+        "Decisions",
+        "Clear Waters",
+        "Daily Beetle",
+        "Carefree"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "0e21442f06081b8b8daa1ace75efa0fe"
+    }
   }
 ]

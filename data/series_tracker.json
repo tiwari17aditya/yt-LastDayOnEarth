@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 123,
+  "current_episode": 124,
   "completed_episodes": [
     {
       "episode": 1,
@@ -824,6 +824,13 @@
       "video_id": "w6PjPx8GlbY",
       "youtube_url": "https://youtu.be/w6PjPx8GlbY",
       "job_id": "w6PjPx8GlbY"
+    },
+    {
+      "episode": 123,
+      "title": "High-Value Resource Scavenge & Smelting! | LDoE Survival #123",
+      "video_id": "_7a0lKMQ2iw",
+      "youtube_url": "https://youtu.be/_7a0lKMQ2iw",
+      "job_id": "_7a0lKMQ2iw"
     }
   ]
 }
