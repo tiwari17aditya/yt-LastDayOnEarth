@@ -168,6 +168,29 @@ class AudioProcessingError(PipelineError):
         )
 
 
+class CommentaryError(PipelineError):
+    """Raised when commentary script generation, voice synthesis, or timeline assembly fails."""
+
+    def __init__(
+        self,
+        operation: str,
+        root_cause: str,
+        recovery_action: str = "Fallback to standard background music loop.",
+        file_path: Optional[str] = None,
+        status: str = "DEGRADED",
+        details: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        super().__init__(
+            operation=operation,
+            component="CommentaryEngine",
+            root_cause=root_cause,
+            recovery_action=recovery_action,
+            file_path=file_path,
+            status=status,
+            details=details,
+        )
+
+
 class VideoProcessingError(PipelineError):
     """Raised when FFmpeg video encoding, transcoding, or composite rendering fails."""
 

@@ -17,6 +17,7 @@ from src.exceptions import (
     PrivacyRedactionError,
     SubtitleGenerationError,
     AudioProcessingError,
+    CommentaryError,
     VideoProcessingError,
     PublishingError,
     NotificationError,
@@ -127,6 +128,7 @@ def run_pipeline(
     local_only: bool = True,
     force: bool = False,
     delete_input: Optional[bool] = None,
+    advance_tracker: bool = False,
 ) -> RenderResult:
     """Executes the complete video processing workflow for a single video file."""
     settings = get_settings()
@@ -357,6 +359,63 @@ def run_pipeline(
                     "attribution_text": "Music: 'Decisions' by Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 License",
                 }]
 
+        # Step 3b: AI Spoken Commentary Walkthrough Integration
+        if getattr(settings, "commentary", None) and settings.commentary.enabled:
+            try:
+                logger.info(
+                    "Step 3b/6: Synthesizing AI spoken commentary walkthrough",
+                    extra_data={
+                        "persona": settings.commentary.persona,
+                        "voice": settings.commentary.voice,
+                        "include_bgm": settings.commentary.include_bgm,
+                    },
+                )
+                from src.audio.commentary_engine import CommentaryEngine, CommentaryPersona
+
+                # Match configured persona enum safely
+                persona_enum = CommentaryPersona.CASUAL
+                try:
+                    persona_enum = CommentaryPersona(settings.commentary.persona.lower())
+                except ValueError:
+                    persona_enum = CommentaryPersona.CASUAL
+
+                commentary_engine = CommentaryEngine(
+                    temp_dir=settings.processing.temp_dir / "commentary"
+                )
+                commentary_output_path = settings.processing.temp_dir / f"{input_video_path.stem}_commentary_master.m4a"
+
+                current_ep_num = title_mgr.get_current_episode()
+
+                final_commentary_track = commentary_engine.generate_commentary_track(
+                    duration=video_duration,
+                    output_path=commentary_output_path,
+                    events=events,
+                    episode_number=current_ep_num,
+                    persona=persona_enum,
+                    include_bgm=settings.commentary.include_bgm,
+                    bgm_audio=music_file,
+                    volume_boost_db=settings.commentary.volume_boost_db,
+                )
+
+                if final_commentary_track and final_commentary_track.exists():
+                    music_file = final_commentary_track
+                    logger.info(
+                        f"AI voice commentary synthesized and attached successfully: {music_file}",
+                        extra_data={"duration": video_duration, "persona": persona_enum.value},
+                    )
+            except Exception as ce:
+                logger.warning(
+                    f"Commentary synthesis degraded: {ce}. Falling back seamlessly to standard background audio.",
+                    extra_data={
+                        "operation": "synthesize_commentary",
+                        "component": "CommentaryEngine",
+                        "file": str(input_video_path),
+                        "root_cause": str(ce),
+                        "recovery_action": "Proceeding with standard BGM audio loop; video render is unaffected.",
+                        "status": "DEGRADED",
+                    },
+                )
+
         # Step 4: Video Composite Rendering via FFmpeg
         logger.info("Step 4/6: Executing FFmpeg composite video render")
         output_path = processor.get_output_path(input_video_path.name)
@@ -526,19 +585,20 @@ def run_pipeline(
                 )
         else:
             logger.info("Local execution: Output generated in project output/ folder without upload.")
-            try:
-                title_mgr.advance_episode(title=metadata.title, job_id="local_execution")
-            except Exception as se:
-                logger.warning(
-                    f"Could not advance episode counter in local mode: {se}",
-                    extra_data={
-                        "operation": "advance_episode",
-                        "component": "TitleManager",
-                        "root_cause": str(se),
-                        "recovery_action": "Check series_tracker.json permissions.",
-                        "status": "DEGRADED",
-                    },
-                )
+            if advance_tracker:
+                try:
+                    title_mgr.advance_episode(title=metadata.title, job_id="local_execution")
+                except Exception as se:
+                    logger.warning(
+                        f"Could not advance episode counter in local mode: {se}",
+                        extra_data={
+                            "operation": "advance_episode",
+                            "component": "TitleManager",
+                            "root_cause": str(se),
+                            "recovery_action": "Check series_tracker.json permissions.",
+                            "status": "DEGRADED",
+                        },
+                    )
 
         # Step 6: History Logging & Notifications
         logger.info("Step 6/6: Recording job execution to history")

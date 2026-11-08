@@ -173,6 +173,26 @@ class ProcessingSettings(BaseModel):
     )
 
 
+class CommentarySettings(BaseModel):
+    enabled: bool = Field(
+        default_factory=lambda: os.getenv("ENABLE_VOICE_COMMENTARY", "true").lower() == "true"
+    )
+    persona: str = Field(default_factory=lambda: os.getenv("COMMENTARY_PERSONA", "casual"))
+    voice: str = Field(default_factory=lambda: os.getenv("COMMENTARY_VOICE", "en-US-GuyNeural"))
+    rate: str = Field(default_factory=lambda: os.getenv("COMMENTARY_RATE", "+0%"))
+    pitch: str = Field(default_factory=lambda: os.getenv("COMMENTARY_PITCH", "+0Hz"))
+    volume_boost_db: str = Field(default_factory=lambda: os.getenv("COMMENTARY_VOLUME_BOOST_DB", "+3dB"))
+    include_bgm: bool = Field(
+        default_factory=lambda: os.getenv("COMMENTARY_INCLUDE_BGM", "false").lower() == "true"
+    )
+    ducking_ratio: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("COMMENTARY_DUCKING_RATIO"), 6.0)
+    )
+    min_cue_interval: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("COMMENTARY_MIN_CUE_INTERVAL"), 45.0)
+    )
+
+
 class PipelineSettings(BaseModel):
     environment: str = Field(default_factory=lambda: os.getenv("ENVIRONMENT", "development"))
     log_level: str = Field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
@@ -184,6 +204,7 @@ class PipelineSettings(BaseModel):
     fediverse: FediverseSettings = Field(default_factory=FediverseSettings)
     smtp: SMTPSettings = Field(default_factory=SMTPSettings)
     processing: ProcessingSettings = Field(default_factory=ProcessingSettings)
+    commentary: CommentarySettings = Field(default_factory=CommentarySettings)
 
 
 def get_settings() -> PipelineSettings:
