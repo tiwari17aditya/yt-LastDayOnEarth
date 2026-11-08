@@ -3933,5 +3933,44 @@
       "ads_removed": [],
       "md5_checksum": "400a09fccd3e4f15d3bb6c23def4a496"
     }
+  },
+  {
+    "job_id": "job_20261108_144345",
+    "timestamp": "2026-11-08T14:43:45.938279+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 11-37-12_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_11-37-12_1_Processed_08112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "JvHTR5lHefg",
+    "youtube_url": "https://youtu.be/JvHTR5lHefg",
+    "details": {
+      "video_id": "JvHTR5lHefg",
+      "youtube_url": "https://youtu.be/JvHTR5lHefg",
+      "video_output": "output/ScreenRecording_11-04-2026_11-37-12_1_Processed_08112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_11-37-12_1_Processed_08112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_11-37-12_1_Processed_08112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Home Base Operations! | LDoE Survival #121",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Home Base Operations Plus Base Defense &... #121",
+        "walkthrough": "Surviving Day 121: Entering Home Base And Home Base Operations Plus Base Defense &... #121",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #121"
+      },
+      "duration_seconds": 1685.689138,
+      "soundtrack_tracks": [
+        "Bossa Antigua",
+        "Clear Waters",
+        "Bossa Antigua",
+        "Sneaky Snitch",
+        "Volatile Reaction",
+        "Monkeys Spinning Monkeys",
+        "Local Forecast",
+        "Life of Riley",
+        "Shores of Avalon"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "a74d6db21f68e8871553a43b604bf8ec"
+    }
   }
 ]
