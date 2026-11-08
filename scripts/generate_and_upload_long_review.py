@@ -62,31 +62,37 @@ def main():
         secs = int(c.start_time % 60)
         logger.info(f"  Cue #{idx+1:02d} [{mins:02d}:{secs:02d}] {c.topic}: {c.text[:55]}...")
 
-    # Synthesize all cues
-    commentary_engine.synthesize_all_cues(cues=cues, persona=CommentaryPersona.CASUAL)
-
-    # Assemble timeline track
     raw_timeline = temp_dir / "raw_timeline_voice_continuous.m4a"
-    commentary_engine.build_timeline_commentary_track(
-        cues=cues,
-        total_duration=duration,
-        output_path=raw_timeline,
-    )
+    if raw_timeline.exists() and raw_timeline.stat().st_size > 500 * 1024:
+        logger.info(f"Using existing raw continuous timeline voice track: {raw_timeline}")
+    else:
+        # Synthesize all cues
+        commentary_engine.synthesize_all_cues(cues=cues, persona=CommentaryPersona.CASUAL)
+
+        # Assemble timeline track
+        commentary_engine.build_timeline_commentary_track(
+            cues=cues,
+            total_duration=duration,
+            output_path=raw_timeline,
+        )
 
     # 3. Create Low-Volume Ambient Background Music Loop & Duck Behind Voice
     logger.info("Step 2/4: Generating soothing ambient BGM loop and mixing with sidechain ducking...")
     audio_mixer = AudioMixer()
     bgm_loop_path = temp_dir / "ambient_bgm_loop_15min.m4a"
-    audio_mixer.create_random_loop_sequence(target_duration=duration, output_path=bgm_loop_path)
+    if not bgm_loop_path.exists() or bgm_loop_path.stat().st_size < 500 * 1024:
+        audio_mixer.create_random_loop_sequence(target_duration=duration, output_path=bgm_loop_path)
+    else:
+        logger.info(f"Using existing ambient BGM loop track: {bgm_loop_path}")
 
     mixed_audio_track = temp_dir / "master_commentary_ducked_bgm_15min.m4a"
     commentary_engine.mix_commentary_with_bgm(
         commentary_audio=raw_timeline,
         bgm_audio=bgm_loop_path,
         output_audio_path=mixed_audio_track,
-        ducking_ratio=4.0,
-        voice_volume_boost_db="+3dB",
-        bgm_volume_db="-22dB",
+        ducking_ratio=5.0,
+        voice_volume_boost_db="+4dB",
+        bgm_volume_db="-24dB",
         duration=duration,
     )
     logger.info(f"Master ducked commentary audio track ready: {mixed_audio_track}")
@@ -106,7 +112,7 @@ def main():
 
     # 5. Upload to YouTube as Unlisted
     logger.info("Step 4/4: Uploading review video to YouTube as Unlisted...")
-    title = "Last Day on Earth: Survival — Full 15-Min Continuous AI Voice Walkthrough (Review)"
+    title = "Last Day on Earth: Survival — 15-Min Continuous AI Voice Walkthrough (Refined Audio Review)"
 
     # Build description with concise, clickable chapter headings
     ts_lines = []
@@ -188,7 +194,7 @@ def main():
     print(f"Video Title   : {title}")
     print(f"Duration      : {duration/60.0:.2f} minutes ({duration:.1f}s)")
     print(f"Voice Style   : Style 2 - Casual Companion (en-US-GuyNeural)")
-    print(f"Audio Mix     : Sidechain Ducked Ambient BGM (-22dB) + Normalized Voice (+3dB, -16 LUFS)")
+    print(f"Audio Mix     : Sidechain Ducked Ambient BGM (-24dB) + Prominent Voice (+4dB, -14 LUFS)")
     print(f"Chapters Count: {len(cues)} clean chapter headings")
     print(f"Privacy Status: UNLISTED (Private for Creator Review)")
     print(f"Review URL    : {upload_url}")

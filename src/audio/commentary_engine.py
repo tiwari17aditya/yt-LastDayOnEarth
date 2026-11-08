@@ -711,9 +711,9 @@ class CommentaryEngine:
         bgm_audio: Path,
         output_audio_path: Path,
         raw_game_audio: Optional[Path] = None,
-        ducking_ratio: float = 4.0,
-        voice_volume_boost_db: str = "+3dB",
-        bgm_volume_db: str = "-22dB",
+        ducking_ratio: float = 5.0,
+        voice_volume_boost_db: str = "+4dB",
+        bgm_volume_db: str = "-24dB",
         duration: Optional[float] = None,
     ) -> Path:
         """Applies professional dynamic sidechain compression: BGM ducks automatically when commentary speaks."""
@@ -721,11 +721,11 @@ class CommentaryEngine:
 
         if raw_game_audio and raw_game_audio.exists():
             filtergraph = (
+                f"[1:a]volume={voice_volume_boost_db},loudnorm=I=-14:TP=-1.0:LRA=10,asplit=2[voice_sc][voice_mix];"
                 f"[0:a]volume={bgm_volume_db}[bg_soft];"
-                f"[1:a]volume={voice_volume_boost_db},loudnorm=I=-16:TP=-1.5:LRA=11[voice];"
-                f"[bg_soft][voice]sidechaincompress=threshold=0.03:ratio={ducking_ratio}:attack=120:release=600[bg_ducked];"
-                f"[2:a]volume=-20dB[game_low];"
-                f"[bg_ducked][voice][game_low]amix=inputs=3:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
+                f"[bg_soft][voice_sc]sidechaincompress=threshold=0.02:ratio={ducking_ratio}:attack=100:release=700[bg_ducked];"
+                f"[2:a]volume=-22dB[game_low];"
+                f"[bg_ducked][voice_mix][game_low]amix=inputs=3:normalize=0:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
             )
             cmd = [
                 "ffmpeg", "-y",
@@ -739,10 +739,10 @@ class CommentaryEngine:
             ]
         else:
             filtergraph = (
+                f"[1:a]volume={voice_volume_boost_db},loudnorm=I=-14:TP=-1.0:LRA=10,asplit=2[voice_sc][voice_mix];"
                 f"[0:a]volume={bgm_volume_db}[bg_soft];"
-                f"[1:a]volume={voice_volume_boost_db},loudnorm=I=-16:TP=-1.5:LRA=11[voice];"
-                f"[bg_soft][voice]sidechaincompress=threshold=0.03:ratio={ducking_ratio}:attack=120:release=600[bg_ducked];"
-                f"[bg_ducked][voice]amix=inputs=2:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
+                f"[bg_soft][voice_sc]sidechaincompress=threshold=0.02:ratio={ducking_ratio}:attack=100:release=700[bg_ducked];"
+                f"[bg_ducked][voice_mix]amix=inputs=2:normalize=0:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
             )
             cmd = [
                 "ffmpeg", "-y",
@@ -796,9 +796,9 @@ class CommentaryEngine:
         persona: CommentaryPersona = CommentaryPersona.CASUAL,
         include_bgm: bool = True,
         bgm_audio: Optional[Path] = None,
-        volume_boost_db: str = "+3dB",
-        bgm_volume_db: str = "-22dB",
-        ducking_ratio: float = 4.0,
+        volume_boost_db: str = "+4dB",
+        bgm_volume_db: str = "-24dB",
+        ducking_ratio: float = 5.0,
         min_cue_interval: float = 25.0,
         raw_game_audio: Optional[Path] = None,
     ) -> Path:

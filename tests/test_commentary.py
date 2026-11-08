@@ -46,10 +46,10 @@ def test_commentary_settings_defaults():
     assert settings.commentary.enabled is True
     assert settings.commentary.persona == "casual"
     assert settings.commentary.voice == "en-US-GuyNeural"
-    assert settings.commentary.volume_boost_db == "+3dB"
+    assert settings.commentary.volume_boost_db == "+4dB"
     assert settings.commentary.include_bgm is True
-    assert settings.commentary.bgm_volume_db == "-22dB"
-    assert settings.commentary.ducking_ratio == 4.0
+    assert settings.commentary.bgm_volume_db == "-24dB"
+    assert settings.commentary.ducking_ratio == 5.0
     assert settings.commentary.min_cue_interval == 25.0
 
 
