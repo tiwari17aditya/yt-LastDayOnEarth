@@ -73,11 +73,19 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `analyze_events(video_path: Path) -> List[GameplayEvent]`
   - `generate_subtitles(events: List[GameplayEvent], output_path: Path) -> Path`
 
-### 3.4 Audio Engine (`src/audio/`)
-- **Responsibility**: Select appropriate music track from the 20 royalty-free catalog, loop seamlessly, and duck audio under gameplay sound effects.
-- **Interface**: `BaseAudioMixer`
-  - `select_track(mood: str, target_duration: float) -> MusicTrack`
-  - `build_audio_filter(video_audio_stream: str, music_track: MusicTrack, ducking_db: str) -> str`
+### 3.4 Audio & AI Commentary Engine (`src/audio/`)
+- **Responsibility**: Select appropriate music track from the 20 royalty-free catalog, loop seamlessly, duck audio under gameplay sound effects, and synthesize continuous AI companion voice walkthroughs.
+- **Components**:
+  - `AudioMixer`: Manages royalty-free music library selection, duration probing, and multi-track concatenation loops (`create_random_loop_sequence`).
+  - `CommentaryEngine` (`src/audio/commentary_engine.py`):
+    - Synthesizes dynamic, domain-grounded commentary dialogue across video durations using `edge-tts`.
+    - Supports three distinct personas: Energetic (`en-US-ChristopherNeural`), Casual (`en-US-GuyNeural`), and Tactical (`en-US-AndrewNeural`).
+    - Fills timeline silence gaps during gameplay downtime/roaming with 36+ survival strategy and advancement topics (~25s interval).
+    - Dynamic FFmpeg Sidechain Compression: Routes voice through `asplit=2` to trigger `sidechaincompress(threshold=0.02, ratio=5.0)` against ambient background music (`-24dB`), ducking it to `-30dB` when speaking while keeping spoken voice at `-14 LUFS` broadcast level via `amix(normalize=0)`.
+    - Fail-Safe Fallback: Degradation path catches synthesis errors and automatically falls back to standard background music loop without halting video rendering or publishing.
+- **Interface**:
+  - `BaseAudioMixer`: `select_track(mood: str, target_duration: float) -> MusicTrack`, `build_audio_filter(...) -> str`
+  - `CommentaryEngine`: `generate_script(...) -> List[CommentaryCue]`, `synthesize_all_cues(...)`, `build_timeline_commentary_track(...)`, `mix_commentary_with_bgm(...)`, `generate_commentary_track(...)`
 
 ### 3.5 Video Processor & Outro Animation Engine (`src/processor/`)
 - **Responsibility**: Assemble video streams, blur filters, burned-in styled subtitles, mixed audio, and animated brand outro tails using FFmpeg into a broadcast-standard YouTube-ready MP4.

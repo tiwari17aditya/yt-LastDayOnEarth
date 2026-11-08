@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-11-08
+
+### Added
+- **Interactive AI Spoken Commentary Companion Engine (`src/audio/commentary_engine.py`)**:
+  - Implemented `CommentaryEngine` orchestrating intelligent script synthesis, neural text-to-speech generation via `edge-tts`, timeline assembly, broadcast loudness normalization, and dynamic background music sidechain ducking.
+  - Three distinct commentary persona profiles:
+    - **Style 1 (Energetic Companion)**: `en-US-ChristopherNeural` (+3% pitch, +5% rate) for fast-paced combat and raids.
+    - **Style 2 (Casual Walkthrough Companion - Default)**: `en-US-GuyNeural` (+0% pitch, +0% rate) for natural, conversational survival walkthroughs.
+    - **Style 3 (Tactical Survival Guide)**: `en-US-AndrewNeural` (-2% pitch, -3% rate) for analytical, resource-economy optimization.
+  - **Continuous Dialogue Flow**: Automatically identifies timeline silence gaps and injects 36+ comprehensive LDoE procedural survival topics (honeycomb base defenses, wall-trick doorway techniques, smelter charcoal efficiency, Chopper milestones, dog breeding traits, Bunker Alfa farming, and Kefir game evolution) during roaming/crafting downtime (~25s interval).
+  - **Dynamic Audio Sidechain Ducking with `asplit`**:
+    - High-quality dual-stream routing: `asplit=2` feeds both the sidechain compressor and master audio mixer without stream pad consumption.
+    - Normalizes voice audio to broadcast standards (`-14 LUFS`, peak `-1.0dB`, `volume=+4dB`).
+    - Gently attenuates ambient background music to `-24dB`, smoothly ducking it down to `-30dB` when voice is active via `sidechaincompress(ratio=5.0)`.
+    - Native `amix(normalize=0)` mixing ensures speech retains 100% volume without artificial division.
+  - **Short YouTube Chapter Headings**: Formats video chapters into concise topic headings starting at `00:00` for native YouTube scrubber chapters (e.g. `00:00 - Introduction & Base Prep`, `00:38 - Storage & Inventory Sorting`).
+  - **Fail-Safe Resilience & Global Engineering Rule 4 Compliance**:
+    - `CommentaryError` provides structured machine-readable error reporting (`operation`, `component="CommentaryEngine"`, `status="DEGRADED"`).
+    - If commentary synthesis fails, the pipeline seamlessly degrades to standard background music without crashing or aborting video rendering or uploads.
+  - **Configuration Controls (`src/config.py`, `.env.example`)**:
+    - Added `CommentarySettings` supporting `ENABLE_VOICE_COMMENTARY`, `COMMENTARY_PERSONA`, `COMMENTARY_VOICE`, `COMMENTARY_VOLUME_BOOST_DB`, `COMMENTARY_INCLUDE_BGM`, `COMMENTARY_BGM_VOLUME_DB`, `COMMENTARY_DUCKING_RATIO`, and `COMMENTARY_MIN_CUE_INTERVAL`.
+  - **Unit Test Coverage (`tests/test_commentary.py`)**:
+    - Added 13 comprehensive unit tests verifying persona profiles, script structure, event grounding, retry fail-safe isolation, and pipeline graceful degradation (46/46 tests passing across test suite).
+
 ## [1.11.0] - 2026-11-06
 
 ### Added

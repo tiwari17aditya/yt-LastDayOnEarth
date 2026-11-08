@@ -8,11 +8,12 @@ The pipeline automates the end-to-end publishing journey:
 1. **Google Drive Ingestion**: Monitors incoming gameplay video uploads (`Input/Input 1`).
 2. **Privacy Protection & Automated Ad Cutting**: Scans video frames to detect and cleanly excise in-game mobile commercial advertisements (rewarded ads, countdown timers) and redacts sensitive personal popups while strictly preserving the player username and game HUD.
 3. **Gameplay Context & Subtitles**: Generates synchronized in-game commentary and authentic chapter markers using Gemini 2.5 Flash Vision multimodal keyframe analysis, backed by a Title History Anti-Repetition Guard preventing consecutive duplicate episode phrasings.
-4. **Royalty-Free Audio Engine**: Integrates a curated catalog of 20 royalty-free survival and gaming tracks, seamlessly looping and ducking background music.
-5. **FFmpeg Video Composite**: Hardcodes stylized subtitles and renders high-definition, YouTube-optimized video with standardized naming convention (`<Title>_Processed_<DDMMYYYY>.mp4`).
-6. **AI Metadata Generation**: Crafts tailored YouTube titles, structured descriptions with chapter timestamps, game tags, and music licensing attributions.
-7. **YouTube Publishing**: Uploads directly to YouTube via YouTube Data API v3.
-8. **Notifications & Periodic Reporting**: Delivers immediate email alerts upon completion/failure, plus automated weekly and monthly aggregation reports.
+4. **Interactive AI Voice Commentary Companion**: Generates continuous, domain-grounded spoken survival walkthrough commentary (Style 2 GuyNeural companion) dynamically ducked over royalty-free background music via FFmpeg sidechain compression (`asplit` dual-stream routing), with automated fallback degradation.
+5. **Royalty-Free Audio Engine**: Integrates a curated catalog of 20 royalty-free survival and gaming tracks, seamlessly looping and ducking background music.
+6. **FFmpeg Video Composite**: Hardcodes stylized subtitles and renders high-definition, YouTube-optimized video with standardized naming convention (`<Title>_Processed_<DDMMYYYY>.mp4`).
+7. **AI Metadata Generation**: Crafts tailored YouTube titles, structured descriptions with concise chapter timestamps, game tags, and music licensing attributions.
+8. **YouTube Publishing**: Uploads directly to YouTube via YouTube Data API v3.
+9. **Notifications & Periodic Reporting**: Delivers immediate email alerts upon completion/failure, plus automated weekly and monthly aggregation reports.
 
 ---
 
