@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 118,
+  "current_episode": 119,
   "completed_episodes": [
     {
       "episode": 1,
@@ -789,6 +789,13 @@
       "video_id": "KstUOUnjZCU",
       "youtube_url": "https://youtu.be/KstUOUnjZCU",
       "job_id": "KstUOUnjZCU"
+    },
+    {
+      "episode": 118,
+      "title": "Best Base Storage & Workshop Layout Guide | LDoE #118",
+      "video_id": "M6xyptKzqxI",
+      "youtube_url": "https://youtu.be/M6xyptKzqxI",
+      "job_id": "M6xyptKzqxI"
     }
   ]
 }

@@ -3830,5 +3830,43 @@
       "ads_removed": [],
       "md5_checksum": "d1e430b200cd7559c19590850a2a1238"
     }
+  },
+  {
+    "job_id": "job_20261108_004602",
+    "timestamp": "2026-11-08T00:46:02.124200+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 02-12-51_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_02-12-51_1_Processed_07112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "M6xyptKzqxI",
+    "youtube_url": "https://youtu.be/M6xyptKzqxI",
+    "details": {
+      "video_id": "M6xyptKzqxI",
+      "youtube_url": "https://youtu.be/M6xyptKzqxI",
+      "video_output": "output/ScreenRecording_11-04-2026_02-12-51_1_Processed_07112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_02-12-51_1_Processed_07112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_02-12-51_1_Processed_07112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Base Storage Optimization! | LDoE Survival #118",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Organizing Storage & Chests Plus... #118",
+        "walkthrough": "Surviving Day 118: Home Base Operations And Organizing Storage & Chests Plus Entering Home... #118",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #118"
+      },
+      "duration_seconds": 1700.492925,
+      "soundtrack_tracks": [
+        "Fretless",
+        "Monkeys Spinning Monkeys",
+        "Shores of Avalon",
+        "Electro Cabello",
+        "Clean Soul",
+        "Sneaky Snitch",
+        "Shores of Avalon",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "1483e66fa6218bc9680f1604e2102b90"
+    }
   }
 ]
