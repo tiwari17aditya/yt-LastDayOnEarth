@@ -80,95 +80,222 @@ class CommentaryCue:
     style: CommentaryPersona = CommentaryPersona.CASUAL
     duration: float = 0.0
     audio_path: Optional[Path] = None
+    topic: str = ""  # Short chapter heading for YouTube description
 
 
 # Comprehensive pool of procedural commentary dialogue for Last Day on Earth
 PROCEDURAL_CASUAL_TOPICS = [
     {
         "category": "inventory",
+        "topic": "Storage & Inventory Sorting",
         "text": "I always like to spend a few minutes organizing storage before heading out. Having dedicated chests for raw wood, ores, and weapons saves so much time later.",
     },
     {
+        "category": "progression",
+        "topic": "Base Evolution & Memories",
+        "text": "Looking around this base, remember when this was just a small three-by-three wooden box with a single campfire? We have come such a long way since those early grind sessions.",
+    },
+    {
         "category": "smelting",
+        "topic": "Smelter Fuel Efficiency",
         "text": "Checking in on our smelters. A quick pro tip: turning raw wood into charcoal gives you much higher fuel efficiency than burning plain logs.",
     },
     {
         "category": "defense",
+        "topic": "Honeycomb Wall Defense",
         "text": "Expanding our base perimeter today. Upgrading from basic wood to sturdy level two planks makes a huge difference when the daily zombie horde sweeps through.",
     },
     {
+        "category": "horde",
+        "topic": "Horde Pathing Mechanics",
+        "text": "When the daily horde visits, they break two to three outer walls and pass right through. Do not waste stone on outer walls until your inner reinforced core is finished.",
+    },
+    {
         "category": "combat",
+        "topic": "Sneak Attack Melee Strategy",
         "text": "Clearing out the perimeter with sneak attacks here. That triple damage bonus on the first strike saves a ton of weapon durability in the long run.",
     },
     {
+        "category": "durability",
+        "topic": "Weapon Durability Economy",
+        "text": "Always keep an eye on weapon durability. For easy resource zones, craft cheap cleavers or wooden spears. Save your high-damage katanas and machetes for the bunker.",
+    },
+    {
         "category": "vehicle",
+        "topic": "Chopper Motorcycle Assembly",
         "text": "Taking a quick look at the Chopper. Piecing together wheels, the gas tank, and engine parts is always one of the most rewarding milestones in LDoE.",
     },
     {
+        "category": "watchtower",
+        "topic": "Northern Watchtower & Oak",
+        "text": "Once your Chopper is running, hauling the electric generator to the northern watchtower unlocks oak clearings and winter snow zones. It opens up the whole map.",
+    },
+    {
         "category": "recycler",
+        "topic": "Recycler Scrap & Electronics",
         "text": "Our recycler is steadily running. Leveling up electronics and mechanics with spare batteries and broken flashlights is the best route to free copper and steel.",
     },
     {
         "category": "companion",
+        "topic": "Canine Companion Breeding",
         "text": "Stopping by the dog crate to feed the pups. Rolling traits like Bloodhound or True Friend gives you an incredible passive boost out in the field.",
     },
     {
+        "category": "true_friend",
+        "topic": "True Friend Dog Ability",
+        "text": "Getting a pup with True Friend takes patience, but having a dog that actually attacks zombies with you and opens secret bunker crawl spaces is unbeatable.",
+    },
+    {
         "category": "scouting",
+        "topic": "Zone Scouting & Minimap Pacing",
         "text": "Pacing ourselves through this zone. You always want to keep one eye glued to the minimap to avoid getting cornered by spitters or roaming packs.",
     },
     {
+        "category": "spitters",
+        "topic": "Toxic Spitter Evasion",
+        "text": "Watch out for toxic spitters! Sidestep the green spit. If you take three hits and get smelly, every zombie across the entire zone starts sprinting right at you.",
+    },
+    {
         "category": "bunker",
+        "topic": "Bunker Alfa Ticket Farming",
         "text": "Stocking up combat tickets for Bunker Alfa. Cashing in green, yellow, and red tickets downstairs remains the most consistent source of military firearms.",
     },
     {
+        "category": "wall_trick",
+        "topic": "Wall Trick Doorway Technique",
+        "text": "Practicing the wall trick on doorway frames is the single biggest ammo saver in LDoE. Time your melee swings right as the zombie strikes the wall.",
+    },
+    {
         "category": "farm",
+        "topic": "Crooked Creek Farm Strategy",
         "text": "Whenever you hit Crooked Creek Farm, remember to sneak past the diseased giants if you want to conserve ammo, and let the saw cutter finish the blue crate quietly.",
     },
     {
+        "category": "ravager",
+        "topic": "Farm Ravager Boss Tactics",
+        "text": "When fighting the Ravager at the farm, simply circle around him when he pauses to spit. He deals zero armor damage as long as you keep moving laterally.",
+    },
+    {
         "category": "gunsmith",
+        "topic": "Gunsmith Weapon Modding",
         "text": "Fine-tuning our weapon mods at the gunsmith bench. Adding red dot optics and expanded magazines transforms even basic pistols into clearing machines.",
     },
     {
-        "category": "winter",
-        "text": "Getting our warm fur armor ready for the cold zones. Freezing ruins your attack speed and leaves you vulnerable, so insulation is everything.",
-    },
-    {
         "category": "police",
+        "topic": "Blackport PD Wave Defense",
         "text": "Managing resources for the Blackport PD yard. Surviving consecutive waves without burning through all your armor is the secret to scoring purple inspector badges.",
     },
     {
+        "category": "winter",
+        "topic": "Winter Zone Thermal Prep",
+        "text": "Getting our warm fur armor ready for the cold zones. Freezing ruins your attack speed and leaves you vulnerable, so thermal flasks and fur insulation are everything.",
+    },
+    {
+        "category": "oak",
+        "topic": "Oak Forest Woodcraft",
+        "text": "Heading to the oak clearings. Always bring iron hatchets instead of basic stone ones, because regular tools cannot chop through thick oak trunks.",
+    },
+    {
+        "category": "evolution",
+        "topic": "LDoE Game Advancements",
+        "text": "Looking back at how far Kefir has developed this game — from basic forest zones to drone combat, laboratory runs, and the settlement — it has been an awesome journey.",
+    },
+    {
+        "category": "settlement",
+        "topic": "Settlement Power & Barracks",
+        "text": "The settlement system has completely transformed late-game progression. Routing power distribution and upgrading residential barracks gives permanent perks.",
+    },
+    {
+        "category": "crater",
+        "topic": "Multiplayer Crater Trading",
+        "text": "If you haven't checked out the Crater sector recently, running multiplayer clan contracts and setting up your own shop is such a fun change of pace.",
+    },
+    {
+        "category": "air_drop",
+        "topic": "Air Drop Energy Timing",
+        "text": "Air drop event tip: when an event triggers, always travel there immediately. If your survivor energy dips under 70, the map often spawns an extra trader or drop.",
+    },
+    {
+        "category": "healer",
+        "topic": "Healer Buff Strategy",
+        "text": "Never ignore the healer standing near your pickup truck. Grabbing that five percent rare weapon drop buff or full energy refill before a raid gives you a massive edge.",
+    },
+    {
+        "category": "sorting",
+        "topic": "Fast-Drop Inventory Sorting",
+        "text": "Keeping a designated dump chest near your base entrance saves so much time. Drop everything instantly after a run, and do deep sorting once your crates fill up.",
+    },
+    {
+        "category": "fishing",
+        "topic": "Fishing Buffs & Recipes",
+        "text": "Hitting the fishing pond with professional rods and burley. Cooking catfish and trout dishes on the kitchen stove gives long-lasting buffs for boss fights.",
+    },
+    {
+        "category": "gear_check",
+        "topic": "Armor Conservation Discipline",
+        "text": "Discipline with armor saves thousands of cloth and leather. Never chop wood or gather limestone in full tactical armor — keep durability fresh for real danger.",
+    },
+    {
+        "category": "community",
+        "topic": "Community Milestone Question",
+        "text": "I'm curious to hear where you all are at in your survival journey right now! Are you grinding Bunker Alfa, finishing the Chopper, or building stone walls? Let me know in the comments!",
+    },
+    {
         "category": "crafting",
+        "topic": "Workbench Resource Loops",
         "text": "Keeping our workbenches humming. Crafting thick leather, sewing bandages, and refining iron ensures you never start a mission unprepared.",
     },
     {
         "category": "resupply",
+        "topic": "Health & Nutrition Routine",
         "text": "Checking our health bar and nourishment. Eating canned food and drinking water regularly prevents your survivor from slowing down during high-stress runs.",
+    },
+    {
+        "category": "atv",
+        "topic": "Late-Game ATV Transmission",
+        "text": "Working toward the ATV is the ultimate long-term grind in LDoE. Stocking up car batteries, cogwheels, and transmission cases from the bravo bunker takes real dedication.",
+    },
+    {
+        "category": "bunker_bravo",
+        "topic": "Bunker Bravo Radiation Prep",
+        "text": "Speaking of Bunker Bravo, radiation suits and anti-rad ampoules are mandatory. The radiation timer forces you to blitz rooms at lightning speed.",
+    },
+    {
+        "category": "motel",
+        "topic": "Motel Resource Clears",
+        "text": "The motel remains one of the best low-risk loot spots for beginners. You can clear the whole building with just a spear and walk away with easy energy drinks.",
     },
 ]
 
 PROCEDURAL_ENERGETIC_TOPICS = [
     {
         "category": "hype",
+        "topic": "Adrenaline & Action Momentum",
         "text": "Alright survivors, let's keep the momentum going! Checking our gear, stacking the best melee weapons, and staying on high alert!",
     },
     {
         "category": "craft",
-        "text": "Look at those furnaces burning! Production never stops on this base â€” turning raw ore into iron bars 24/7!",
+        "topic": "Furnace & Production Rush",
+        "text": "Look at those furnaces burning! Production never stops on this base — turning raw ore into iron bars 24/7!",
     },
     {
         "category": "combat",
+        "topic": "Rapid Zombie Elimination",
         "text": "Spotted spitters and fast biters closing in! Keep moving, don't let them surround you. That sneak attack bonus is so satisfying!",
     },
     {
         "category": "loot",
+        "topic": "High-Tier Crate Looting",
         "text": "Opening up these high-tier crates... engine parts, weapon mods, and rare tickets! That is a massive score!",
     },
     {
         "category": "threat",
+        "topic": "Noise Meter Threat Alert",
         "text": "Watch the noise meter! In higher zones, making too much racket brings the Big One, and that's an instant reset. Staying light and fast!",
     },
     {
         "category": "clutch",
+        "topic": "Bandage Hotkey Clutch Recovery",
         "text": "Down to half health but we've got bandages hotkeyed! Quick heal, reset the fight, and back into action!",
     },
 ]
@@ -176,22 +303,27 @@ PROCEDURAL_ENERGETIC_TOPICS = [
 PROCEDURAL_TACTICAL_TOPICS = [
     {
         "category": "tactical_rule",
-        "text": "Key survival rule: always calculate weapon durability per enemy encounter. Avoid using firearms on standard roaming zombies â€” preserve guns for Frenzied Giants.",
+        "topic": "Durability & Weapon Economy",
+        "text": "Key survival rule: always calculate weapon durability per enemy encounter. Avoid using firearms on standard roaming zombies — preserve guns for Frenzied Giants.",
     },
     {
         "category": "base_layout",
+        "topic": "Honeycomb Perimeter Defense",
         "text": "When building your base layout, implement a honeycomb wall design. The daily horde destroys two to three outer walls, but cannot penetrate your reinforced core.",
     },
     {
         "category": "wall_trick",
+        "topic": "Doorframe Wall-Trick Technique",
         "text": "Notice the engagement spacing here. Utilizing door mechanics and wall-tricking eliminates incoming damage entirely, saving both healing items and armor durability.",
     },
     {
         "category": "loot_priority",
+        "topic": "High-Value Item Prioritization",
         "text": "Priority loot extracted. Always prioritize red combat tickets, aluminum wire, and factory parts over common limestone and raw pine.",
     },
     {
         "category": "resource_calc",
+        "topic": "Energy Travel Calculation",
         "text": "Energy conservation principle: batch your resource runs to adjacent zones to minimize travel energy while maximizing inventory capacity.",
     },
 ]
@@ -214,12 +346,13 @@ class CommentaryEngine:
         duration: float = 900.0,
         episode_number: Optional[int] = None,
         persona: CommentaryPersona = CommentaryPersona.CASUAL,
-        min_cue_interval: float = 60.0,
+        min_cue_interval: float = 25.0,
     ) -> List[CommentaryCue]:
         """Synthesizes high-engagement, domain-grounded LDoE commentary cues matching video duration.
         
         Dynamically distributes cues across the timeline with comfortable breathing room,
         grounding dialogue in detected gameplay events or procedural survival walkthrough topics.
+        Ensures continuous, interactive commentary during roaming and free-play downtime.
         """
         ep_label = f"Episode {episode_number}" if episode_number else "our survival series"
         cues: List[CommentaryCue] = []
@@ -230,79 +363,24 @@ class CommentaryEngine:
                 f"Hey everyone, welcome back to Last Day on Earth! In {ep_label}, we're diving into base optimization, "
                 "stocking up on essential survival supplies, and heading out into the wasteland. Let's see what we can accomplish today."
             )
+            intro_topic = "Introduction & Base Prep"
         elif persona == CommentaryPersona.ENERGETIC:
             intro_text = (
                 f"What is up survivors! Welcome back to Last Day on Earth, {ep_label}! Today we are gearing up, "
                 "raiding deep into zombie territory, and testing our base defenses. Let's get right into it!"
             )
+            intro_topic = "High-Energy Intro & Objectives"
         else:  # TACTICAL
             intro_text = (
                 f"Welcome survivors. This is {ep_label} of our Last Day on Earth strategic walkthrough. "
                 "Today's focus is resource economy, defense optimization, and risk-managed clearing."
             )
+            intro_topic = "Strategic Mission Briefing"
 
-        cues.append(CommentaryCue(start_time=2.0, text=intro_text, style=persona))
+        cues.append(CommentaryCue(start_time=2.0, text=intro_text, style=persona, topic=intro_topic))
 
-        # 2. Outro Hook (starts ~20-25s before end)
+        # 2. Outro Hook (starts ~20-22s before end)
         outro_time = max(15.0, duration - 22.0)
-
-        # 3. Middle Dialogue Cues (spaced across video timeline)
-        if duration >= 50.0:
-            usable_start = 30.0
-            usable_end = outro_time - 30.0
-
-            # Check if valid events exist
-            event_cues_added = False
-            last_cue_time = 0.0
-
-            if events:
-                for ev in events:
-                    ev_time = getattr(ev, "start_time", None)
-                    if ev_time is None or not (usable_start <= ev_time <= usable_end):
-                        continue
-
-                    if last_cue_time > 0 and (ev_time - last_cue_time < min_cue_interval):
-                        continue
-
-                    ev_type = getattr(ev, "action_type", getattr(ev, "event_type", "nav"))
-                    ev_desc = getattr(ev, "description", "")
-
-                    # Map event to conversational cue
-                    cue_text = self._format_event_cue(ev_type, ev_desc, persona)
-                    cues.append(CommentaryCue(start_time=float(ev_time), text=cue_text, style=persona))
-                    last_cue_time = float(ev_time)
-                    event_cues_added = True
-
-            # If no events or sparse gaps, fill procedurally
-            if not event_cues_added or (outro_time - max(last_cue_time, 2.0) > 180.0):
-                procedural_topics = (
-                    PROCEDURAL_CASUAL_TOPICS
-                    if persona == CommentaryPersona.CASUAL
-                    else PROCEDURAL_ENERGETIC_TOPICS
-                    if persona == CommentaryPersona.ENERGETIC
-                    else PROCEDURAL_TACTICAL_TOPICS
-                )
-
-                # Compute target spacing (between 70s and 120s)
-                total_span = usable_end - usable_start
-                if total_span > 0:
-                    num_steps = max(1, min(len(procedural_topics), int(total_span // 85.0)))
-                    step_size = total_span / (num_steps + 1)
-
-                    topic_idx = 0
-                    current_t = usable_start + (step_size * 0.4)
-
-                    while current_t <= usable_end and topic_idx < len(procedural_topics):
-                        # Ensure distance from any already added event cues
-                        conflict = any(abs(c.start_time - current_t) < 35.0 for c in cues)
-                        if not conflict and (last_cue_time == 0.0 or current_t - last_cue_time >= 45.0):
-                            item = procedural_topics[topic_idx]
-                            cues.append(CommentaryCue(start_time=round(current_t, 1), text=item["text"], style=persona))
-                            last_cue_time = current_t
-                            topic_idx += 1
-                        current_t += step_size
-
-        # Append Outro Hook
         if persona == CommentaryPersona.CASUAL:
             outro_text = (
                 "Thanks so much for hanging out and watching today's episode! If you enjoyed this walkthrough, "
@@ -319,37 +397,143 @@ class CommentaryEngine:
                 "That concludes today's tactical breakdown. Remember to subscribe for more in-depth LDoE raid guides, "
                 "and leave your questions in the comments below. Stay sharp out there."
             )
+        outro_cue = CommentaryCue(start_time=round(outro_time, 1), text=outro_text, style=persona, topic="Episode Recap & Outro")
 
-        cues.append(CommentaryCue(start_time=round(outro_time, 1), text=outro_text, style=persona))
+        # 3. Middle Dialogue Cues (continuous pacing across video timeline)
+        if duration >= 45.0:
+            usable_start = 25.0
+            usable_end = outro_time - 20.0
+
+            # Step 1: Collect detected gameplay events if provided
+            event_cues: List[CommentaryCue] = []
+            if events:
+                last_ev_time = 0.0
+                for ev in events:
+                    ev_time = getattr(ev, "start_time", None)
+                    if ev_time is None or not (usable_start <= ev_time <= usable_end):
+                        continue
+
+                    if last_ev_time > 0 and (ev_time - last_ev_time < min_cue_interval):
+                        continue
+
+                    ev_type = getattr(ev, "action_type", getattr(ev, "event_type", "nav"))
+                    ev_desc = getattr(ev, "description", "")
+
+                    cue_text, cue_topic = self._format_event_cue(ev_type, ev_desc, persona)
+                    event_cues.append(
+                        CommentaryCue(
+                            start_time=float(ev_time),
+                            text=cue_text,
+                            style=persona,
+                            topic=cue_topic,
+                        )
+                    )
+                    last_ev_time = float(ev_time)
+
+            # Combine intro, event cues, and outro to identify silence gaps
+            anchor_cues = [cues[0]] + event_cues + [outro_cue]
+            anchor_cues.sort(key=lambda c: c.start_time)
+
+            # Step 2: Fill gaps continuously so roaming/free time has active strategy/advancement talk
+            procedural_topics = (
+                PROCEDURAL_CASUAL_TOPICS
+                if persona == CommentaryPersona.CASUAL
+                else PROCEDURAL_ENERGETIC_TOPICS
+                if persona == CommentaryPersona.ENERGETIC
+                else PROCEDURAL_TACTICAL_TOPICS
+            )
+
+            final_cues: List[CommentaryCue] = [anchor_cues[0]]
+            topic_idx = 0
+
+            for i in range(len(anchor_cues) - 1):
+                c_prev = anchor_cues[i]
+                c_next = anchor_cues[i + 1]
+
+                # Estimated speech duration of preceding cue (~8 seconds)
+                prev_finish = c_prev.start_time + 8.0
+                gap = c_next.start_time - prev_finish
+
+                # If gap permits dialogue with natural breather, insert procedural commentary
+                if gap >= (min_cue_interval + 4.0):
+                    num_inserts = int(gap // (min_cue_interval + 3.0))
+                    if num_inserts > 0:
+                        interval = gap / (num_inserts + 1)
+                        for k in range(1, num_inserts + 1):
+                            insert_time = round(prev_finish + (interval * k), 1)
+                            if insert_time <= usable_end:
+                                item = procedural_topics[topic_idx % len(procedural_topics)]
+                                topic_idx += 1
+                                final_cues.append(
+                                    CommentaryCue(
+                                        start_time=insert_time,
+                                        text=item["text"],
+                                        style=persona,
+                                        topic=item.get("topic", "Survival Strategy"),
+                                    )
+                                )
+
+                final_cues.append(c_next)
+
+            cues = final_cues
+        else:
+            cues.append(outro_cue)
 
         # Sort cues strictly chronologically
         cues.sort(key=lambda c: c.start_time)
         return cues
 
-    def _format_event_cue(self, event_type: str, description: str, persona: CommentaryPersona) -> str:
-        """Adapts a gameplay event into natural persona dialogue."""
+    def _format_event_cue(self, event_type: str, description: str, persona: CommentaryPersona) -> Tuple[str, str]:
+        """Adapts a gameplay event into natural persona dialogue and returns (dialogue_text, topic_heading)."""
         desc_clean = description.strip() if description else "this objective"
         ev_type = (event_type or "").lower()
         if persona == CommentaryPersona.CASUAL:
             if any(k in ev_type for k in ["combat", "fight", "attack", "kill"]):
-                return f"Spotting enemy movement here: {desc_clean}. Taking our time, dodging attacks to preserve armor durability."
+                return (
+                    f"Spotting enemy movement here: {desc_clean}. Taking our time, dodging attacks to preserve armor durability.",
+                    "Combat & Defense Strategy",
+                )
             elif any(k in ev_type for k in ["craft", "smelt", "furnace", "workshop", "build"]):
-                return f"Checking our production here: {desc_clean}. Keeping materials organized and workbenches running smoothly."
+                return (
+                    f"Checking our production here: {desc_clean}. Keeping materials organized and workbenches running smoothly.",
+                    "Crafting & Smelting Queue",
+                )
             elif any(k in ev_type for k in ["loot", "crate", "chest", "storage"]):
-                return f"Opening up this stash: {desc_clean}. Exactly the kind of high-value components we need for future upgrades."
+                return (
+                    f"Opening up this stash: {desc_clean}. Exactly the kind of high-value components we need for future upgrades.",
+                    "High-Value Loot Recovery",
+                )
             elif any(k in ev_type for k in ["defense", "base", "wall", "spike"]):
-                return f"Focusing on base security: {desc_clean}. Reinforcing this perimeter pays off every single time the horde arrives."
+                return (
+                    f"Focusing on base security: {desc_clean}. Reinforcing this perimeter pays off every single time the horde arrives.",
+                    "Base Defense & Fortifications",
+                )
             else:
-                return f"Moving to the next objective: {desc_clean}. Staying cautious and keeping our vitals topped off."
+                return (
+                    f"Moving to the next objective: {desc_clean}. Staying cautious and keeping our vitals topped off.",
+                    "Wasteland Exploration",
+                )
         elif persona == CommentaryPersona.ENERGETIC:
             if any(k in ev_type for k in ["combat", "fight", "attack", "kill"]):
-                return f"Zombies spotted! {desc_clean}! Let's take them down quickly before they swarm us!"
+                return (
+                    f"Zombies spotted! {desc_clean}! Let's take them down quickly before they swarm us!",
+                    "High-Intensity Combat",
+                )
             elif any(k in ev_type for k in ["loot", "crate", "chest"]):
-                return f"Yes! Checking this loot: {desc_clean}! That is pure value right there!"
+                return (
+                    f"Yes! Checking this loot: {desc_clean}! That is pure value right there!",
+                    "Loot Crate Opening",
+                )
             else:
-                return f"Pushing ahead into {desc_clean}! Let's get it done!"
+                return (
+                    f"Pushing ahead into {desc_clean}! Let's get it done!",
+                    "Fast-Paced Zone Push",
+                )
         else:  # TACTICAL
-            return f"Engaging tactical sequence: {desc_clean}. Maintaining positioning and monitoring weapon wear."
+            return (
+                f"Engaging tactical sequence: {desc_clean}. Maintaining positioning and monitoring weapon wear.",
+                "Tactical Objective Execution",
+            )
 
     async def _synthesize_single_cue(
         self,
@@ -527,17 +711,20 @@ class CommentaryEngine:
         bgm_audio: Path,
         output_audio_path: Path,
         raw_game_audio: Optional[Path] = None,
-        ducking_ratio: float = 6.0,
+        ducking_ratio: float = 4.0,
         voice_volume_boost_db: str = "+3dB",
+        bgm_volume_db: str = "-22dB",
+        duration: Optional[float] = None,
     ) -> Path:
         """Applies professional dynamic sidechain compression: BGM ducks automatically when commentary speaks."""
         output_audio_path.parent.mkdir(parents=True, exist_ok=True)
 
         if raw_game_audio and raw_game_audio.exists():
             filtergraph = (
-                f"[1:a]volume={voice_volume_boost_db}[voice];"
-                f"[0:a][voice]sidechaincompress=threshold=0.04:ratio={ducking_ratio}:attack=150:release=700[bg_ducked];"
-                f"[2:a]volume=-18dB[game_low];"
+                f"[0:a]volume={bgm_volume_db}[bg_soft];"
+                f"[1:a]volume={voice_volume_boost_db},loudnorm=I=-16:TP=-1.5:LRA=11[voice];"
+                f"[bg_soft][voice]sidechaincompress=threshold=0.03:ratio={ducking_ratio}:attack=120:release=600[bg_ducked];"
+                f"[2:a]volume=-20dB[game_low];"
                 f"[bg_ducked][voice][game_low]amix=inputs=3:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
             )
             cmd = [
@@ -549,12 +736,12 @@ class CommentaryEngine:
                 "-map", "[aout]",
                 "-c:a", "aac",
                 "-b:a", "256k",
-                str(output_audio_path),
             ]
         else:
             filtergraph = (
-                f"[1:a]volume={voice_volume_boost_db}[voice];"
-                f"[0:a][voice]sidechaincompress=threshold=0.04:ratio={ducking_ratio}:attack=150:release=700[bg_ducked];"
+                f"[0:a]volume={bgm_volume_db}[bg_soft];"
+                f"[1:a]volume={voice_volume_boost_db},loudnorm=I=-16:TP=-1.5:LRA=11[voice];"
+                f"[bg_soft][voice]sidechaincompress=threshold=0.03:ratio={ducking_ratio}:attack=120:release=600[bg_ducked];"
                 f"[bg_ducked][voice]amix=inputs=2:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
             )
             cmd = [
@@ -565,8 +752,11 @@ class CommentaryEngine:
                 "-map", "[aout]",
                 "-c:a", "aac",
                 "-b:a", "256k",
-                str(output_audio_path),
             ]
+
+        if duration:
+            cmd.extend(["-t", str(duration)])
+        cmd.append(str(output_audio_path))
 
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         logger.info(f"Commentary mixed with ducked BGM successfully: {output_audio_path}")
@@ -604,9 +794,12 @@ class CommentaryEngine:
         events: Optional[List[Any]] = None,
         episode_number: Optional[int] = None,
         persona: CommentaryPersona = CommentaryPersona.CASUAL,
-        include_bgm: bool = False,
+        include_bgm: bool = True,
         bgm_audio: Optional[Path] = None,
         volume_boost_db: str = "+3dB",
+        bgm_volume_db: str = "-22dB",
+        ducking_ratio: float = 4.0,
+        min_cue_interval: float = 25.0,
         raw_game_audio: Optional[Path] = None,
     ) -> Path:
         """One-stop workflow: Generates script, synthesizes neural voice, and produces final master audio track."""
@@ -619,6 +812,7 @@ class CommentaryEngine:
                 duration=duration,
                 episode_number=episode_number,
                 persona=persona,
+                min_cue_interval=min_cue_interval,
             )
             logger.info(f"Generated {len(cues)} commentary cues for duration {duration:.1f}s ({persona.value})")
 
@@ -635,13 +829,16 @@ class CommentaryEngine:
 
             # 4. Mix or Pure Voice
             if include_bgm and bgm_audio and bgm_audio.exists():
-                logger.info("Mixing commentary with background music loop via sidechain ducking...")
+                logger.info(f"Mixing commentary with background music loop ({bgm_volume_db}) via sidechain ducking (ratio {ducking_ratio})...")
                 return self.mix_commentary_with_bgm(
                     commentary_audio=raw_voice_path,
                     bgm_audio=bgm_audio,
                     output_audio_path=output_path,
                     raw_game_audio=raw_game_audio,
                     voice_volume_boost_db=volume_boost_db,
+                    bgm_volume_db=bgm_volume_db,
+                    ducking_ratio=ducking_ratio,
+                    duration=duration,
                 )
             else:
                 logger.info("Normalizing pure voice commentary track (Zero added BGM)...")

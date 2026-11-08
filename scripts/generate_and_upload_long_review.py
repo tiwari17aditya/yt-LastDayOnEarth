@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Generates full 15.5-minute Style 2 Casual Walkthrough video and uploads to YouTube as Unlisted for review."""
+"""Generates full 15.5-minute Style 2 Casual Walkthrough video with continuous AI commentary,
+low soothing ambient background music, and clean YouTube chapters without debug text."""
 
 import json
 import os
@@ -14,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.logging_config import get_logger
 from src.audio.commentary_engine import CommentaryEngine, CommentaryPersona
+from src.audio.selector import AudioMixer
 from src.processor.video_processor import VideoProcessor
 from src.publisher.youtube_client import VideoPublishMetadata, YouTubeClient
 from src.google_auth import get_google_credentials
@@ -32,9 +34,9 @@ def main():
         logger.error(f"Input video not found: {input_video}")
         sys.exit(1)
 
-    temp_dir = Path("temp/long_review")
+    temp_dir = Path("temp/long_review_continuous")
     temp_dir.mkdir(parents=True, exist_ok=True)
-    output_video = Path("output/Last_Day_On_Earth_Casual_Walkthrough_15Min_Review.mp4")
+    output_video = Path("output/Last_Day_On_Earth_Continuous_Commentary_15Min_Review.mp4")
     output_video.parent.mkdir(parents=True, exist_ok=True)
 
     # 1. Probe duration
@@ -43,84 +45,85 @@ def main():
     duration = processor.get_video_duration(input_video)
     logger.info(f"Input video duration: {duration:.2f} seconds ({duration/60.0:.2f} minutes)")
 
-    # 2. Generate Commentary Script & Synthesize Pure Voice Audio Track
-    logger.info("Step 1/3: Synthesizing full 15.5-minute Style 2 Casual AI Commentary (GuyNeural)...")
+    # 2. Generate Commentary Script & Synthesize Voice Audio Track
+    logger.info("Step 1/4: Synthesizing continuous Style 2 Casual AI Commentary (GuyNeural, ~25s intervals)...")
     commentary_engine = CommentaryEngine(temp_dir=temp_dir / "commentary")
 
-    master_commentary_track = temp_dir / "master_casual_commentary_15min.m4a"
-
-    # Generate full timeline script
+    # Generate continuous script with 25.0s min cue interval
     cues = commentary_engine.generate_script(
         duration=duration,
         episode_number=99,
         persona=CommentaryPersona.CASUAL,
+        min_cue_interval=25.0,
     )
-    logger.info(f"Generated {len(cues)} commentary dialogue cues spaced across timeline:")
+    logger.info(f"Generated {len(cues)} continuous commentary dialogue cues spaced across timeline:")
     for idx, c in enumerate(cues):
         mins = int(c.start_time // 60)
         secs = int(c.start_time % 60)
-        logger.info(f"  Cue #{idx+1:02d} [{mins:02d}:{secs:02d}] {c.text[:70]}...")
+        logger.info(f"  Cue #{idx+1:02d} [{mins:02d}:{secs:02d}] {c.topic}: {c.text[:55]}...")
 
-    # Check if already synthesized
-    if master_commentary_track.exists() and master_commentary_track.stat().st_size > 500 * 1024:
-        logger.info(f"Using pre-synthesized master commentary audio: {master_commentary_track}")
-    else:
-        # Synthesize all cues
-        commentary_engine.synthesize_all_cues(cues=cues, persona=CommentaryPersona.CASUAL)
+    # Synthesize all cues
+    commentary_engine.synthesize_all_cues(cues=cues, persona=CommentaryPersona.CASUAL)
 
-        # Assemble timeline track
-        raw_timeline = temp_dir / "raw_timeline_voice.m4a"
-        commentary_engine.build_timeline_commentary_track(
-            cues=cues,
-            total_duration=duration,
-            output_path=raw_timeline,
-        )
+    # Assemble timeline track
+    raw_timeline = temp_dir / "raw_timeline_voice_continuous.m4a"
+    commentary_engine.build_timeline_commentary_track(
+        cues=cues,
+        total_duration=duration,
+        output_path=raw_timeline,
+    )
 
-        # Normalize pure voice audio to broadcast standards (-16 LUFS, +3dB boost)
-        commentary_engine.normalize_pure_voice_track(
-            raw_voice_audio=raw_timeline,
-            output_audio_path=master_commentary_track,
-            volume_boost_db="+3dB",
-        )
-        logger.info(f"Master pure voice commentary track ready: {master_commentary_track}")
+    # 3. Create Low-Volume Ambient Background Music Loop & Duck Behind Voice
+    logger.info("Step 2/4: Generating soothing ambient BGM loop and mixing with sidechain ducking...")
+    audio_mixer = AudioMixer()
+    bgm_loop_path = temp_dir / "ambient_bgm_loop_15min.m4a"
+    audio_mixer.create_random_loop_sequence(target_duration=duration, output_path=bgm_loop_path)
 
-    # 3. Composite Video Render (Fast stream-copy or check existing)
-    if output_video.exists() and output_video.stat().st_size > 50 * 1024 * 1024:
-        logger.info(f"Using pre-rendered composite video: {output_video} ({output_video.stat().st_size / (1024*1024):.1f} MB)")
-    else:
-        logger.info("Step 2/3: Muxing 15.5-minute video with pure voice commentary track...")
-        render_start = time.time()
-        commentary_engine.render_commentary_video(
-            video_input=input_video,
-            mixed_audio_input=master_commentary_track,
-            output_video_path=output_video,
-        )
-        render_time = time.time() - render_start
-        file_size_mb = output_video.stat().st_size / (1024 * 1024)
-        logger.info(f"Video muxed successfully in {render_time:.1f}s ({file_size_mb:.1f} MB): {output_video}")
+    mixed_audio_track = temp_dir / "master_commentary_ducked_bgm_15min.m4a"
+    commentary_engine.mix_commentary_with_bgm(
+        commentary_audio=raw_timeline,
+        bgm_audio=bgm_loop_path,
+        output_audio_path=mixed_audio_track,
+        ducking_ratio=4.0,
+        voice_volume_boost_db="+3dB",
+        bgm_volume_db="-22dB",
+        duration=duration,
+    )
+    logger.info(f"Master ducked commentary audio track ready: {mixed_audio_track}")
 
-    # 4. Upload to YouTube as Unlisted
-    logger.info("Step 3/3: Uploading long review video to YouTube as Unlisted...")
-    title = "Last Day on Earth: Survival — Full 15-Min Casual AI Voice Walkthrough (Review)"
+    # 4. Composite Video Render (Fast stream-copy)
+    logger.info("Step 3/4: Muxing 15.5-minute video with continuous commentary & ambient BGM track...")
+    render_start = time.time()
+    commentary_engine.render_commentary_video(
+        video_input=input_video,
+        mixed_audio_input=mixed_audio_track,
+        output_video_path=output_video,
+        duration=duration,
+    )
+    render_time = time.time() - render_start
+    file_size_mb = output_video.stat().st_size / (1024 * 1024)
+    logger.info(f"Video muxed successfully in {render_time:.1f}s ({file_size_mb:.1f} MB): {output_video}")
 
-    # Build description with clickable timestamps
+    # 5. Upload to YouTube as Unlisted
+    logger.info("Step 4/4: Uploading review video to YouTube as Unlisted...")
+    title = "Last Day on Earth: Survival — Full 15-Min Continuous AI Voice Walkthrough (Review)"
+
+    # Build description with concise, clickable chapter headings
     ts_lines = []
-    for c in cues:
-        mins = int(c.start_time // 60)
-        secs = int(c.start_time % 60)
-        ts_lines.append(f"{mins:02d}:{secs:02d} - {c.text[:65]}...")
+    for idx, c in enumerate(cues):
+        if idx == 0:
+            ts_lines.append(f"00:00 - {c.topic or 'Introduction & Base Prep'}")
+        else:
+            mins = int(c.start_time // 60)
+            secs = int(c.start_time % 60)
+            ts_lines.append(f"{mins:02d}:{secs:02d} - {c.topic or 'Survival Strategy'}")
     timestamps_text = "\n".join(ts_lines)
 
     description = (
-        "Full 15-Minute Gameplay Walkthrough featuring Style 2 (Casual AI Voice Commentary Companion).\n\n"
-        "TIMESTAMPS & COMMENTARY TOPICS:\n"
+        "Last Day on Earth: Survival — Full 15-Minute Gameplay Walkthrough featuring interactive AI voice companion commentary.\n\n"
+        "CHAPTERS & WALKTHROUGH HIGHLIGHTS:\n"
         f"{timestamps_text}\n\n"
-        "AUDIO & PIPELINE CONFIGURATION:\n"
-        "- Voice Model: en-US-GuyNeural (Casual, friendly walkthrough style)\n"
-        "- Pure Spoken Voice Track (Zero added BGM per creator preference)\n"
-        "- Broadcast Normalization: -16 LUFS, +3dB boost, true peak limiter -1.5dB\n"
-        "- Sleek 1-sec Action Subtitle Overlays\n"
-        "- Full 1080p 60 FPS Composite Render\n\n"
+        "Enjoying the journey? Drop a like, subscribe to follow the survival progression, and let us know your favorite base setup in the comments!\n\n"
         "This is an unlisted full-length review video for channel development and testing."
     )
 
@@ -135,7 +138,7 @@ def main():
     client = YouTubeClient()
     upload_url = client.upload_video(output_video, metadata)
 
-    # 5. Safety Cleanup: Preserve series_tracker.json & keep playlist clean
+    # 6. Safety Cleanup: Preserve series_tracker.json & keep playlist clean
     logger.info("Performing safety cleanups on series_tracker.json and public playlist...")
     try:
         tracker_file = Path("data/series_tracker.json")
@@ -180,12 +183,13 @@ def main():
         logger.warning(f"Error during safety cleanup: {e}")
 
     print("\n" + "=" * 65)
-    print("FULL 15-MINUTE CASUAL COMMENTARY VIDEO UPLOADED SUCCESSFULLY!")
+    print("CONTINUOUS CASUAL COMMENTARY VIDEO UPLOADED SUCCESSFULLY!")
     print("=" * 65)
     print(f"Video Title   : {title}")
     print(f"Duration      : {duration/60.0:.2f} minutes ({duration:.1f}s)")
-    print(f"Voice Style   : Style 2 - Casual Walkthrough (en-US-GuyNeural)")
-    print(f"Audio Mix     : Pure Voice (Zero BGM, +3dB Boost, -16 LUFS)")
+    print(f"Voice Style   : Style 2 - Casual Companion (en-US-GuyNeural)")
+    print(f"Audio Mix     : Sidechain Ducked Ambient BGM (-22dB) + Normalized Voice (+3dB, -16 LUFS)")
+    print(f"Chapters Count: {len(cues)} clean chapter headings")
     print(f"Privacy Status: UNLISTED (Private for Creator Review)")
     print(f"Review URL    : {upload_url}")
     print("=" * 65 + "\n")

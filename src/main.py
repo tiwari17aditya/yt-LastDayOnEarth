@@ -395,6 +395,9 @@ def run_pipeline(
                     include_bgm=settings.commentary.include_bgm,
                     bgm_audio=music_file,
                     volume_boost_db=settings.commentary.volume_boost_db,
+                    bgm_volume_db=getattr(settings.commentary, "bgm_volume_db", "-22dB"),
+                    ducking_ratio=getattr(settings.commentary, "ducking_ratio", 4.0),
+                    min_cue_interval=getattr(settings.commentary, "min_cue_interval", 25.0),
                 )
 
                 if final_commentary_track and final_commentary_track.exists():
