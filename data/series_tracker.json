@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 120,
+  "current_episode": 121,
   "completed_episodes": [
     {
       "episode": 1,
@@ -803,6 +803,13 @@
       "video_id": "UkVAqEj-d9M",
       "youtube_url": "https://youtu.be/UkVAqEj-d9M",
       "job_id": "UkVAqEj-d9M"
+    },
+    {
+      "episode": 120,
+      "title": "Surviving Day 120: Workbench & Blueprints And Organizing Storage & Chests Plus Inventory &... #120",
+      "video_id": "U00_PrhyZVA",
+      "youtube_url": "https://youtu.be/U00_PrhyZVA",
+      "job_id": "U00_PrhyZVA"
     }
   ]
 }

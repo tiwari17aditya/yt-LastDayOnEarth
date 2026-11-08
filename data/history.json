@@ -3900,5 +3900,38 @@
       "ads_removed": [],
       "md5_checksum": "a13c54766cdf9a0f67c8b75cba781780"
     }
+  },
+  {
+    "job_id": "job_20261108_113929",
+    "timestamp": "2026-11-08T11:39:29.760641+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 13-10-54_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_13-10-54_1_Processed_08112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "U00_PrhyZVA",
+    "youtube_url": "https://youtu.be/U00_PrhyZVA",
+    "details": {
+      "video_id": "U00_PrhyZVA",
+      "youtube_url": "https://youtu.be/U00_PrhyZVA",
+      "video_output": "output/ScreenRecording_11-04-2026_13-10-54_1_Processed_08112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_13-10-54_1_Processed_08112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_13-10-54_1_Processed_08112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Base Storage Optimization! | LDoE Survival #120",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Organizing Storage & Chests Plus... #120",
+        "walkthrough": "Surviving Day 120: Workbench & Blueprints And Organizing Storage & Chests Plus Inventory &... #120",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #120"
+      },
+      "duration_seconds": 555.032926,
+      "soundtrack_tracks": [
+        "Shores of Avalon",
+        "Volatile Reaction",
+        "Bossa Antigua"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "400a09fccd3e4f15d3bb6c23def4a496"
+    }
   }
 ]
