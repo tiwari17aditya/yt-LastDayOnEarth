@@ -4048,5 +4048,37 @@
       "ads_removed": [],
       "md5_checksum": "0e21442f06081b8b8daa1ace75efa0fe"
     }
+  },
+  {
+    "job_id": "job_20261109_012127",
+    "timestamp": "2026-11-09T01:21:27.081847+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 17-25-45_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_17-25-45_1_Processed_09112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "lXQ5yZ6hROw",
+    "youtube_url": "https://youtu.be/lXQ5yZ6hROw",
+    "details": {
+      "video_id": "lXQ5yZ6hROw",
+      "youtube_url": "https://youtu.be/lXQ5yZ6hROw",
+      "video_output": "output/ScreenRecording_11-04-2026_17-25-45_1_Processed_09112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_17-25-45_1_Processed_09112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_17-25-45_1_Processed_09112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Base Storage Optimization! | LDoE Survival #124",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Organizing Storage & Chests Plus Home... #124",
+        "walkthrough": "Surviving Day 124: Entering Home Base And Organizing Storage & Chests Plus Home Base... #124",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #124"
+      },
+      "duration_seconds": 379.821565,
+      "soundtrack_tracks": [
+        "Life of Riley",
+        "Daily Beetle"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "341c8b5a2cc6b445613fe6bfe69b83db"
+    }
   }
 ]
