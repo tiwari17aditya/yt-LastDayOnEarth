@@ -4080,5 +4080,50 @@
       "ads_removed": [],
       "md5_checksum": "341c8b5a2cc6b445613fe6bfe69b83db"
     }
+  },
+  {
+    "job_id": "job_20261109_094038",
+    "timestamp": "2026-11-09T09:40:38.406763+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 17-32-20_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_17-32-20_1_Processed_09112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "SbiagksDB1E",
+    "youtube_url": "https://youtu.be/SbiagksDB1E",
+    "details": {
+      "video_id": "SbiagksDB1E",
+      "youtube_url": "https://youtu.be/SbiagksDB1E",
+      "video_output": "output/ScreenRecording_11-04-2026_17-32-20_1_Processed_09112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_17-32-20_1_Processed_09112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_17-32-20_1_Processed_09112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #125",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #125",
+        "walkthrough": "Surviving Day 125: Workbench & Blueprints And Crafting Planks & Upgrades Plus Organizing... #125",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #125"
+      },
+      "duration_seconds": 3469.46873,
+      "soundtrack_tracks": [
+        "Carefree",
+        "Daily Beetle",
+        "Decisions",
+        "Wallpaper",
+        "Fretless",
+        "Urban Gauntlet",
+        "Bossa Antigua",
+        "Wallpaper",
+        "Electro Cabello",
+        "Daily Beetle",
+        "Decisions",
+        "Fretless",
+        "Daily Beetle",
+        "Monkeys Spinning Monkeys",
+        "Wallpaper"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "4a68f3b472e31f8b90273aad1322c9bd"
+    }
   }
 ]
