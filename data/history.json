@@ -4125,5 +4125,36 @@
       "ads_removed": [],
       "md5_checksum": "4a68f3b472e31f8b90273aad1322c9bd"
     }
+  },
+  {
+    "job_id": "job_20261110_223221",
+    "timestamp": "2026-11-10T22:32:21.649855+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 21-44-31_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_21-44-31_1_Processed_10112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "3IyMiDubVx4",
+    "youtube_url": "https://youtu.be/3IyMiDubVx4",
+    "details": {
+      "video_id": "3IyMiDubVx4",
+      "youtube_url": "https://youtu.be/3IyMiDubVx4",
+      "video_output": "output/ScreenRecording_11-04-2026_21-44-31_1_Processed_10112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_21-44-31_1_Processed_10112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_21-44-31_1_Processed_10112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Workshop & Smelting! | LDoE Survival #126",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Workshop & Smelting Furnaces Plus... #126",
+        "walkthrough": "Surviving Day 126: Workbench & Blueprints And Workshop & Smelting Furnaces Plus Organizing... #126",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #126"
+      },
+      "duration_seconds": 225.352676,
+      "soundtrack_tracks": [
+        "Bossa Antigua"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "af386f790bda3ebeb4299b18d88fbcb1"
+    }
   }
 ]
