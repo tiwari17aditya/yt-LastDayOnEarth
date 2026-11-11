@@ -4156,5 +4156,46 @@
       "ads_removed": [],
       "md5_checksum": "af386f790bda3ebeb4299b18d88fbcb1"
     }
+  },
+  {
+    "job_id": "job_20261111_023638",
+    "timestamp": "2026-11-11T02:36:38.501081+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 21-06-25_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_21-06-25_1_Processed_11112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "1aeC-cGC4Eg",
+    "youtube_url": "https://youtu.be/1aeC-cGC4Eg",
+    "details": {
+      "video_id": "1aeC-cGC4Eg",
+      "youtube_url": "https://youtu.be/1aeC-cGC4Eg",
+      "video_output": "output/ScreenRecording_11-04-2026_21-06-25_1_Processed_11112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_21-06-25_1_Processed_11112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_21-06-25_1_Processed_11112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Workshop & Smelting! | LDoE Survival #127",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Workshop & Smelting Furnaces Plus... #127",
+        "walkthrough": "Surviving Day 127: Workbench & Blueprints And Workshop & Smelting Furnaces Plus Home Base... #127",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #127"
+      },
+      "duration_seconds": 2075.711972,
+      "soundtrack_tracks": [
+        "Local Forecast",
+        "Shores of Avalon",
+        "Electro Cabello",
+        "Clean Soul",
+        "Constance",
+        "Urban Gauntlet",
+        "Carefree",
+        "Sneaky Snitch",
+        "Local Forecast",
+        "Carefree",
+        "Wallpaper"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "fb6d615f4339c917d7ab24a029f47454"
+    }
   }
 ]
