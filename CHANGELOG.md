@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-11-11
+
+### Added
+- **Publishing Release Queue Manager (`src/publisher/queue_manager.py`)**:
+  - Implemented `PublishingQueueManager` providing persistent queue tracking (`data/publishing_queue.json`) and release timetable calculation.
+  - Release cadence enforcement:
+    - **Weekdays (Mon–Fri)**: 2 videos per day at **3:00 PM IST** (09:30 UTC) and **7:00 PM IST** (13:30 UTC).
+    - **Weekends (Sat–Sun)**: 3 videos per day at **11:00 AM IST** (05:30 UTC), **4:00 PM IST** (10:30 UTC), and **8:00 PM IST** (14:30 UTC).
+  - Batch Queue Sequencing: Automatically allocates consecutive slots across future calendar days when multiple videos are processed, preserving series sequence without time slot collisions.
+  - Status Synchronization: Automatically transitions matured queue items from `SCHEDULED` to `PUBLISHED` when the scheduled time elapses or upon querying the YouTube API.
+  - CLI Queue Inspector: Added `python -m src.main queue-status [--sync]` command for instant inspection of the series release queue.
+- **YouTube Native Scheduled Release Integration (`src/publisher/youtube_client.py`)**:
+  - Videos are uploaded as `private` initially with `publishAt` RFC 3339 timestamp formatted for native YouTube release scheduling.
+  - Added `publish_at` attribute to `VideoPublishMetadata`.
+  - Added robust API error recovery for scheduling rejection with automatic fallback to standard private upload.
+  - Queue registration: Enqueues each uploaded video in `PublishingQueueManager` immediately following series tracker advancement.
+- **Controlled Social Promotion Guard (`src/publisher/multi_publisher.py`)**:
+  - Defers decentralized social promotion (Mastodon & Lemmy) for scheduled private videos, ensuring public social posts only fire when videos are accessible to viewers.
+- **Unit Test Suite (`tests/test_queue_manager.py`)**:
+  - Added 7 comprehensive unit tests verifying slot allocation, batch sequence distribution, queue persistence, status transitions, YouTube upload status payload, and social deferral (53/53 tests passing across full suite).
+
+### Changed
+- **IST Ingestion Cron Cadence (`.github/workflows/scheduled_pipeline.yml`)**:
+  - Replaced 30-minute polling with creator-aligned schedule:
+    - **Weekdays (Mon–Fri)**: 2 scans per day at **3:00 PM IST** (`09:30 UTC`) and **7:00 PM IST** (`13:30 UTC`) via cron `'30 9,13 * * 1-5'`.
+    - **Weekends (Sat–Sun)**: 4 scans per day at **11:00 AM IST** (`05:30 UTC`), **2:00 PM IST** (`08:30 UTC`), **5:00 PM IST** (`11:30 UTC`), and **8:00 PM IST** (`14:30 UTC`) via cron `'30 5,8,11,14 * * 6,0'`.
+  - Changed default `YOUTUBE_PRIVACY_STATUS` to `"private"` and enabled `YOUTUBE_SCHEDULED_PUBLISH="true"`.
+  - Added `data/publishing_queue.json` to post-run Git commit persistence step.
+- **Configuration Controls (`src/config.py`)**:
+  - Added `scheduled_publish` and `publishing_queue_file` to `YouTubeSettings`.
+
 ## [1.12.0] - 2026-11-08
 
 ### Added

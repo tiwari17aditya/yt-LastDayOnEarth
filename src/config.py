@@ -70,7 +70,13 @@ class YouTubeSettings(BaseModel):
         default_factory=lambda: os.getenv("YOUTUBE_CLIENT_SECRETS_FILE", "config/client_secrets.json")
     )
     token_file: str = Field(default_factory=lambda: os.getenv("YOUTUBE_TOKEN_FILE", "config/token.json"))
-    privacy_status: str = Field(default_factory=lambda: os.getenv("YOUTUBE_PRIVACY_STATUS", "public"))
+    privacy_status: str = Field(default_factory=lambda: os.getenv("YOUTUBE_PRIVACY_STATUS", "private"))
+    scheduled_publish: bool = Field(
+        default_factory=lambda: os.getenv("YOUTUBE_SCHEDULED_PUBLISH", "true").lower() == "true"
+    )
+    publishing_queue_file: Path = Field(
+        default_factory=lambda: Path(os.getenv("YOUTUBE_PUBLISHING_QUEUE_FILE", "data/publishing_queue.json"))
+    )
     playlist_title: str = Field(
         default_factory=lambda: os.getenv("YOUTUBE_PLAYLIST_TITLE", "Last Day on Earth: Survival — Official Gameplay Series")
     )

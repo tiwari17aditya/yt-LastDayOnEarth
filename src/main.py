@@ -89,6 +89,7 @@ from src.publisher.title_manager import TitleManager
 from src.publisher.peertube_client import PeerTubeClient
 from src.publisher.fediverse_broadcaster import FediverseBroadcaster
 from src.publisher.multi_publisher import MultiPlatformPublisher
+from src.publisher.queue_manager import PublishingQueueManager
 from src.notifications.email_client import EmailNotifier
 from src.notifications.gmail_client import GmailNotifier
 from src.notifications.report_generator import WeeklyReportGenerator
@@ -104,6 +105,8 @@ class RenderResult(type(Path())):
     youtube_url: str = ""
     uploaded_to_youtube: bool = False
     video_id: str = ""
+    publish_at: Optional[str] = None
+    scheduled_slot_ist: Optional[str] = None
 
 
 def get_notifier(settings):
@@ -175,6 +178,11 @@ def run_pipeline(
         sync_youtube=settings.youtube.sync_episode_with_youtube,
     )
     thumbnail_gen = ThumbnailGenerator(output_dir=settings.processing.output_dir)
+    queue_mgr = (
+        PublishingQueueManager(queue_file=settings.youtube.publishing_queue_file)
+        if getattr(settings.youtube, "scheduled_publish", True)
+        else None
+    )
     youtube_pub = YouTubeClient(
         client_secrets_file=settings.youtube.client_secrets_file,
         token_file=settings.youtube.token_file,
@@ -183,6 +191,7 @@ def run_pipeline(
         title_manager=title_mgr,
         gemini_api_key=settings.gemini.api_key,
         gemini_model=settings.gemini.model,
+        queue_manager=queue_mgr,
     )
 
     peertube_pub = (
@@ -529,6 +538,27 @@ def run_pipeline(
                 status="FAILED",
             )
 
+        # Assign scheduled release slot if scheduled publishing is enabled
+        scheduled_slot_utc = None
+        scheduled_slot_ist_str = None
+        if not local_only and queue_mgr and getattr(settings.youtube, "scheduled_publish", True):
+            try:
+                scheduled_slot_utc = queue_mgr.get_next_slot()
+                scheduled_slot_ist_str = queue_mgr.format_ist_time(scheduled_slot_utc)
+                metadata.publish_at = scheduled_slot_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+                metadata.privacy_status = "private"
+                logger.info(
+                    f"Assigned YouTube Scheduled Publishing Slot: {scheduled_slot_ist_str} "
+                    f"({metadata.publish_at}) | Initial Privacy: private",
+                    extra_data={
+                        "publish_at": metadata.publish_at,
+                        "slot_ist": scheduled_slot_ist_str,
+                        "episode": ep_num_for_publishing,
+                    },
+                )
+            except Exception as qse:
+                logger.warning(f"Could not compute scheduled slot from queue manager: {qse}")
+
         metadata_json_path = output_path.with_name(f"{output_path.stem}_metadata.json")
         try:
             publisher.export_metadata_json(metadata, metadata_json_path)
@@ -622,6 +652,9 @@ def run_pipeline(
                 details={
                     "video_id": video_id,
                     "youtube_url": youtube_url,
+                    "scheduled_publish_time_utc": getattr(metadata, "publish_at", None),
+                    "scheduled_publish_time_ist": scheduled_slot_ist_str,
+                    "privacy_status": metadata.privacy_status,
                     "video_output": str(output_path),
                     "metadata_output": str(metadata_json_path),
                     "thumbnail_output": str(thumbnail_path) if thumbnail_path else None,
@@ -654,6 +687,8 @@ def run_pipeline(
                 details={
                     "duration_seconds": video_duration,
                     "soundtrack_tracks": [t["title"] for t in track_sequence],
+                    "scheduled_release": scheduled_slot_ist_str or "Immediate",
+                    "privacy_status": metadata.privacy_status,
                 },
             )
         except Exception as ne:
@@ -700,6 +735,8 @@ def run_pipeline(
         result.youtube_url = youtube_url
         result.uploaded_to_youtube = uploaded_to_youtube
         result.video_id = video_id
+        result.publish_at = getattr(metadata, "publish_at", None)
+        result.scheduled_slot_ist = scheduled_slot_ist_str
         return result
 
     except PipelineError as pe:
@@ -761,6 +798,13 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                 drive_client.cleanup_old_output_videos(retention_days=settings.drive.output_retention_days)
             except Exception as oe:
                 logger.warning(f"Drive Output video retention cleanup skipped: {oe}")
+
+            # Step C: Sync publishing queue status to transition matured scheduled releases
+            try:
+                queue_mgr = PublishingQueueManager(queue_file=settings.youtube.publishing_queue_file)
+                queue_mgr.sync_queue_status()
+            except Exception as qse:
+                logger.debug(f"Queue status sync encountered: {qse}")
 
             pending_videos = drive_client.list_pending_videos()
 
@@ -970,6 +1014,10 @@ def main() -> None:
     assets_parser.add_argument("--download", action="store_true", default=True, help="Download static assets from Google Drive Assets (default)")
     assets_parser.add_argument("--upload", action="store_true", help="Upload local assets to Google Drive Assets folder")
 
+    # Publishing Release Queue command
+    queue_parser = subparsers.add_parser("queue-status", help="Inspect scheduled YouTube release queue and upcoming timetable")
+    queue_parser.add_argument("--sync", action="store_true", help="Sync status with current time and YouTube API")
+
     args = parser.parse_args()
 
     if args.command == "process":
@@ -1006,6 +1054,12 @@ def main() -> None:
         if args.email:
             sent = gen.send_weekly_report(summary)
             print("Weekly report email dispatched successfully." if sent else "Failed to send weekly report email.")
+    elif args.command == "queue-status":
+        settings = get_settings()
+        mgr = PublishingQueueManager(queue_file=settings.youtube.publishing_queue_file)
+        if args.sync:
+            mgr.sync_queue_status()
+        print(mgr.format_queue_summary())
     else:
         parser.print_help()
 

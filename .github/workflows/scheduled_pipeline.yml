@@ -1,9 +1,12 @@
 name: Scheduled Last Day on Earth Video Pipeline
 
 on:
-  # Run automatically every 30 minutes
+  # Scheduled Google Drive polling aligned with creator release rhythm
   schedule:
-    - cron: '*/30 * * * *'
+    # Weekdays: 2 times a day (3:00 PM IST [09:30 UTC] & 7:00 PM IST [13:30 UTC])
+    - cron: '30 9,13 * * 1-5'
+    # Weekends: 4 times a day (11:00 AM [05:30 UTC], 2:00 PM [08:30 UTC], 5:00 PM [11:30 UTC], 8:00 PM [14:30 UTC] IST)
+    - cron: '30 5,8,11,14 * * 6,0'
 
   # Allow manual trigger anytime via GitHub UI
   workflow_dispatch:
@@ -84,7 +87,8 @@ jobs:
           GDRIVE_INPUT_FOLDER_NAME: "Input"
           GDRIVE_PROCESSED_FOLDER_NAME: "Processed"
           GDRIVE_ASSETS_FOLDER_NAME: "Assets"
-          YOUTUBE_PRIVACY_STATUS: "public"
+          YOUTUBE_PRIVACY_STATUS: "private"
+          YOUTUBE_SCHEDULED_PUBLISH: "true"
           VIDEO_PRESET: "veryfast"
           ENVIRONMENT: "production"
           LOG_LEVEL: "INFO"
@@ -121,7 +125,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/series_tracker.json data/history.json data/thumbnails/ || true
+          git add data/series_tracker.json data/publishing_queue.json data/history.json data/thumbnails/ || true
           if ! git diff --staged --quiet; then
             git commit -m "chore: persist series tracker & history updates [skip ci]"
             git pull --rebase origin main || true

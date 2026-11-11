@@ -4,6 +4,7 @@ import json
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from src.logging_config import get_logger
@@ -42,6 +43,7 @@ class VideoPublishMetadata:
     localizations: Optional[Dict[str, Dict[str, str]]] = None
     default_language: str = "en"
     events: Optional[List[Any]] = None
+    publish_at: Optional[str] = None  # RFC 3339 format (e.g., 2026-11-12T09:30:00Z) for YouTube scheduled release
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
@@ -103,6 +105,7 @@ class YouTubeClient(BasePublisher):
         title_manager: Optional[TitleManager] = None,
         gemini_api_key: Optional[str] = None,
         gemini_model: str = "gemini-2.5-flash",
+        queue_manager: Optional[Any] = None,
     ) -> None:
         self.client_secrets_file = client_secrets_file
         self.token_file = token_file
@@ -110,6 +113,7 @@ class YouTubeClient(BasePublisher):
         self.playlist_title = playlist_title
         self.title_manager = title_manager or TitleManager()
         self.playlist_manager = PlaylistManager(series_playlist_title=self.playlist_title)
+        self.queue_manager = queue_manager
         self.tag_generator = DynamicTagGenerator(
             gemini_api_key=gemini_api_key,
             gemini_model=gemini_model,
@@ -514,6 +518,18 @@ class YouTubeClient(BasePublisher):
                 running_len += cost
 
             insert_parts = ["snippet", "status"]
+            status_body = {
+                "privacyStatus": metadata.privacy_status,
+                "selfDeclaredMadeForKids": False,
+            }
+            if getattr(metadata, "publish_at", None):
+                # YouTube API requires privacyStatus='private' when scheduling via publishAt
+                status_body["privacyStatus"] = "private"
+                status_body["publishAt"] = metadata.publish_at
+                logger.info(
+                    f"Scheduling YouTube video release via publishAt: {metadata.publish_at} (privacyStatus: private)"
+                )
+
             body = {
                 "snippet": {
                     "title": metadata.title,
@@ -522,10 +538,7 @@ class YouTubeClient(BasePublisher):
                     "categoryId": metadata.category_id,
                     "defaultLanguage": getattr(metadata, "default_language", "en") or "en",
                 },
-                "status": {
-                    "privacyStatus": metadata.privacy_status,
-                    "selfDeclaredMadeForKids": False,
-                },
+                "status": status_body,
             }
 
             if getattr(metadata, "localizations", None):
@@ -583,6 +596,16 @@ class YouTubeClient(BasePublisher):
                         "Zombie Survival",
                     ]
                     response = _execute_upload(fallback_body, insert_parts)
+                elif "publishat" in combined_err or "scheduledpublishing" in combined_err:
+                    logger.warning(
+                        "YouTube rejected publishAt scheduling. Retrying upload as standard private video...",
+                        extra_data={"error": err_str, "publish_at": getattr(metadata, "publish_at", None)},
+                    )
+                    fallback_body = dict(body)
+                    fallback_body["status"] = dict(body["status"])
+                    fallback_body["status"].pop("publishAt", None)
+                    fallback_body["status"]["privacyStatus"] = "private"
+                    response = _execute_upload(fallback_body, insert_parts)
                 else:
                     raise upload_err
 
@@ -626,6 +649,21 @@ class YouTubeClient(BasePublisher):
                 )
             except Exception as se:
                 logger.warning(f"Could not advance episode counter in series tracker: {se}")
+
+            # Record in publishing release queue if scheduled release is active
+            if getattr(metadata, "publish_at", None) and getattr(self, "queue_manager", None):
+                try:
+                    dt_val = datetime.fromisoformat(metadata.publish_at.replace("Z", "+00:00"))
+                    self.queue_manager.add_scheduled_video(
+                        video_id=video_id,
+                        title=metadata.title,
+                        episode_number=metadata.episode_number or (self.title_manager.get_current_episode() - 1),
+                        publish_at_utc=dt_val,
+                        youtube_url=youtube_url,
+                        privacy_status="private",
+                    )
+                except Exception as qe:
+                    logger.warning(f"Could not record scheduled video {video_id} in queue manager: {qe}")
 
             # Automatically ensure dedicated playlist exists and strictly add video to it
             playlist_id = None

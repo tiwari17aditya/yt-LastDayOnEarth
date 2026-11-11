@@ -1,0 +1,14 @@
+{
+  "description": "Last Day on Earth Automated YouTube Publishing Release Queue",
+  "weekday_slots_ist": [
+    "15:00",
+    "19:00"
+  ],
+  "weekend_slots_ist": [
+    "11:00",
+    "16:00",
+    "20:00"
+  ],
+  "queue": [],
+  "last_updated_utc": "2026-11-11T09:15:19Z"
+}

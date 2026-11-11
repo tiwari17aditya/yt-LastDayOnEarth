@@ -142,23 +142,29 @@ class MultiPlatformPublisher(BasePublisher):
 
         # 3. Decentralized Social Promotion: Mastodon & Lemmy
         if self.enable_fediverse and self.broadcaster:
-            thumb_path = Path(metadata.thumbnail_path) if metadata.thumbnail_path else None
-            try:
-                logger.info("Broadcasting release to open-source social networks (Fediverse)...")
-                broadcast_results = self.broadcaster.broadcast_release(
-                    title=metadata.title,
-                    youtube_url=result.youtube_url,
-                    episode_number=metadata.episode_number,
-                    peertube_url=result.peertube_url,
-                    thumbnail_path=thumb_path,
+            if getattr(metadata, "publish_at", None):
+                logger.info(
+                    "Video is scheduled for future public release via YouTube publishAt. "
+                    "Social broadcast deferred until video transitions to public."
                 )
-                result.social_broadcasts = broadcast_results
-                for platform, url in broadcast_results.items():
-                    if url:
-                        result.published_platforms.append(f"Social:{platform}")
-            except Exception as be:
-                result.errors["SocialBroadcast"] = str(be)
-                logger.warning(f"Social broadcast non-critical degradation: {be}")
+            else:
+                thumb_path = Path(metadata.thumbnail_path) if metadata.thumbnail_path else None
+                try:
+                    logger.info("Broadcasting release to open-source social networks (Fediverse)...")
+                    broadcast_results = self.broadcaster.broadcast_release(
+                        title=metadata.title,
+                        youtube_url=result.youtube_url,
+                        episode_number=metadata.episode_number,
+                        peertube_url=result.peertube_url,
+                        thumbnail_path=thumb_path,
+                    )
+                    result.social_broadcasts = broadcast_results
+                    for platform, url in broadcast_results.items():
+                        if url:
+                            result.published_platforms.append(f"Social:{platform}")
+                except Exception as be:
+                    result.errors["SocialBroadcast"] = str(be)
+                    logger.warning(f"Social broadcast non-critical degradation: {be}")
 
         logger.info(
             f"Multi-platform publish complete: {result.published_platforms}",

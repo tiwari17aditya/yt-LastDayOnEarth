@@ -15,25 +15,30 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 ```text
 [ Google Drive: MyDrive -> youtube-projects -> LastDayOnEarth -> Input ]
              │
-             │ (GitHub Actions cron: '0 */3 * * *' - 8 times daily)
+             │ (GitHub Actions crons aligned with IST rhythms:
+             │  - Weekdays: 3:00 PM IST & 7:00 PM IST ['30 9,13 * * 1-5']
+             │  - Weekends: 11:00 AM, 2:00 PM, 5:00 PM, 8:00 PM IST ['30 5,8,11,14 * * 6,0'])
              ▼
 [ Workflow Orchestrator: src/main.py drive-cron ]
              │
  ┌───────────┴─────────────────────────────────────────────────────────────────┐
  │ 1. Ingestion: Google Drive API v3 (Strict safety boundary lock)            │
- │ 2. Privacy Guard: Redacts only real phone/OS popups (preserves HUD/username) │
+ │ 2. Privacy Guard: Redacts real phone/OS popups (preserves HUD/username)    │
  │ 3. Gameplay AI: 1-sec sleek action cues ("Global Map", "Crafting", etc.)   │
- │ 4. Audio Engine: 20 Soothing non-copyrighted CC-BY 4.0 tracks with ducking   │
- │ 5. Video Processor: FFmpeg composite render (veryfast preset, 60fps)        │
- │ 6. Publisher: YouTube Data API v3 upload & rich SEO metadata (Public)       │
- │ 7. Playlist Manager: Dedicated playlist auto-discovery & video assignment   │
- │ 8. Input Video Cleanup: Immediately deletes raw video from Drive Input      │
- │ 9. Drive Output: Uploads video & metadata to Output/videos & Output/metadata │
- │ 10. Notifier: Google Gmail API v1 rich HTML notification dispatch           │
- │ 11. Storage Tracker: Appends execution record to data/history.json          │
+ │ 4. Audio Engine: CC-BY 4.0 tracks with dynamic sidechain ducking           │
+ │ 5. Commentary Engine: Edge-TTS neural commentary walkthrough + downtime    │
+ │ 6. Video Processor: FFmpeg composite render (veryfast preset, 60fps)        │
+ │ 7. Queue Manager: Calculates next open slot (2/day weekdays, 3/day weekends)│
+ │ 8. Publisher: YouTube Data API v3 upload as Private with native publishAt  │
+ │ 9. Playlist Manager: Dedicated playlist auto-discovery & video assignment   │
+ │ 10. Input Cleanup: Immediately deletes raw video from Drive Input          │
+ │ 11. Drive Output: Uploads video & metadata to Output/videos & Output/meta  │
+ │ 12. Notifier: Google Gmail API v1 rich HTML notification dispatch          │
+ │ 13. Queue & History Tracker: Persists data/publishing_queue.json & history │
  └───────────┬─────────────────────────────────────────────────────────────────┘
              │
-             ├──► [ YouTube Channel (Published / Public in Dedicated Playlist) ]
+             ├──► [ YouTube Channel (Uploaded Private, Scheduled for Public Release) ]
+             ├──► [ Publishing Queue Ledger (data/publishing_queue.json) ]
              ├──► [ Google Drive: Output/videos & Output/metadata ]
              ├──► [ Google Drive: Input Video Deleted Immediately ]
              └──► [ Gmail Notification (Direct via Gmail API) ]
@@ -96,13 +101,18 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `EndScreenGenerator` (`src/processor/endscreen_generator.py`): Visual template slate generator matching YouTube interactive card layout dimensions.
 - **Naming Rule**: `<Original_Title>_Processed_<DDMMYYYY>.mp4`
 
-### 3.6 Publisher & Dynamic Metadata (`src/publisher/`)
-- **Responsibility**: Formulate engaging, SEO-optimized front-loaded titles, descriptions with chapter markers & ~50 dynamic trending hashtags, dynamic video tags, automated custom HD thumbnail generation, direct Public upload via YouTube Data API v3, dedicated playlist management, and automated decentralized cross-posting across open-source networks.
+### 3.6 Publisher, Release Queue & Dynamic Metadata (`src/publisher/`)
+- **Responsibility**: Formulate engaging, SEO-optimized front-loaded titles, descriptions with chapter markers & ~50 dynamic trending hashtags, dynamic video tags, automated custom HD thumbnail generation, staged private YouTube uploads with native scheduled public release (`publishAt`), queue management across weekdays/weekends, dedicated playlist management, and automated decentralized cross-posting across open-source networks.
 - **Components**:
   - `BasePublisher`: Abstract base interface defining metadata generation and video uploading contracts.
-  - `YouTubeClient`: Handles OAuth upload, thumbnail upload, playlist management, and video assignment on YouTube. Enforces strict Creative Commons CC BY 4.0 music licensing and Kefir Games Fair Use copyright disclaimers in all generated video descriptions to prevent Content ID claims and territorial blocks.
+  - `PublishingQueueManager` (`src/publisher/queue_manager.py`):
+    - Persistent release ledger (`data/publishing_queue.json`) managing episode sequences and time-slot allocations.
+    - Cadence Matrix: Weekdays (2 videos/day at 3:00 PM & 7:00 PM IST) and Weekends (3 videos/day at 11:00 AM, 4:00 PM & 8:00 PM IST).
+    - Multi-video sequencing: When multiple videos are ingested in batch, calculates consecutive open slots across upcoming days without slot collisions or series skips.
+    - Synchronization: Automatically transitions matured releases from `SCHEDULED` to `PUBLISHED` when the scheduled time passes.
+  - `YouTubeClient`: Handles OAuth upload, thumbnail upload, playlist management, and video assignment on YouTube. Sets initial privacy to `private` and applies `status.publishAt` so YouTube automatically releases videos publicly at the designated timetable. Includes automatic API error recovery with fallback to private upload.
   - `PeerTubeClient`: Open-source decentralized video hosting client implementing `BasePublisher` via PeerTube REST API v1 (federated across the global ActivityPub Fediverse).
-  - `FediverseBroadcaster`: Cross-posts rich release announcements with custom thumbnails, video links, and dynamic hashtags to Mastodon and Lemmy communities.
+  - `FediverseBroadcaster`: Cross-posts rich release announcements with custom thumbnails, video links, and dynamic hashtags to Mastodon and Lemmy communities (automatically deferred for scheduled private videos until public).
   - `MultiPlatformPublisher`: Orchestrates primary publishing (YouTube) and non-blocking open-source mirrors and social broadcasts (PeerTube + Fediverse), preserving fail-safe pipeline semantics.
   - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, search-intent tutorial formula (`search_guide`, +37% viewer retention), Title History Anti-Repetition Guard (`is_title_repetitive` vs last 10 episodes in `data/series_tracker.json`), persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`).
   - `MetadataLocalizer` (`src/publisher/localization.py`): Multi-language translation engine producing YouTube Data API v3 `localizations` payloads and synchronized `.srt` Closed Caption tracks for key player regions: Russian (`ru`), Portuguese (`pt`), and Spanish (`es`).

@@ -74,6 +74,16 @@ flake8 src/ scripts/
 black --check src/ scripts/
 ```
 
+### 3.1 Testing Scheduled Release Queue
+Inspect and synchronize the series release queue:
+```bash
+# View active publishing queue and release timetable
+python -m src.main queue-status
+
+# Synchronize queue status with YouTube API and current time
+python -m src.main queue-status --sync
+```
+
 ---
 
 ## 4. Git Commit Guidelines

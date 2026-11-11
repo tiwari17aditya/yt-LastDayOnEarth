@@ -118,6 +118,10 @@ python scripts/manage_playlist.py --dedup
 # Vertical YouTube Shorts (9:16) Auto-Clipper
 python scripts/generate_short.py --video data/output/gameplay.mp4 --start 45.0 --duration 35.0 --episode 12
 
+# Inspect Scheduled YouTube Release Queue
+python -m src.main queue-status
+python -m src.main queue-status --sync
+
 # Cinematic Animated Outro Tail with Smooth Fade-Out/In Transition
 python scripts/generate_animated_outro.py
 
@@ -147,11 +151,12 @@ python scripts/generate_thumbnail.py --episode 13 --upload --video-id <ID>
 ```
 
 ### GitHub Actions Automation
-A scheduled workflow (`.github/workflows/scheduled_pipeline.yml`) runs **every 30 minutes** (`*/30 * * * *`):
-- Connects to Google Drive API directly (no local file sync needed).
-- Checks `MyDrive/youtube-projects/LastDayOnEarth/Input`.
-- If no videos are pending, exits in ~15 seconds.
-- If a video is pending, downloads, renders with soothing music & action cues, uploads to YouTube, deletes raw input, cleans old outputs, and sends a Gmail alert!
+A scheduled workflow (`.github/workflows/scheduled_pipeline.yml`) runs aligned with creator release rhythms:
+- **Weekdays (Mon–Fri)**: 2 times daily at **3:00 PM IST** (`09:30 UTC`) and **7:00 PM IST** (`13:30 UTC`) (`30 9,13 * * 1-5`).
+- **Weekends (Sat–Sun)**: 4 times daily at **11:00 AM IST** (`05:30 UTC`), **2:00 PM IST** (`08:30 UTC`), **5:00 PM IST** (`11:30 UTC`), and **8:00 PM IST** (`14:30 UTC`) (`30 5,8,11,14 * * 6,0`).
+- Connects to Google Drive API directly (no local file sync needed) and checks `MyDrive/youtube-projects/LastDayOnEarth/Input`.
+- If no videos are pending, exits cleanly in ~15 seconds.
+- When videos are pending: downloads, renders with AI commentary & soothing music, uploads to YouTube as **`private`**, applies native YouTube scheduled release (`publishAt`) into the next sequential slot (**2 videos/day on weekdays, 3 videos/day on weekends**), records the video in `data/publishing_queue.json`, cleans Drive Input, and dispatches a notification!
 
 ---
 
