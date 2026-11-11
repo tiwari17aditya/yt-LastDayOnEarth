@@ -4197,5 +4197,52 @@
       "ads_removed": [],
       "md5_checksum": "fb6d615f4339c917d7ab24a029f47454"
     }
+  },
+  {
+    "job_id": "job_20261111_181828",
+    "timestamp": "2026-11-11T18:18:28.001486+00:00",
+    "input_filename": "ScreenRecording_11-04-2026 23-50-14_1.mp4",
+    "output_filename": "ScreenRecording_11-04-2026_23-50-14_1_Processed_11112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "g8VPAtfPX8k",
+    "youtube_url": "https://youtu.be/g8VPAtfPX8k",
+    "details": {
+      "video_id": "g8VPAtfPX8k",
+      "youtube_url": "https://youtu.be/g8VPAtfPX8k",
+      "scheduled_publish_time_utc": "2026-11-12T09:30:00Z",
+      "scheduled_publish_time_ist": "12 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-04-2026_23-50-14_1_Processed_11112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-04-2026_23-50-14_1_Processed_11112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-04-2026_23-50-14_1_Processed_11112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #128",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base... #128",
+        "walkthrough": "Surviving Day 128: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #128",
+        "search_guide": "How to Farm & Master Blueprint Upgrades & Home Base Operations Fast | LDoE #128"
+      },
+      "duration_seconds": 2510.602789,
+      "soundtrack_tracks": [
+        "Electro Cabello",
+        "Local Forecast",
+        "Volatile Reaction",
+        "Groove Grove",
+        "Sneaky Snitch",
+        "Urban Gauntlet",
+        "Volatile Reaction",
+        "Wallpaper",
+        "Urban Gauntlet",
+        "Carefree",
+        "Sneaky Snitch",
+        "Clean Soul",
+        "Pamgaea",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "3f31c90c64c999d493b2c01ae981f6a7"
+    }
   }
 ]
