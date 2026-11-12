@@ -50,7 +50,7 @@ def test_weekday_slot_calculation(temp_queue_file):
     mgr.add_scheduled_video("v1", "Ep 1", 1, slot1)
     
     # Next slot should be Wednesday 19:00 IST
-    slot2 = mgr.get_next_slot()
+    slot2 = mgr.get_next_slot(reference_time=wed_morning)
     slot2_ist = slot2.astimezone(IST)
     assert slot2_ist.hour == 19
     assert slot2_ist.minute == 0
@@ -59,7 +59,7 @@ def test_weekday_slot_calculation(temp_queue_file):
     mgr.add_scheduled_video("v2", "Ep 2", 2, slot2)
     
     # Next slot should be Thursday 15:00 IST
-    slot3 = mgr.get_next_slot()
+    slot3 = mgr.get_next_slot(reference_time=wed_morning)
     slot3_ist = slot3.astimezone(IST)
     assert slot3_ist.hour == 15
     assert slot3_ist.minute == 0
@@ -82,21 +82,21 @@ def test_weekend_slot_calculation(temp_queue_file):
     mgr.add_scheduled_video("v1", "Ep 1", 1, slot1)
     
     # Slot 2: Saturday 04:00 PM (16:00) IST
-    slot2 = mgr.get_next_slot()
+    slot2 = mgr.get_next_slot(reference_time=sat_morning)
     slot2_ist = slot2.astimezone(IST)
     assert slot2_ist.hour == 16
     assert slot2_ist.minute == 0
     mgr.add_scheduled_video("v2", "Ep 2", 2, slot2)
     
     # Slot 3: Saturday 08:00 PM (20:00) IST
-    slot3 = mgr.get_next_slot()
+    slot3 = mgr.get_next_slot(reference_time=sat_morning)
     slot3_ist = slot3.astimezone(IST)
     assert slot3_ist.hour == 20
     assert slot3_ist.minute == 0
     mgr.add_scheduled_video("v3", "Ep 3", 3, slot3)
     
     # Slot 4: Sunday 11:00 AM IST
-    slot4 = mgr.get_next_slot()
+    slot4 = mgr.get_next_slot(reference_time=sat_morning)
     slot4_ist = slot4.astimezone(IST)
     assert slot4_ist.hour == 11
     assert slot4_ist.minute == 0
@@ -109,7 +109,7 @@ def test_sequential_slots_for_batch(temp_queue_file):
     
     start_time = datetime(2026, 11, 11, 4, 30, tzinfo=timezone.utc)  # Wednesday morning
     for i in range(1, 9):
-        slot = mgr.get_next_slot(reference_time=start_time if i == 1 else None)
+        slot = mgr.get_next_slot(reference_time=start_time)
         mgr.add_scheduled_video(f"vid_{i}", f"Episode #{i}", i, slot)
     
     items = mgr.load_queue()

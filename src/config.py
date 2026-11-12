@@ -185,17 +185,17 @@ class CommentarySettings(BaseModel):
     )
     persona: str = Field(default_factory=lambda: os.getenv("COMMENTARY_PERSONA", "casual"))
     voice: str = Field(default_factory=lambda: os.getenv("COMMENTARY_VOICE", "en-US-GuyNeural"))
-    rate: str = Field(default_factory=lambda: os.getenv("COMMENTARY_RATE", "+0%"))
-    pitch: str = Field(default_factory=lambda: os.getenv("COMMENTARY_PITCH", "+0Hz"))
-    volume_boost_db: str = Field(default_factory=lambda: os.getenv("COMMENTARY_VOLUME_BOOST_DB", "+4dB"))
+    rate: str = Field(default_factory=lambda: os.getenv("COMMENTARY_RATE", "-3%"))
+    pitch: str = Field(default_factory=lambda: os.getenv("COMMENTARY_PITCH", "-2Hz"))
+    volume_boost_db: str = Field(default_factory=lambda: os.getenv("COMMENTARY_VOLUME_BOOST_DB", "+1dB"))
     include_bgm: bool = Field(
         default_factory=lambda: os.getenv("COMMENTARY_INCLUDE_BGM", "true").lower() == "true"
     )
     bgm_volume_db: str = Field(
-        default_factory=lambda: os.getenv("COMMENTARY_BGM_VOLUME_DB", "-24dB")
+        default_factory=lambda: os.getenv("COMMENTARY_BGM_VOLUME_DB", "-22dB")
     )
     ducking_ratio: float = Field(
-        default_factory=lambda: _safe_float(os.getenv("COMMENTARY_DUCKING_RATIO"), 5.0)
+        default_factory=lambda: _safe_float(os.getenv("COMMENTARY_DUCKING_RATIO"), 3.5)
     )
     min_cue_interval: float = Field(
         default_factory=lambda: _safe_float(os.getenv("COMMENTARY_MIN_CUE_INTERVAL"), 25.0)

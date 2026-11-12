@@ -28,6 +28,7 @@ logger = get_logger(component="CommentaryEngine")
 class CommentaryPersona(str, Enum):
     """Available commentary personas and presentation styles."""
     CASUAL = "casual"         # Warm, conversational, friendly gameplay walkthrough (Style 2 - Recommended)
+    SOFT = "soft"             # Soft-spoken, calm, relaxing survival companion (Gentle & Soothing)
     ENERGETIC = "energetic"   # High-excitement, hype gamer, fast reactions (Style 1)
     TACTICAL = "tactical"     # Pro-survival strategist, game mechanics & raid tips (Style 3)
 
@@ -48,15 +49,23 @@ PERSONA_PROFILES: Dict[CommentaryPersona, PersonaConfig] = {
     CommentaryPersona.CASUAL: PersonaConfig(
         persona=CommentaryPersona.CASUAL,
         voice="en-US-GuyNeural",
-        rate="+0%",
-        pitch="+0Hz",
-        volume="+0%",
-        description="Friendly, conversational gamer walkthrough companion. Natural, relatable, and relaxed.",
+        rate="-3%",
+        pitch="-2Hz",
+        volume="-2%",
+        description="Friendly, conversational gamer walkthrough companion. Soft, natural, relatable, and relaxed.",
+    ),
+    CommentaryPersona.SOFT: PersonaConfig(
+        persona=CommentaryPersona.SOFT,
+        voice="en-US-GuyNeural",
+        rate="-4%",
+        pitch="-2Hz",
+        volume="-4%",
+        description="Soft-spoken, calm, relaxing survival companion. Gentle walkthrough cadence with soothing delivery.",
     ),
     CommentaryPersona.ENERGETIC: PersonaConfig(
         persona=CommentaryPersona.ENERGETIC,
         voice="en-US-ChristopherNeural",
-        rate="+5%",
+        rate="+4%",
         pitch="+0Hz",
         volume="+0%",
         description="High-energy, hype gamer persona. Punchy reactions, fast-paced and enthusiastic.",
@@ -66,7 +75,7 @@ PERSONA_PROFILES: Dict[CommentaryPersona, PersonaConfig] = {
         voice="en-US-AndrewNeural",
         rate="-2%",
         pitch="-2Hz",
-        volume="+0%",
+        volume="-1%",
         description="Strategic survival guide and pro walkthrough. Focused on tips, weapon durability, and mechanics.",
     ),
 }
@@ -335,6 +344,7 @@ class CommentaryEngine:
     def __init__(self, temp_dir: Path = Path("temp/commentary")) -> None:
         self.temp_dir = temp_dir
         self.temp_dir.mkdir(parents=True, exist_ok=True)
+        self.last_cues: List[CommentaryCue] = []
 
     def get_persona_config(self, persona: CommentaryPersona) -> PersonaConfig:
         """Retrieve voice parameters for a specific persona."""
@@ -358,7 +368,13 @@ class CommentaryEngine:
         cues: List[CommentaryCue] = []
 
         # 1. Intro Hook (starts at 2.0s)
-        if persona == CommentaryPersona.CASUAL:
+        if persona == CommentaryPersona.SOFT:
+            intro_text = (
+                f"Hey everyone, welcome back to Last Day on Earth. This is {ep_label}, and today we're taking a relaxed, "
+                "steady pace through our base routine, organizing supplies, and heading out into the wasteland. Let's get comfortable and get to it."
+            )
+            intro_topic = "Soothing Intro & Base Routine"
+        elif persona == CommentaryPersona.CASUAL:
             intro_text = (
                 f"Hey everyone, welcome back to Last Day on Earth! In {ep_label}, we're diving into base optimization, "
                 "stocking up on essential survival supplies, and heading out into the wasteland. Let's see what we can accomplish today."
@@ -381,7 +397,13 @@ class CommentaryEngine:
 
         # 2. Outro Hook (starts ~20-22s before end)
         outro_time = max(15.0, duration - 22.0)
-        if persona == CommentaryPersona.CASUAL:
+        if persona == CommentaryPersona.SOFT:
+            outro_text = (
+                "Thank you so much for relaxing and spending some time with me on today's episode. If you enjoyed this calm walkthrough, "
+                "please leave a gentle like, subscribe to keep following our survival progress, and let me know your thoughts down below. "
+                "Take care, and see you next time."
+            )
+        elif persona == CommentaryPersona.CASUAL:
             outro_text = (
                 "Thanks so much for hanging out and watching today's episode! If you enjoyed this walkthrough, "
                 "please drop a thumbs up, subscribe to follow the journey, and drop a comment below with your favorite survival setup. "
@@ -437,7 +459,7 @@ class CommentaryEngine:
             # Step 2: Fill gaps continuously so roaming/free time has active strategy/advancement talk
             procedural_topics = (
                 PROCEDURAL_CASUAL_TOPICS
-                if persona == CommentaryPersona.CASUAL
+                if persona in (CommentaryPersona.CASUAL, CommentaryPersona.SOFT)
                 else PROCEDURAL_ENERGETIC_TOPICS
                 if persona == CommentaryPersona.ENERGETIC
                 else PROCEDURAL_TACTICAL_TOPICS
@@ -487,7 +509,7 @@ class CommentaryEngine:
         """Adapts a gameplay event into natural persona dialogue and returns (dialogue_text, topic_heading)."""
         desc_clean = description.strip() if description else "this objective"
         ev_type = (event_type or "").lower()
-        if persona == CommentaryPersona.CASUAL:
+        if persona in (CommentaryPersona.CASUAL, CommentaryPersona.SOFT):
             if any(k in ev_type for k in ["combat", "fight", "attack", "kill"]):
                 return (
                     f"Spotting enemy movement here: {desc_clean}. Taking our time, dodging attacks to preserve armor durability.",
@@ -711,17 +733,22 @@ class CommentaryEngine:
         bgm_audio: Path,
         output_audio_path: Path,
         raw_game_audio: Optional[Path] = None,
-        ducking_ratio: float = 5.0,
-        voice_volume_boost_db: str = "+4dB",
-        bgm_volume_db: str = "-24dB",
+        ducking_ratio: float = 3.5,
+        voice_volume_boost_db: str = "+1dB",
+        bgm_volume_db: str = "-22dB",
         duration: Optional[float] = None,
     ) -> Path:
-        """Applies professional dynamic sidechain compression: BGM ducks automatically when commentary speaks."""
+        """Applies gentle acoustic EQ, loudness normalization, and dynamic sidechain compression for soft, warm voice."""
         output_audio_path.parent.mkdir(parents=True, exist_ok=True)
+
+        soft_voice_filter = (
+            f"highpass=f=75,lowpass=f=7800,equalizer=f=3200:t=q:w=1.2:g=-2.0,"
+            f"volume={voice_volume_boost_db},loudnorm=I=-16:TP=-1.5:LRA=11"
+        )
 
         if raw_game_audio and raw_game_audio.exists():
             filtergraph = (
-                f"[1:a]volume={voice_volume_boost_db},loudnorm=I=-14:TP=-1.0:LRA=10,asplit=2[voice_sc][voice_mix];"
+                f"[1:a]{soft_voice_filter},asplit=2[voice_sc][voice_mix];"
                 f"[0:a]volume={bgm_volume_db}[bg_soft];"
                 f"[bg_soft][voice_sc]sidechaincompress=threshold=0.02:ratio={ducking_ratio}:attack=100:release=700[bg_ducked];"
                 f"[2:a]volume=-22dB[game_low];"
@@ -739,7 +766,7 @@ class CommentaryEngine:
             ]
         else:
             filtergraph = (
-                f"[1:a]volume={voice_volume_boost_db},loudnorm=I=-14:TP=-1.0:LRA=10,asplit=2[voice_sc][voice_mix];"
+                f"[1:a]{soft_voice_filter},asplit=2[voice_sc][voice_mix];"
                 f"[0:a]volume={bgm_volume_db}[bg_soft];"
                 f"[bg_soft][voice_sc]sidechaincompress=threshold=0.02:ratio={ducking_ratio}:attack=100:release=700[bg_ducked];"
                 f"[bg_ducked][voice_mix]amix=inputs=2:normalize=0:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
@@ -766,14 +793,19 @@ class CommentaryEngine:
         self,
         raw_voice_audio: Path,
         output_audio_path: Path,
-        volume_boost_db: str = "+3dB",
+        volume_boost_db: str = "+1dB",
     ) -> Path:
-        """Applies loudness normalization (-16 LUFS) and peak limiting to pure spoken audio."""
+        """Applies warm acoustic EQ and loudness normalization (-16 LUFS) to pure spoken audio."""
         output_audio_path.parent.mkdir(parents=True, exist_ok=True)
+        soft_voice_filter = (
+            f"highpass=f=75,lowpass=f=7800,equalizer=f=3200:t=q:w=1.2:g=-2.0,"
+            f"volume={volume_boost_db},loudnorm=I=-16:TP=-1.5:LRA=11,"
+            f"aformat=sample_rates=44100:channel_layouts=stereo"
+        )
         cmd = [
             "ffmpeg", "-y",
             "-i", str(raw_voice_audio),
-            "-filter:a", f"volume={volume_boost_db},loudnorm=I=-16:TP=-1.5:LRA=11,aformat=sample_rates=44100:channel_layouts=stereo",
+            "-filter:a", soft_voice_filter,
             "-c:a", "aac",
             "-b:a", "192k",
             str(output_audio_path),
@@ -787,6 +819,95 @@ class CommentaryEngine:
             shutil.copy2(str(raw_voice_audio), str(output_audio_path))
             return output_audio_path
 
+    def generate_subtitles(
+        self,
+        cues: List[CommentaryCue],
+        output_path: Path,
+        events: Optional[List[Any]] = None,
+    ) -> Path:
+        """Generates synchronized ASS subtitles and closed-caption SRT files for commentary dialogue.
+
+        Renders stylish, highly readable subtitles for spoken gameplay walkthrough cues
+        along with unobtrusive action badges for game events at 1920x1080 canvas resolution.
+        """
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        ass_header = (
+            "[Script Info]\n"
+            "Title: Last Day on Earth Spoken Commentary Subtitles\n"
+            "ScriptType: v4.00+\n"
+            "PlayResX: 1920\n"
+            "PlayResY: 1080\n"
+            "ScaledBorderAndShadow: yes\n\n"
+            "[V4+ Styles]\n"
+            "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, "
+            "Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
+            "Alignment, MarginL, MarginR, MarginV, Encoding\n"
+            "Style: Commentary,Arial,42,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,-1,0,0,0,100,100,0,0,1,3.0,1.5,2,80,80,48,1\n"
+            "Style: ActionBadge,Arial,32,&H0000E5FF,&H000000FF,&H00000000,&H90000000,-1,0,0,0,100,100,0,0,1,2.0,1.0,8,40,40,32,1\n\n"
+            "[Events]\n"
+            "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
+        )
+
+        def format_ass_time(seconds: float) -> str:
+            hrs = int(seconds // 3600)
+            mins = int((seconds % 3600) // 60)
+            secs = seconds % 60
+            return f"{hrs:01d}:{mins:02d}:{secs:05.2f}"
+
+        def format_srt_time(seconds: float) -> str:
+            hrs = int(seconds // 3600)
+            mins = int((seconds % 3600) // 60)
+            secs = int(seconds % 60)
+            millis = int(round((seconds - int(seconds)) * 1000))
+            return f"{hrs:02d}:{mins:02d}:{secs:02d},{millis:03d}"
+
+        ass_lines = [ass_header]
+        srt_entries: List[str] = []
+        srt_idx = 1
+
+        # 1. Spoken commentary dialogue cues
+        for cue in cues:
+            dur = cue.duration if (cue.duration and cue.duration > 0) else max(3.0, len(cue.text.split()) * 0.38)
+            start_t = max(0.0, cue.start_time)
+            end_t = start_t + dur
+
+            start_ass = format_ass_time(start_t)
+            end_ass = format_ass_time(end_t)
+            # Smooth 200ms fade in/out for dialogue
+            ass_lines.append(f"Dialogue: 1,{start_ass},{end_ass},Commentary,,0,0,0,,{{\\fad(200,200)}}{cue.text}\n")
+
+            start_srt = format_srt_time(start_t)
+            end_srt = format_srt_time(end_t)
+            srt_entries.append(f"{srt_idx}\n{start_srt} --> {end_srt}\n{cue.text}\n\n")
+            srt_idx += 1
+
+        # 2. Gameplay event badges (if present and distinct)
+        if events:
+            for ev in events:
+                ev_start = getattr(ev, "start_time", 0.0)
+                ev_end = getattr(ev, "end_time", ev_start + 1.2)
+                ev_desc = getattr(ev, "description", "")
+                if ev_desc:
+                    start_ass = format_ass_time(ev_start)
+                    end_ass = format_ass_time(ev_end)
+                    ass_lines.append(f"Dialogue: 0,{start_ass},{end_ass},ActionBadge,,0,0,0,,{{\\fad(150,150)}}{ev_desc}\n")
+
+        # Write ASS file
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.writelines(ass_lines)
+
+        # Write SRT file alongside
+        srt_path = output_path.with_suffix(".srt")
+        try:
+            with open(srt_path, "w", encoding="utf-8") as f:
+                f.writelines(srt_entries)
+        except Exception as e:
+            logger.warning(f"Could not write SRT closed captions: {e}")
+
+        logger.info(f"Generated {len(cues)} commentary subtitle lines at: {output_path}")
+        return output_path
+
     def generate_commentary_track(
         self,
         duration: float,
@@ -796,9 +917,9 @@ class CommentaryEngine:
         persona: CommentaryPersona = CommentaryPersona.CASUAL,
         include_bgm: bool = True,
         bgm_audio: Optional[Path] = None,
-        volume_boost_db: str = "+4dB",
-        bgm_volume_db: str = "-24dB",
-        ducking_ratio: float = 5.0,
+        volume_boost_db: str = "+1dB",
+        bgm_volume_db: str = "-22dB",
+        ducking_ratio: float = 3.5,
         min_cue_interval: float = 25.0,
         raw_game_audio: Optional[Path] = None,
     ) -> Path:
@@ -819,7 +940,16 @@ class CommentaryEngine:
             # 2. Synthesis
             self.synthesize_all_cues(cues, persona=persona)
 
-            # 3. Timeline assembly
+            # 3. Synchronized subtitles generation (.ass and .srt)
+            self.last_cues = cues
+            try:
+                sub_path = output_path.with_suffix(".ass")
+                self.generate_subtitles(cues=cues, output_path=sub_path, events=events)
+                logger.info(f"Generated synchronized commentary subtitles: {sub_path}")
+            except Exception as se:
+                logger.warning(f"Commentary subtitle generation degraded: {se}")
+
+            # 4. Timeline assembly
             raw_voice_path = self.temp_dir / f"timeline_voice_{output_path.stem}.m4a"
             self.build_timeline_commentary_track(
                 cues=cues,
@@ -827,7 +957,7 @@ class CommentaryEngine:
                 output_path=raw_voice_path,
             )
 
-            # 4. Mix or Pure Voice
+            # 5. Mix or Pure Voice
             if include_bgm and bgm_audio and bgm_audio.exists():
                 logger.info(f"Mixing commentary with background music loop ({bgm_volume_db}) via sidechain ducking (ratio {ducking_ratio})...")
                 return self.mix_commentary_with_bgm(

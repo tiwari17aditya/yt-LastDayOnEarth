@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-11-12
+
+### Added
+- **Synchronized Commentary Subtitles & Closed Captions (`src/audio/commentary_engine.py`)**:
+  - Implemented `generate_subtitles(cues, output_path, events)` generating synchronized ASS subtitles and closed-caption `.srt` files.
+  - Spoken dialogue cues are formatted with readable bottom-center typography (`Style: Commentary`, 1920x1080 canvas, smooth 200ms fade in/out) synchronized with speech timing.
+  - Discrete action badges for key gameplay events (`Style: ActionBadge`) display simultaneously at top-center.
+  - `CommentaryEngine.generate_commentary_track` automatically persists `.ass` and `.srt` subtitle files alongside audio masters.
+- **Calm, Soft Walkthrough Voice Persona (`CommentaryPersona.SOFT`)**:
+  - Added dedicated soothing persona (`CommentaryPersona.SOFT`) with relaxed intro/outro scripts and unhurried pacing.
+  - Tuned `CASUAL` persona with softer voice delivery (`rate="-3%"`, `pitch="-2Hz"`, `volume="-2%"`).
+  - Acoustically shaped vocal EQ filter graph in FFmpeg (`highpass=f=75,lowpass=f=7800,equalizer=f=3200:t=q:w=1.2:g=-2.0`):
+    - Cuts low plosives and rumble under 75Hz.
+    - Filters harsh digital sibilance above 7.8kHz.
+    - Softens 3.2kHz nasal ear-fatigue frequencies by 2.0dB.
+  - Broadcast-standard soft loudness normalization target: `loudnorm=I=-16:TP=-1.5:LRA=11` (down from `-14 LUFS`), true peak limited to prevent clipping.
+  - Smoothed dynamic sidechain ducking ratio to `3.5` with gentle `-22dB` BGM bed volume and default `+1dB` vocal boost.
+
+### Changed
+- **Pipeline Video Filter & Subtitle Integration (`src/main.py`, `src/processor/video_processor.py`)**:
+  - Standardized video filter graph ordering: `scale=1920:1080` canvas normalization runs *before* subtitles are burned, preventing canvas coordinate distortion and cropping.
+  - In `src/main.py` Step 3b, `sub_path` automatically switches to the commentary subtitle track (`commentary_master.ass`), ensuring spoken dialogue is burned into the final video.
+  - Updated `src/subtitles/event_analyzer.py` ASS canvas from legacy iPhone resolution (`2796x1290`) to standard Full HD (`1920x1080`).
+- **Configuration & Workflow Defaults (`src/config.py`, `.github/workflows/scheduled_pipeline.yml`)**:
+  - Updated default voice parameters to soft settings: `volume_boost_db="+1dB"`, `rate="-3%"`, `pitch="-2Hz"`, `ducking_ratio=3.5`, `bgm_volume_db="-22dB"`.
+- **Test Suite Determinism (`tests/test_queue_manager.py`, `tests/test_commentary.py`)**:
+  - Added reference time anchoring in queue manager tests, ensuring deterministic passing regardless of execution timestamp.
+  - Added unit tests for commentary subtitle generation, soft persona script synthesis, and pipeline subtitle binding (56/56 tests passing).
+
 ## [1.13.0] - 2026-11-11
 
 ### Added

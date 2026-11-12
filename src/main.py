@@ -405,12 +405,16 @@ def run_pipeline(
                     bgm_audio=music_file,
                     volume_boost_db=settings.commentary.volume_boost_db,
                     bgm_volume_db=getattr(settings.commentary, "bgm_volume_db", "-22dB"),
-                    ducking_ratio=getattr(settings.commentary, "ducking_ratio", 4.0),
+                    ducking_ratio=getattr(settings.commentary, "ducking_ratio", 3.5),
                     min_cue_interval=getattr(settings.commentary, "min_cue_interval", 25.0),
                 )
 
                 if final_commentary_track and final_commentary_track.exists():
                     music_file = final_commentary_track
+                    commentary_ass = final_commentary_track.with_suffix(".ass")
+                    if commentary_ass.exists():
+                        sub_path = commentary_ass
+                        logger.info(f"Attached synchronized commentary subtitles for video render: {sub_path}")
                     logger.info(
                         f"AI voice commentary synthesized and attached successfully: {music_file}",
                         extra_data={"duration": video_duration, "persona": persona_enum.value},

@@ -85,6 +85,11 @@ class VideoProcessor:
         if privacy_filter:
             video_filters.append(privacy_filter)
 
+        # Standardize canvas resolution to 1920x1080 60fps first so subtitles burn onto a clean canvas
+        video_filters.append(
+            "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60"
+        )
+
         if subtitle_file and Path(subtitle_file).exists():
             # Escape path for FFmpeg subtitles filter on Windows
             escaped_sub = str(subtitle_file).replace("\\", "/").replace(":", "\\:")
@@ -96,7 +101,6 @@ class VideoProcessor:
             fade_dur = min(fade_duration, max(0.2, main_dur / 2.0)) if main_dur > 0 else 0.7
             fade_start = max(0.0, main_dur - fade_dur) if main_dur > 0 else 0.0
 
-            video_filters.append("scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=60")
             if main_dur > 0:
                 video_filters.append(f"fade=t=out:st={fade_start:.2f}:d={fade_dur:.2f}")
 

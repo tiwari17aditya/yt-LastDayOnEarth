@@ -34,22 +34,31 @@ def test_persona_profiles_coverage():
 
     config_casual = engine.get_persona_config(CommentaryPersona.CASUAL)
     assert config_casual.voice == "en-US-GuyNeural"
+    assert config_casual.rate == "-3%"
+    assert config_casual.pitch == "-2Hz"
+
+    config_soft = engine.get_persona_config(CommentaryPersona.SOFT)
+    assert config_soft.voice == "en-US-GuyNeural"
+    assert config_soft.rate == "-4%"
+    assert config_soft.pitch == "-2Hz"
 
     config_tactical = engine.get_persona_config(CommentaryPersona.TACTICAL)
     assert config_tactical.voice == "en-US-AndrewNeural"
 
 
 def test_commentary_settings_defaults():
-    """Verify CommentarySettings are present in PipelineSettings with correct defaults."""
+    """Verify CommentarySettings are present in PipelineSettings with correct soft voice defaults."""
     settings = get_settings()
     assert hasattr(settings, "commentary")
     assert settings.commentary.enabled is True
     assert settings.commentary.persona == "casual"
     assert settings.commentary.voice == "en-US-GuyNeural"
-    assert settings.commentary.volume_boost_db == "+4dB"
+    assert settings.commentary.rate == "-3%"
+    assert settings.commentary.pitch == "-2Hz"
+    assert settings.commentary.volume_boost_db == "+1dB"
     assert settings.commentary.include_bgm is True
-    assert settings.commentary.bgm_volume_db == "-24dB"
-    assert settings.commentary.ducking_ratio == 5.0
+    assert settings.commentary.bgm_volume_db == "-22dB"
+    assert settings.commentary.ducking_ratio == 3.5
     assert settings.commentary.min_cue_interval == 25.0
 
 
@@ -191,6 +200,10 @@ def test_pipeline_commentary_failure_degrades_gracefully(tmp_path):
          patch("src.processor.video_processor.VideoProcessor.render") as mock_render, \
          patch("src.processor.video_processor.VideoProcessor.get_output_path", return_value=tmp_path / "out.mp4"), \
          patch("src.privacy.ad_detector.AdDetector.detect_ads", return_value=[]), \
+         patch("src.processor.thumbnail_generator.ThumbnailGenerator.generate_thumbnail", return_value=tmp_path / "thumb.jpg"), \
+         patch("src.storage.history_tracker.HistoryTracker.record_job"), \
+         patch("src.publisher.title_manager.TitleManager._update_current_episode"), \
+         patch("src.publisher.title_manager.TitleManager.advance_episode"), \
          patch("src.main.get_notifier"):
 
         (tmp_path / "out.mp4").write_bytes(b"dummy output")
@@ -201,4 +214,93 @@ def test_pipeline_commentary_failure_degrades_gracefully(tmp_path):
         # Verify render received the fallback BGM file, NOT failing
         called_music_file = mock_render.call_args[1].get("music_file")
         assert called_music_file == tmp_path / "bgm.m4a"
+
+
+def test_generate_subtitles_creates_ass_and_srt(tmp_path):
+    """Verify generate_subtitles generates valid ASS (1920x1080) and SRT caption files."""
+    engine = CommentaryEngine(temp_dir=tmp_path)
+    cues = [
+        CommentaryCue(start_time=2.0, text="Welcome back everyone to today's calm survival run.", duration=4.5),
+        CommentaryCue(start_time=10.0, text="Here we are checking our workshop storage chests.", duration=3.8),
+    ]
+    events = [
+        GameplayEvent(start_time=0.0, end_time=1.5, action_type="base", description="Base Operations"),
+    ]
+
+    ass_out = tmp_path / "test_subs.ass"
+    engine.generate_subtitles(cues=cues, output_path=ass_out, events=events)
+
+    assert ass_out.exists()
+    srt_out = tmp_path / "test_subs.srt"
+    assert srt_out.exists()
+
+    ass_content = ass_out.read_text(encoding="utf-8")
+    assert "PlayResX: 1920" in ass_content
+    assert "PlayResY: 1080" in ass_content
+    assert "Style: Commentary" in ass_content
+    assert "Style: ActionBadge" in ass_content
+    assert "Welcome back everyone" in ass_content
+    assert "Base Operations" in ass_content
+
+    srt_content = srt_out.read_text(encoding="utf-8")
+    assert "00:00:02,000 --> 00:00:06,500" in srt_content
+    assert "Welcome back everyone" in srt_content
+
+
+def test_soft_voice_persona_script_generation():
+    """Verify CommentaryPersona.SOFT produces gentle, soothing intro and outro text."""
+    engine = CommentaryEngine(temp_dir=Path("temp/test_commentary"))
+    cues = engine.generate_script(
+        duration=300.0,
+        episode_number=125,
+        persona=CommentaryPersona.SOFT,
+    )
+    assert len(cues) >= 3
+    # Check soothing intro
+    intro = cues[0].text.lower()
+    assert "relaxed" in intro or "comfortable" in intro or "steady" in intro
+    assert "125" in intro
+
+    # Check soothing outro
+    outro = cues[-1].text.lower()
+    assert "relaxing" in outro or "calm" in outro
+
+
+def test_main_pipeline_attaches_commentary_subtitles(tmp_path):
+    """Verify that run_pipeline passes the commentary-generated ASS subtitle file to the renderer."""
+    from src.main import run_pipeline
+
+    input_v = tmp_path / "mock_video_subs.mp4"
+    input_v.write_bytes(b"dummy video for subtitle pipeline test")
+
+    mock_ass_path = tmp_path / "mock_video_subs_commentary_master.ass"
+    mock_ass_path.write_text("[Script Info]\nTitle: Test Subtitles", encoding="utf-8")
+    mock_audio_path = tmp_path / "mock_video_subs_commentary_master.m4a"
+    mock_audio_path.write_bytes(b"dummy audio")
+
+    with patch("src.processor.video_processor.VideoProcessor.get_video_duration", return_value=60.0), \
+         patch("src.privacy.detector.PrivacyDetector.scan_video", return_value=[]), \
+         patch("src.privacy.detector.PrivacyDetector.generate_ffmpeg_blur_filter", return_value=None), \
+         patch("src.subtitles.event_analyzer.SubtitleGenerator.analyze_events", return_value=[]), \
+         patch("src.subtitles.event_analyzer.SubtitleGenerator.generate_subtitles", return_value=None), \
+         patch("src.audio.selector.AudioMixer.create_random_loop_sequence", return_value=(tmp_path / "bgm.m4a", [{"title": "Ambient"}])), \
+         patch("src.audio.commentary_engine.CommentaryEngine.generate_commentary_track", return_value=mock_audio_path), \
+         patch("src.processor.video_processor.VideoProcessor.render") as mock_render, \
+         patch("src.processor.video_processor.VideoProcessor.get_output_path", return_value=tmp_path / "out.mp4"), \
+         patch("src.privacy.ad_detector.AdDetector.detect_ads", return_value=[]), \
+         patch("src.processor.thumbnail_generator.ThumbnailGenerator.generate_thumbnail", return_value=tmp_path / "thumb.jpg"), \
+         patch("src.storage.history_tracker.HistoryTracker.record_job"), \
+         patch("src.publisher.title_manager.TitleManager._update_current_episode"), \
+         patch("src.publisher.title_manager.TitleManager.advance_episode"), \
+         patch("src.main.get_notifier"):
+
+        (tmp_path / "out.mp4").write_bytes(b"dummy output")
+
+        result = run_pipeline(input_video_path=input_v, local_only=True, force=True)
+
+        assert mock_render.called
+        # Verify render received the commentary subtitle file
+        called_sub_file = mock_render.call_args[1].get("subtitle_file")
+        assert called_sub_file is not None
+        assert Path(called_sub_file).name.endswith("commentary_master.ass")
 
