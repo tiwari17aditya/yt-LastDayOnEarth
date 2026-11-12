@@ -113,6 +113,66 @@ GAME_VOCABULARY = {
         "Crooked Creek Farm": "Granja",
         "Blackport PD": "Comisaría de Policía",
     },
+    "de": {
+        "Last Day on Earth": "Last Day on Earth",
+        "Survival": "Überleben",
+        "Episode": "Folge",
+        "Ep": "Folge",
+        "Bunker Alfa": "Bunker Alfa",
+        "Bunker Bravo": "Bunker Bravo",
+        "Chopper": "Chopper-Motorrad",
+        "ATV": "ATV-Geländefahrzeug",
+        "Woodworking": "Holzbearbeitungsbank",
+        "Smelting": "Schmelzofen",
+        "Furnace": "Ofen",
+        "Base Building": "Basisbau & Befestigung",
+        "Storage Chest": "Kisten & Lagerung",
+        "Farming": "Ressourcen farmen",
+        "Resource Gathering": "Material sammeln",
+        "Weapon Workshop": "Waffen-Werkbank",
+        "Guns": "Schusswaffen",
+        "Zombie Horde": "Zombie-Horde",
+        "Fastest Way": "Der schnellste Weg",
+        "Guide": "Guide & Tipps",
+        "Tips": "Tipps",
+        "Looting": "Beutezug",
+        "Crafting": "Handwerk & Crafting",
+        "Home Base": "Heimatbasis",
+        "Pine Woods": "Kiefernwald",
+        "Limestone Ridge": "Kalksteingebirge",
+        "Crooked Creek Farm": "Alte Farm",
+        "Blackport PD": "Polizeistation",
+    },
+    "fr": {
+        "Last Day on Earth": "Last Day on Earth",
+        "Survival": "Survie",
+        "Episode": "Épisode",
+        "Ep": "Ép.",
+        "Bunker Alfa": "Bunker Alfa",
+        "Bunker Bravo": "Bunker Bravo",
+        "Chopper": "Moto Chopper",
+        "ATV": "Véhicule ATV",
+        "Woodworking": "Établi à bois",
+        "Smelting": "Fourneau de fusion",
+        "Furnace": "Fourneau",
+        "Base Building": "Construction de base",
+        "Storage Chest": "Coffres & Rangement",
+        "Farming": "Farme de ressources",
+        "Resource Gathering": "Collecte de ressources",
+        "Weapon Workshop": "Établi d'armurerie",
+        "Guns": "Armes à feu",
+        "Zombie Horde": "Horde de zombies",
+        "Fastest Way": "Méthode la plus rapide",
+        "Guide": "Guide complet",
+        "Tips": "Astuces",
+        "Looting": "Pillage de butin",
+        "Crafting": "Artisanat & Craft",
+        "Home Base": "Base principale",
+        "Pine Woods": "Forêt de pins",
+        "Limestone Ridge": "Crête de calcaire",
+        "Crooked Creek Farm": "Ferme abandonnée",
+        "Blackport PD": "Poste de police",
+    },
 }
 
 LOCALIZED_DESCRIPTIONS = {
@@ -134,13 +194,25 @@ LOCALIZED_DESCRIPTIONS = {
         "cta": "¿Te gustó el video? ¡Deja tu like 👍 y suscríbete al canal 🔔 para no perderte nuevos episodios y guías de supervivencia!",
         "playlist": "📺 Lista de reproducción oficial de la serie:",
     },
+    "de": {
+        "greeting": "Willkommen bei Last Day on Earth: Survival! In Folge #{episode} setzen wir unser Überleben im Ödland fort.",
+        "body": "In dieser Episode: Basis-Optimierung, effizientes Ressourcen-Farmen, Crafting und Vorbereitung auf gefährliche Zombie-Zonen.",
+        "cta": "Hat dir das Video gefallen? Hinterlasse gerne einen Daumen nach oben 👍 und abonniere den Kanal 🔔 für tägliche Guides und Walkthroughs!",
+        "playlist": "📺 Komplette Playlist zur Survival-Serie:",
+    },
+    "fr": {
+        "greeting": "Bienvenue sur Last Day on Earth: Survival ! Dans l'épisode #{episode}, nous poursuivons notre aventure de survie.",
+        "body": "Au programme : optimisation de la base, récolte de ressources, artisanat et préparation pour les raids de bunkers.",
+        "cta": "Si cette vidéo vous a plu, laissez un pouce bleu 👍 et abonnez-vous 🔔 pour ne manquer aucun épisode !",
+        "playlist": "📺 Playlist officielle de la série :",
+    },
 }
 
 
 class MetadataLocalizer:
     """Generates localized titles and descriptions for YouTube Data API v3."""
 
-    SUPPORTED_LANGUAGES = ["ru", "pt", "es"]
+    SUPPORTED_LANGUAGES = ["ru", "pt", "es", "de", "fr"]
 
     def __init__(
         self,
@@ -282,6 +354,8 @@ class MetadataLocalizer:
                 "ru": "⏱️ ТАЙМКОДЫ И ГЛАВЫ:",
                 "pt": "⏱️ CAPÍTULOS E TIMESTAMPS:",
                 "es": "⏱️ CAPÍTULOS Y MARCAS DE TIEMPO:",
+                "de": "⏱️ KAPITEL & ZEITSTEMPEL:",
+                "fr": "⏱️ CHAPITRES & HORODATAGES:",
             }
             lines.extend([
                 "",
@@ -318,18 +392,22 @@ class MetadataLocalizer:
                 f"You are a YouTube Gaming localization expert for 'Last Day on Earth: Survival'.\n"
                 f"Primary English Title: {primary_title}\n"
                 f"Episode Number: {episode_number}\n\n"
-                f"Translate and localize the video title and description into 3 languages:\n"
-                f"1. Russian ('ru') - Kefir's home player base (use active Russian gamer terminology: Чоппер, Бункер Альфа, фарм, крафт)\n"
-                f"2. Portuguese ('pt') - Brazilian mobile gaming community (use natural Brazilian Portuguese gamer slang)\n"
-                f"3. Spanish ('es') - Latin American mobile gaming audience\n\n"
+                f"Translate and localize the video title and description into 5 key global languages:\n"
+                f"1. German ('de') - European gaming community (use natural German gamer terminology: Basisbau, Kisten, farmen)\n"
+                f"2. Spanish ('es') - Latin American & European Spanish mobile gaming audience\n"
+                f"3. Russian ('ru') - Kefir's home player base (use active Russian gamer terminology: Чоппер, Бункер Альфа, фарм, крафт)\n"
+                f"4. French ('fr') - French mobile gaming audience\n"
+                f"5. Portuguese ('pt') - Brazilian mobile gaming community\n\n"
                 f"Rules:\n"
                 f"- Title MUST be <= 100 characters in each language.\n"
                 f"- Description should be 2-3 engaging paragraphs with a Call-To-Action (Like & Subscribe).\n"
                 f"- Return strict JSON with format:\n"
                 f"{{\n"
+                f'  "de": {{"title": "...", "description": "..."}},\n'
+                f'  "es": {{"title": "...", "description": "..."}},\n'
                 f'  "ru": {{"title": "...", "description": "..."}},\n'
-                f'  "pt": {{"title": "...", "description": "..."}},\n'
-                f'  "es": {{"title": "...", "description": "..."}}\n'
+                f'  "fr": {{"title": "...", "description": "..."}},\n'
+                f'  "pt": {{"title": "...", "description": "..."}}\n'
                 f"}}\n"
                 f"Return ONLY JSON."
             )
@@ -345,13 +423,13 @@ class MetadataLocalizer:
 
             parsed = json.loads(raw_text)
             validated = {}
-            for lang in ["ru", "pt", "es"]:
+            for lang in self.SUPPORTED_LANGUAGES:
                 if lang in parsed and "title" in parsed[lang] and "description" in parsed[lang]:
                     validated[lang] = {
                         "title": parsed[lang]["title"][:100],
                         "description": parsed[lang]["description"][:5000],
                     }
-            return validated if len(validated) == 3 else None
+            return validated if len(validated) >= 3 else None
         except Exception as e:
             logger.warning(f"Error calling Gemini for localization: {e}")
             return None

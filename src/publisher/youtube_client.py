@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from src.logging_config import get_logger
 from src.exceptions import PublishingError, QuotaExceededError
 
@@ -44,6 +44,7 @@ class VideoPublishMetadata:
     default_language: str = "en"
     events: Optional[List[Any]] = None
     publish_at: Optional[str] = None  # RFC 3339 format (e.g., 2026-11-12T09:30:00Z) for YouTube scheduled release
+    caption_tracks: Optional[Dict[str, Tuple[Path, str]]] = None  # lang -> (srt_path, track_name)
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
@@ -390,24 +391,55 @@ class YouTubeClient(BasePublisher):
         self,
         youtube: Any,
         video_id: str,
-        events: List[Any],
+        events: Optional[List[Any]] = None,
         languages: Optional[List[str]] = None,
+        caption_tracks: Optional[Dict[str, Tuple[Path, str]]] = None,
     ) -> Dict[str, str]:
         """Uploads multi-language Closed Caption tracks (.srt) to YouTube via Data API v3."""
+        from googleapiclient.http import MediaFileUpload
+
+        uploaded: Dict[str, str] = {}
+
+        # 1. High-fidelity commentary caption tracks if provided
+        if caption_tracks:
+            for lang, (srt_p, t_name) in caption_tracks.items():
+                p = Path(srt_p)
+                if not p.exists() or p.stat().st_size == 0:
+                    continue
+                try:
+                    media = MediaFileUpload(str(p), mimetype="application/x-subrip", resumable=False)
+                    body = {
+                        "snippet": {
+                            "videoId": video_id,
+                            "language": lang,
+                            "name": t_name,
+                            "isDraft": False,
+                        }
+                    }
+                    logger.info(f"Uploading {t_name} Closed Caption track to video {video_id}...")
+                    resp = youtube.captions().insert(part="snippet", body=body, media_body=media).execute()
+                    caption_id = resp.get("id")
+                    uploaded[lang] = caption_id
+                    logger.info(f"Closed Caption track ({lang}) uploaded successfully (ID: {caption_id})")
+                except Exception as e:
+                    logger.warning(f"Could not upload {lang} caption track from file {p}: {e}")
+            if uploaded:
+                return uploaded
+
+        # 2. Fallback: synthesize from gameplay events
         if not events:
             return {}
 
-        from googleapiclient.http import MediaFileUpload
-
-        langs = languages or ["en", "ru", "pt", "es"]
+        langs = languages or ["en", "ru", "pt", "es", "de", "fr"]
         track_names = {
-            "en": "English (Gameplay Cues)",
+            "en": "English (Gameplay Walkthrough)",
             "ru": "Русский (Игровые подсказки)",
             "pt": "Português (Dicas de Sobrevivência)",
             "es": "Español (Guía de Supervivencia)",
+            "de": "Deutsch (Walkthrough & Tipps)",
+            "fr": "Français (Guide de survie)",
         }
 
-        uploaded: Dict[str, str] = {}
         captions_temp_dir = Path("temp/captions")
         captions_temp_dir.mkdir(parents=True, exist_ok=True)
 
@@ -695,12 +727,13 @@ class YouTubeClient(BasePublisher):
                 logger.error(f"STRICT COMPLIANCE ALERT: Playlist auto-assignment encountered error: {pe}")
 
             # Upload multi-language Closed Caption tracks (.srt) to YouTube player
-            if getattr(metadata, "events", None):
+            if getattr(metadata, "caption_tracks", None) or getattr(metadata, "events", None):
                 try:
                     self.upload_captions(
                         youtube=youtube,
                         video_id=video_id,
-                        events=metadata.events,
+                        events=getattr(metadata, "events", None),
+                        caption_tracks=getattr(metadata, "caption_tracks", None),
                     )
                 except Exception as cap_err:
                     logger.warning(f"Closed Captions upload skipped: {cap_err}")

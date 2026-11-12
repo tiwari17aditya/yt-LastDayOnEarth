@@ -419,6 +419,49 @@ def run_pipeline(
                         f"AI voice commentary synthesized and attached successfully: {music_file}",
                         extra_data={"duration": video_duration, "persona": persona_enum.value},
                     )
+
+                    # Multi-Lingual Companion Dubs & Closed Captions (German, Spanish, Russian, French)
+                    caption_tracks = {}
+                    en_srt = final_commentary_track.with_suffix(".srt")
+                    if en_srt.exists():
+                        caption_tracks["en"] = (en_srt, "English (Original Walkthrough)")
+
+                    if getattr(settings.commentary, "multilingual_enabled", True) and getattr(commentary_engine, "last_cues", None):
+                        try:
+                            logger.info("Generating multi-lingual companion audio tracks and closed captions...")
+                            multilingual_dir = settings.processing.output_dir / "multilingual" / f"ep_{current_ep_num}"
+                            target_langs = getattr(settings.commentary, "multilingual_languages", ["de", "es", "ru", "fr"])
+                            bgm_track_file = stitched_audio_path if ('stitched_audio_path' in locals() and stitched_audio_path.exists()) else None
+                            multi_pkg = commentary_engine.generate_multilingual_package(
+                                duration=video_duration,
+                                base_cues=commentary_engine.last_cues,
+                                output_dir=multilingual_dir,
+                                target_languages=target_langs,
+                                bgm_audio=bgm_track_file,
+                                events=events,
+                                gemini_api_key=settings.gemini.api_key,
+                            )
+                            track_name_map = {
+                                "de": "Deutsch (Deutsche Untertitel)",
+                                "es": "Español (Subtítulos en español)",
+                                "ru": "Русский (Русские субтитры)",
+                                "fr": "Français (Sous-titres français)",
+                            }
+                            for lang_code, lang_assets in multi_pkg.items():
+                                if "srt" in lang_assets and lang_assets["srt"].exists():
+                                    caption_tracks[lang_code] = (
+                                        lang_assets["srt"],
+                                        track_name_map.get(lang_code, lang_code.upper()),
+                                    )
+                            logger.info(
+                                f"Multi-lingual asset package ready: {len(multi_pkg)} dub tracks, {len(caption_tracks)} caption tracks",
+                                extra_data={"languages": list(multi_pkg.keys())},
+                            )
+                        except Exception as mle:
+                            logger.warning(
+                                f"Multi-lingual companion packaging degraded: {mle}. Primary video unaffected.",
+                                extra_data={"operation": "multilingual_package", "root_cause": str(mle)},
+                            )
             except Exception as ce:
                 logger.warning(
                     f"Commentary synthesis degraded: {ce}. Falling back seamlessly to standard background audio.",
@@ -533,6 +576,8 @@ def run_pipeline(
                 thumbnail_path=thumbnail_path,
                 episode_number=ep_num_for_publishing,
             )
+            if 'caption_tracks' in locals() and caption_tracks:
+                metadata.caption_tracks = caption_tracks
         except Exception as me:
             raise PublishingError(
                 operation="generate_metadata",

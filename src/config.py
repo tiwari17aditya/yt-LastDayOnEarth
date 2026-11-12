@@ -200,6 +200,16 @@ class CommentarySettings(BaseModel):
     min_cue_interval: float = Field(
         default_factory=lambda: _safe_float(os.getenv("COMMENTARY_MIN_CUE_INTERVAL"), 25.0)
     )
+    multilingual_enabled: bool = Field(
+        default_factory=lambda: os.getenv("COMMENTARY_MULTILINGUAL_ENABLED", "true").lower() == "true"
+    )
+    multilingual_languages: List[str] = Field(
+        default_factory=lambda: [
+            l.strip().lower()
+            for l in os.getenv("COMMENTARY_MULTILINGUAL_LANGUAGES", "de,es,ru,fr").split(",")
+            if l.strip()
+        ]
+    )
 
 
 class PipelineSettings(BaseModel):
