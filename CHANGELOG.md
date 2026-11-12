@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.0] - 2026-11-12
+
+### Added
+- **Multi-Language Audio Dubbing & Packaging (`src/audio/commentary_engine.py`)**:
+  - Implemented regional neural voice profiles:
+    - **German (`de`)**: `de-DE-KillianNeural`
+    - **Spanish (`es`)**: `es-ES-AlvaroNeural`
+    - **Russian (`ru`)**: `ru-RU-DmitryNeural`
+    - **French (`fr`)**: `fr-FR-HenriNeural`
+  - Dual-layer script translation engine (`translate_cues`):
+    - Layer 1 (AI Generation): Gemini 2.5 Flash batch translation maintaining survival game idioms (*Bunker Alfa, Chopper, Wall trick, Frenzied Giants*).
+    - Layer 2 (Deterministic Fallback): Community vocabulary dictionary translation in `src/publisher/localization.py`.
+  - Regional audio synthesis and packaging (`synthesize_regional_audio_track`, `generate_multilingual_package`):
+    - Synthesizes timeline audio for all regional voices with background music sidechain ducking.
+    - Generates localized `.srt` closed caption files alongside each audio dub track.
+    - Writes `multilingual_manifest.json` indexing all regional audio and subtitle assets.
+- **YouTube Multi-Language Closed Captions Upload (`src/publisher/youtube_client.py`)**:
+  - Enhanced `upload_captions` to upload multi-lingual caption tracks via YouTube Data API v3 (`youtube.captions().insert`).
+  - Automatically uploads closed captions in English, German, Spanish, Russian, and French upon video publication.
+- **Expanded Community Localization (`src/publisher/localization.py`)**:
+  - Added German (`de`) and French (`fr`) high-frequency LDoE gaming vocabulary and description templates.
+  - Expanded `SUPPORTED_LANGUAGES` to `["ru", "pt", "es", "de", "fr"]` for YouTube metadata localizations.
+- **Unit Test Suite (`tests/test_multilingual.py`)**:
+  - Added 6 comprehensive unit tests verifying regional voice mappings, dictionary translation, Gemini translation mocking, package manifest synthesis, and YouTube caption upload payloads (62/62 tests passing).
+
 ## [1.14.0] - 2026-11-12
 
 ### Added

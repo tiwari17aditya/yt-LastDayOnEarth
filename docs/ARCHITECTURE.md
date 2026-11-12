@@ -79,18 +79,21 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `generate_subtitles(events: List[GameplayEvent], output_path: Path) -> Path`
 
 ### 3.4 Audio & AI Commentary Engine (`src/audio/`)
-- **Responsibility**: Select appropriate music track from the 20 royalty-free catalog, loop seamlessly, duck audio under gameplay sound effects, and synthesize continuous AI companion voice walkthroughs.
+- **Responsibility**: Select appropriate music track from the 20 royalty-free catalog, loop seamlessly, duck audio under gameplay sound effects, synthesize continuous AI companion voice walkthroughs, generate synchronized dialogue subtitles, and produce multi-lingual companion dub packages.
 - **Components**:
   - `AudioMixer`: Manages royalty-free music library selection, duration probing, and multi-track concatenation loops (`create_random_loop_sequence`).
   - `CommentaryEngine` (`src/audio/commentary_engine.py`):
     - Synthesizes dynamic, domain-grounded commentary dialogue across video durations using `edge-tts`.
-    - Supports three distinct personas: Energetic (`en-US-ChristopherNeural`), Casual (`en-US-GuyNeural`), and Tactical (`en-US-AndrewNeural`).
+    - Personas: Casual (`en-US-GuyNeural`), Soft Walkthrough Companion (`CommentaryPersona.SOFT`), Energetic (`en-US-ChristopherNeural`), and Tactical (`en-US-AndrewNeural`).
+    - Soft Voice Acoustics: Warm vocal EQ curve (`highpass=75,lowpass=7800,equalizer=3200Hz -2dB`), -16 LUFS loudness target, gentle -22dB BGM bed, and 3.5 sidechain ducking ratio.
+    - Synchronized Subtitles: Emits burned-in Full HD (`1920x1080`) ASS dialogue subtitles (`Style: Commentary`) and matching `.srt` closed caption files for spoken walkthrough narration.
+    - Multi-Language Regional Dubs: Translates cues into German (`de`), Spanish (`es`), Russian (`ru`), and French (`fr`) using Gemini AI with gaming vocabulary fallback, synthesizing companion `.m4a` dubs and `.srt` caption files indexed via `multilingual_manifest.json`.
     - Fills timeline silence gaps during gameplay downtime/roaming with 36+ survival strategy and advancement topics (~25s interval).
-    - Dynamic FFmpeg Sidechain Compression: Routes voice through `asplit=2` to trigger `sidechaincompress(threshold=0.02, ratio=5.0)` against ambient background music (`-24dB`), ducking it to `-30dB` when speaking while keeping spoken voice at `-14 LUFS` broadcast level via `amix(normalize=0)`.
+    - Dynamic FFmpeg Sidechain Compression: Routes voice through `asplit=2` to trigger `sidechaincompress(threshold=0.02, ratio=3.5)` against ambient background music (`-22dB`), ducking it smoothly while keeping spoken voice at `-16 LUFS` broadcast level via `amix(normalize=0)`.
     - Fail-Safe Fallback: Degradation path catches synthesis errors and automatically falls back to standard background music loop without halting video rendering or publishing.
 - **Interface**:
   - `BaseAudioMixer`: `select_track(mood: str, target_duration: float) -> MusicTrack`, `build_audio_filter(...) -> str`
-  - `CommentaryEngine`: `generate_script(...) -> List[CommentaryCue]`, `synthesize_all_cues(...)`, `build_timeline_commentary_track(...)`, `mix_commentary_with_bgm(...)`, `generate_commentary_track(...)`
+  - `CommentaryEngine`: `generate_script(...) -> List[CommentaryCue]`, `synthesize_all_cues(...)`, `generate_subtitles(...)`, `translate_cues(...)`, `synthesize_regional_audio_track(...)`, `generate_multilingual_package(...)`, `mix_commentary_with_bgm(...)`, `generate_commentary_track(...)`
 
 ### 3.5 Video Processor & Outro Animation Engine (`src/processor/`)
 - **Responsibility**: Assemble video streams, blur filters, burned-in styled subtitles, mixed audio, and animated brand outro tails using FFmpeg into a broadcast-standard YouTube-ready MP4.
@@ -115,14 +118,14 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `FediverseBroadcaster`: Cross-posts rich release announcements with custom thumbnails, video links, and dynamic hashtags to Mastodon and Lemmy communities (automatically deferred for scheduled private videos until public).
   - `MultiPlatformPublisher`: Orchestrates primary publishing (YouTube) and non-blocking open-source mirrors and social broadcasts (PeerTube + Fediverse), preserving fail-safe pipeline semantics.
   - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, search-intent tutorial formula (`search_guide`, +37% viewer retention), Title History Anti-Repetition Guard (`is_title_repetitive` vs last 10 episodes in `data/series_tracker.json`), persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`).
-  - `MetadataLocalizer` (`src/publisher/localization.py`): Multi-language translation engine producing YouTube Data API v3 `localizations` payloads and synchronized `.srt` Closed Caption tracks for key player regions: Russian (`ru`), Portuguese (`pt`), and Spanish (`es`).
+  - `MetadataLocalizer` (`src/publisher/localization.py`): Multi-language translation engine producing YouTube Data API v3 `localizations` payloads and synchronized `.srt` Closed Caption tracks for key player regions: German (`de`), Spanish (`es`), Russian (`ru`), French (`fr`), and Portuguese (`pt`).
   - `DynamicTagGenerator` (`src/publisher/metadata_generator.py`): Dynamically analyzes gameplay events and titles to synthesize ~50 trending hashtags via Gemini AI or multi-cluster contextual algorithmic selection with seeded rotation.
   - `scripts/resolve_copyright_claims.py`: Channel-wide copyright and territorial restriction auditing, batch-fixing, and YouTube Studio dispute resolution copy generator.
 - **Interface**: `BasePublisher`
   - `generate_metadata(video_title: str, events: List[GameplayEvent], ...) -> VideoPublishMetadata`
   - `export_metadata_json(metadata: VideoPublishMetadata, output_json_path: Path) -> Path`
   - `upload_video(video_path: Path, metadata: VideoPublishMetadata) -> str`
-  - `upload_captions(youtube: Any, video_id: str, events: List[Any], languages: List[str]) -> Dict[str, str]`
+  - `upload_captions(youtube: Any, video_id: str, events: Optional[List[Any]] = None, languages: Optional[List[str]] = None, caption_tracks: Optional[Dict[str, Tuple[Path, str]]] = None) -> Dict[str, str]`
   - `publish_all(video_path: Path, metadata: VideoPublishMetadata) -> MultiPlatformPublishResult` (in `MultiPlatformPublisher`)
 
 ### 3.7 Notifications & Reporting (`src/notifications/`)
