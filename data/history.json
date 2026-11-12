@@ -4244,5 +4244,41 @@
       "ads_removed": [],
       "md5_checksum": "3f31c90c64c999d493b2c01ae981f6a7"
     }
+  },
+  {
+    "job_id": "job_20261112_180637",
+    "timestamp": "2026-11-12T18:06:37.517338+00:00",
+    "input_filename": "ScreenRecording_11-05-2026 02-02-10_1.mp4",
+    "output_filename": "ScreenRecording_11-05-2026_02-02-10_1_Processed_12112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "HT0ULX-3jsg",
+    "youtube_url": "https://youtu.be/HT0ULX-3jsg",
+    "details": {
+      "video_id": "HT0ULX-3jsg",
+      "youtube_url": "https://youtu.be/HT0ULX-3jsg",
+      "scheduled_publish_time_utc": "2026-11-13T09:30:00Z",
+      "scheduled_publish_time_ist": "13 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-05-2026_02-02-10_1_Processed_12112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-05-2026_02-02-10_1_Processed_12112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-05-2026_02-02-10_1_Processed_12112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Home Base Operations! | LDoE Survival #129",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Home Base Operations Plus Workshop &... #129",
+        "walkthrough": "Surviving Day 129: Entering Home Base And Home Base Operations Plus Workshop & Smelting... #129",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #129"
+      },
+      "duration_seconds": 670.065,
+      "soundtrack_tracks": [
+        "Fretless",
+        "Shores of Avalon",
+        "Clear Waters"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "6a34dcbb37c0e2a368d6ef4c9fe8733a"
+    }
   }
 ]

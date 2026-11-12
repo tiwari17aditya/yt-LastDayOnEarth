@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 129,
+  "current_episode": 130,
   "completed_episodes": [
     {
       "episode": 1,
@@ -866,6 +866,13 @@
       "video_id": "g8VPAtfPX8k",
       "youtube_url": "https://youtu.be/g8VPAtfPX8k",
       "job_id": "g8VPAtfPX8k"
+    },
+    {
+      "episode": 129,
+      "title": "Bunker Alfa Infiltration & Red Crate Run! | LDoE Survival #129",
+      "video_id": "HT0ULX-3jsg",
+      "youtube_url": "https://youtu.be/HT0ULX-3jsg",
+      "job_id": "HT0ULX-3jsg"
     }
   ]
 }
