@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 130,
+  "current_episode": 131,
   "completed_episodes": [
     {
       "episode": 1,
@@ -873,6 +873,13 @@
       "video_id": "HT0ULX-3jsg",
       "youtube_url": "https://youtu.be/HT0ULX-3jsg",
       "job_id": "HT0ULX-3jsg"
+    },
+    {
+      "episode": 130,
+      "title": "Crooked Creek Farm Clearing & Combat! | LDoE Survival #130",
+      "video_id": "wU3F0VHV8mc",
+      "youtube_url": "https://youtu.be/wU3F0VHV8mc",
+      "job_id": "wU3F0VHV8mc"
     }
   ]
 }

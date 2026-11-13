@@ -27,11 +27,22 @@
       "title": "Bunker Alfa Infiltration & Red Crate Run! | LDoE Survival #129",
       "scheduled_publish_time_utc": "2026-11-13T09:30:00Z",
       "scheduled_publish_time_ist": "13 Nov 2026, 03:00 PM IST",
-      "privacy_status": "private",
-      "status": "SCHEDULED",
+      "privacy_status": "public",
+      "status": "PUBLISHED",
       "youtube_url": "https://youtu.be/HT0ULX-3jsg",
       "enqueued_at_utc": "2026-11-12T18:06:32Z"
+    },
+    {
+      "episode_number": 130,
+      "video_id": "wU3F0VHV8mc",
+      "title": "Crooked Creek Farm Clearing & Combat! | LDoE Survival #130",
+      "scheduled_publish_time_utc": "2026-11-14T05:30:00Z",
+      "scheduled_publish_time_ist": "14 Nov 2026, 11:00 AM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/wU3F0VHV8mc",
+      "enqueued_at_utc": "2026-11-13T17:46:22Z"
     }
   ],
-  "last_updated_utc": "2026-11-12T18:06:32Z"
+  "last_updated_utc": "2026-11-13T17:46:22Z"
 }
