@@ -8,19 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.16.0] - 2026-11-14
 
 ### Added
-- **Chronological Mobile Recording Timestamp Parser (`src/ingestion/drive_client.py`)**:
-  - Implemented `parse_recording_timestamp(filename)` supporting both iOS mobile recording format (`ScreenRecording_MM-DD-YYYY HH-MM-SS`) and Android/ISO format (`ScreenRecording_YYYY-MM-DD HH-MM-SS`).
+- **Chronological Mobile Recording Timestamp Parser & Backfill Priority (`src/ingestion/drive_client.py`)**:
+  - Implemented `parse_recording_timestamp(filename)` supporting iOS mobile recording format (`ScreenRecording_MM-DD-YYYY HH-MM-SS`), Android/ISO (`YYYY-MM-DD`), compact timestamp (`YYYYMMDD_HHMMSS`), and Unix epoch timestamps with flexible 1-or-2 digit month/day matching.
   - Added strict chronological sorting to `GoogleDriveClient.list_pending_videos()`, ensuring pending input files are queued by actual mobile capture time rather than Drive upload timestamp.
+  - **Historical Backfill Priority**: Any older video entered into the input directory at any point in time automatically jumps to the head of the ingestion queue (`pending_videos[0]`), guaranteeing older recordings are never skipped or leapfrogged.
   - Guarantees sequential gameplay processing (`#129`, `#130`, `#131`), storyline continuity, and consistent base progression.
 - **Google Drive Ingestion Pagination (`src/ingestion/drive_client.py`)**:
   - Enhanced Drive query iteration using `nextPageToken` loop, resolving the previous 50-file single-page limit and discovering all files across large batches of 60+ recordings.
+- **Accelerated Ingestion Cadence & Storage Clearance (`.github/workflows/scheduled_pipeline.yml`)**:
+  - Configured balanced scheduled limits: 2 videos per weekday run (4 videos/day) and 1 per weekend run (4 videos/day), clearing 28 raw videos per week (~75 GB storage reclaimed/week) strictly within YouTube's 10,000 daily API quota limit.
 - **Local Directory Serial Ingestion (`src/main.py`)**:
   - Enhanced `process` CLI command to accept either a single file or an entire input directory.
   - Discovers all video files in a directory, orders them chronologically by recording timestamp, and processes them serially.
 - **Automated Scheduling & Queue Verification**:
   - Confirmed immediate post-processing scheduling via YouTube Data API v3 (`publishAt` with initial `privacyStatus: private`), queued for IST audience peak slots (2/day weekdays, 3/day weekends) tracked via `data/publishing_queue.json`.
 - **Unit Test Coverage (`tests/test_processor_and_config.py`)**:
-  - Added unit tests for `parse_recording_timestamp` across multiple naming patterns and verified out-of-order Drive input sorting (64/64 tests passing).
+  - Added unit tests for `parse_recording_timestamp` across multiple naming patterns, verified out-of-order Drive input sorting, and confirmed historical backfill priority (65/65 tests passing).
 
 ## [1.15.0] - 2026-11-12
 

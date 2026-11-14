@@ -112,7 +112,14 @@ jobs:
           fi
           LIMIT="${{ github.event.inputs.limit }}"
           if [ -z "$LIMIT" ] || [ "$LIMIT" = "null" ]; then
-            LIMIT="1"
+            # Balanced release cadence & storage clearance: 2 videos on weekday runs (2 runs = 4/day),
+            # 1 video on weekend runs (4 runs = 4/day), strictly within 10,000 daily YouTube API quota.
+            DOW=$(date +%u)
+            if [ "$DOW" -le 5 ]; then
+              LIMIT="2"
+            else
+              LIMIT="1"
+            fi
           else
             # Strip decimal fraction if passed as float by GitHub Actions (e.g. '3.0' -> '3')
             LIMIT="${LIMIT%.*}"

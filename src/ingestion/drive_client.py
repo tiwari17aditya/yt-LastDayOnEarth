@@ -32,11 +32,13 @@ def parse_recording_timestamp(filename: str) -> Optional[datetime]:
     """Extracts device recording datetime from mobile screen recording filename pattern.
 
     Supports:
-    - iOS format: ScreenRecording_MM-DD-YYYY HH-MM-SS_1.mp4 or ScreenRecording_MM-DD-YYYY_HH-MM-SS
+    - iOS format: ScreenRecording_MM-DD-YYYY HH-MM-SS_1.mp4 or ScreenRecording_MM-DD-YYYY_HH-MM-SS (single/double digit M/D)
     - Android/ISO format: ScreenRecording_YYYY-MM-DD HH-MM-SS or ScreenRecording_YYYY-MM-DD_HH-MM-SS
+    - Compact format: ScreenRecording_YYYYMMDD_HHMMSS or Record_YYYYMMDD_HHMMSS
+    - ReplayKit / Unix timestamp: RPReplay_Final<epoch> or ScreenRecord_<epoch>
     """
-    # Pattern 1: iOS MM-DD-YYYY HH-MM-SS or MM-DD-YYYY_HH-MM-SS
-    match = re.search(r"(\d{2})[-_](\d{2})[-_](\d{4})[\s_]+(\d{2})[-_](\d{2})[-_](\d{2})", filename)
+    # Pattern 1: iOS MM-DD-YYYY HH-MM-SS or MM-DD-YYYY_HH-MM-SS (supports single or double digit M/D)
+    match = re.search(r"(\d{1,2})[-_](\d{1,2})[-_](\d{4})[\s_]+(\d{1,2})[-_](\d{1,2})[-_](\d{1,2})", filename)
     if match:
         m, d, y, h, mn, s = map(int, match.groups())
         try:
@@ -45,12 +47,30 @@ def parse_recording_timestamp(filename: str) -> Optional[datetime]:
             pass
 
     # Pattern 2: ISO YYYY-MM-DD HH-MM-SS or YYYY-MM-DD_HH-MM-SS
-    match_iso = re.search(r"(\d{4})[-_](\d{2})[-_](\d{2})[\s_]+(\d{2})[-_](\d{2})[-_](\d{2})", filename)
+    match_iso = re.search(r"(\d{4})[-_](\d{1,2})[-_](\d{1,2})[\s_]+(\d{1,2})[-_](\d{1,2})[-_](\d{1,2})", filename)
     if match_iso:
         y, m, d, h, mn, s = map(int, match_iso.groups())
         try:
             return datetime(y, m, d, h, mn, s)
         except ValueError:
+            pass
+
+    # Pattern 3: Compact YYYYMMDD_HHMMSS
+    match_compact = re.search(r"(\d{4})(\d{2})(\d{2})[-_](\d{2})(\d{2})(\d{2})", filename)
+    if match_compact:
+        y, m, d, h, mn, s = map(int, match_compact.groups())
+        try:
+            return datetime(y, m, d, h, mn, s)
+        except ValueError:
+            pass
+
+    # Pattern 4: Unix timestamp (e.g. RPReplay_Final1731580000 or screen_1731580000)
+    match_epoch = re.search(r"(?:RPReplay_Final|recording|screen)[-_]?(\d{10})", filename, re.IGNORECASE)
+    if match_epoch:
+        try:
+            epoch = int(match_epoch.group(1))
+            return datetime.fromtimestamp(epoch)
+        except (ValueError, OSError):
             pass
 
     return None

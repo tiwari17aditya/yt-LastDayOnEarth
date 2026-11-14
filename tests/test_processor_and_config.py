@@ -212,9 +212,67 @@ def test_parse_recording_timestamp():
     dt3 = parse_recording_timestamp("ScreenRecording_2026-11-08 15-30-00.mp4")
     assert dt3 == datetime(2026, 11, 8, 15, 30, 0)
 
+    # Single-digit month and day
+    dt4 = parse_recording_timestamp("ScreenRecording_5-8-2026 09-05-02.mp4")
+    assert dt4 == datetime(2026, 5, 8, 9, 5, 2)
+
+    # Compact format
+    dt5 = parse_recording_timestamp("Record_20261105_121357.mp4")
+    assert dt5 == datetime(2026, 11, 5, 12, 13, 57)
+
+    # Unix epoch format
+    dt6 = parse_recording_timestamp("RPReplay_Final1731580000.mp4")
+    assert dt6 is not None
+
     # Unknown format fallback
     dt_none = parse_recording_timestamp("custom_video_without_date.mp4")
     assert dt_none is None
+
+
+def test_drive_client_backfill_historical_priority(tmp_path, monkeypatch):
+    """Verifies that an older video entered at any time immediately takes head of queue."""
+    from unittest.mock import MagicMock
+    from src.ingestion.drive_client import GoogleDriveClient
+    from src.storage.history_tracker import HistoryTracker
+
+    history_file = tmp_path / "history.json"
+    tracker = HistoryTracker(history_file=history_file)
+
+    client = GoogleDriveClient(input_folder_name="Input", processed_folder_name="Processed")
+    client.input_folder_id = "folder_in"
+    client.processed_folder_id = "folder_proc"
+    client.service = MagicMock()
+
+    # User uploads an older Nov 5 video after Nov 11, 13, 14 videos already exist in Input
+    mock_input_files = [
+        {"id": "vid_nov14", "name": "ScreenRecording_11-14-2026 13-00-00_1.mp4", "size": "10000000", "mimeType": "video/mp4", "md5Checksum": "md5_14"},
+        {"id": "vid_nov11", "name": "ScreenRecording_11-11-2026 18-00-00_1.mp4", "size": "10000000", "mimeType": "video/mp4", "md5Checksum": "md5_11"},
+        {"id": "vid_nov05_backfilled", "name": "ScreenRecording_11-05-2026 12-13-57_1.mp4", "size": "10000000", "mimeType": "video/mp4", "md5Checksum": "md5_05"},
+    ]
+
+    def mock_list(q, **kwargs):
+        mock_req = MagicMock()
+        if "folder_in" in q:
+            mock_req.execute.return_value = {"files": mock_input_files}
+        else:
+            mock_req.execute.return_value = {"files": []}
+        return mock_req
+
+    client.service.files().list.side_effect = mock_list
+    client.delete_video = MagicMock()
+
+    monkeypatch.setattr(
+        "src.storage.history_tracker.HistoryTracker.__init__",
+        lambda self, history_file=history_file: setattr(self, "history_file", history_file) or self._ensure_file_exists()
+    )
+
+    pending = client.list_pending_videos()
+    assert len(pending) == 3
+    # The backfilled Nov 5 video MUST immediately be the first video in the queue
+    assert pending[0]["name"] == "ScreenRecording_11-05-2026 12-13-57_1.mp4"
+    assert pending[0]["id"] == "vid_nov05_backfilled"
+    assert pending[1]["name"] == "ScreenRecording_11-11-2026 18-00-00_1.mp4"
+    assert pending[2]["name"] == "ScreenRecording_11-14-2026 13-00-00_1.mp4"
 
 
 def test_drive_client_chronological_sorting(tmp_path, monkeypatch):
