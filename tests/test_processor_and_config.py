@@ -195,3 +195,69 @@ def test_drive_client_deduplication_against_history(tmp_path, monkeypatch):
     assert pending[0]["name"] == "new_video.mp4"
     client.delete_video.assert_called_once_with("file_old")
 
+
+def test_parse_recording_timestamp():
+    from src.ingestion.drive_client import parse_recording_timestamp
+    from datetime import datetime
+
+    # iOS space format
+    dt1 = parse_recording_timestamp("ScreenRecording_11-05-2026 12-13-57_1.mp4")
+    assert dt1 == datetime(2026, 11, 5, 12, 13, 57)
+
+    # iOS underscore format
+    dt2 = parse_recording_timestamp("ScreenRecording_09-23-2026_12-53-25_1.mp4")
+    assert dt2 == datetime(2026, 9, 23, 12, 53, 25)
+
+    # ISO format
+    dt3 = parse_recording_timestamp("ScreenRecording_2026-11-08 15-30-00.mp4")
+    assert dt3 == datetime(2026, 11, 8, 15, 30, 0)
+
+    # Unknown format fallback
+    dt_none = parse_recording_timestamp("custom_video_without_date.mp4")
+    assert dt_none is None
+
+
+def test_drive_client_chronological_sorting(tmp_path, monkeypatch):
+    from unittest.mock import MagicMock
+    from src.ingestion.drive_client import GoogleDriveClient
+    from src.storage.history_tracker import HistoryTracker
+
+    history_file = tmp_path / "history.json"
+    tracker = HistoryTracker(history_file=history_file)
+
+    client = GoogleDriveClient(input_folder_name="Input", processed_folder_name="Processed")
+    client.input_folder_id = "folder_in"
+    client.processed_folder_id = "folder_proc"
+    client.service = MagicMock()
+
+    # Out-of-order uploaded files
+    mock_input_files = [
+        {"id": "f3", "name": "ScreenRecording_11-14-2026 10-00-00_1.mp4", "size": "10000000", "mimeType": "video/mp4", "md5Checksum": "md5_3"},
+        {"id": "f1", "name": "ScreenRecording_11-05-2026 12-00-00_1.mp4", "size": "10000000", "mimeType": "video/mp4", "md5Checksum": "md5_1"},
+        {"id": "f2", "name": "ScreenRecording_11-08-2026 15-00-00_1.mp4", "size": "10000000", "mimeType": "video/mp4", "md5Checksum": "md5_2"},
+    ]
+
+    def mock_list(q, **kwargs):
+        mock_req = MagicMock()
+        if "folder_in" in q:
+            mock_req.execute.return_value = {"files": mock_input_files}
+        else:
+            mock_req.execute.return_value = {"files": []}
+        return mock_req
+
+    client.service.files().list.side_effect = mock_list
+    client.delete_video = MagicMock()
+
+    monkeypatch.setattr(
+        "src.storage.history_tracker.HistoryTracker.__init__",
+        lambda self, history_file=history_file: setattr(self, "history_file", history_file) or self._ensure_file_exists()
+    )
+
+    pending = client.list_pending_videos()
+    assert len(pending) == 3
+    # Check strict chronological order
+    assert pending[0]["name"] == "ScreenRecording_11-05-2026 12-00-00_1.mp4"
+    assert pending[1]["name"] == "ScreenRecording_11-08-2026 15-00-00_1.mp4"
+    assert pending[2]["name"] == "ScreenRecording_11-14-2026 10-00-00_1.mp4"
+
+

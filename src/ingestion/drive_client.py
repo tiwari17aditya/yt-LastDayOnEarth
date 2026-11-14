@@ -1,7 +1,9 @@
 """Google Drive API client strictly constrained to MyDrive -> youtube-projects -> LastDayOnEarth."""
 
 import io
+import re
 from abc import ABC, abstractmethod
+from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
@@ -24,6 +26,34 @@ DEFAULT_OUTPUT_FOLDER = "Output"
 DEFAULT_ASSETS_FOLDER = "Assets"
 
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".avi", ".m4v"}
+
+
+def parse_recording_timestamp(filename: str) -> Optional[datetime]:
+    """Extracts device recording datetime from mobile screen recording filename pattern.
+
+    Supports:
+    - iOS format: ScreenRecording_MM-DD-YYYY HH-MM-SS_1.mp4 or ScreenRecording_MM-DD-YYYY_HH-MM-SS
+    - Android/ISO format: ScreenRecording_YYYY-MM-DD HH-MM-SS or ScreenRecording_YYYY-MM-DD_HH-MM-SS
+    """
+    # Pattern 1: iOS MM-DD-YYYY HH-MM-SS or MM-DD-YYYY_HH-MM-SS
+    match = re.search(r"(\d{2})[-_](\d{2})[-_](\d{4})[\s_]+(\d{2})[-_](\d{2})[-_](\d{2})", filename)
+    if match:
+        m, d, y, h, mn, s = map(int, match.groups())
+        try:
+            return datetime(y, m, d, h, mn, s)
+        except ValueError:
+            pass
+
+    # Pattern 2: ISO YYYY-MM-DD HH-MM-SS or YYYY-MM-DD_HH-MM-SS
+    match_iso = re.search(r"(\d{4})[-_](\d{2})[-_](\d{2})[\s_]+(\d{2})[-_](\d{2})[-_](\d{2})", filename)
+    if match_iso:
+        y, m, d, h, mn, s = map(int, match_iso.groups())
+        try:
+            return datetime(y, m, d, h, mn, s)
+        except ValueError:
+            pass
+
+    return None
 
 
 class BaseIngestionClient(ABC):
@@ -193,15 +223,22 @@ class GoogleDriveClient(BaseIngestionClient):
         )
 
         try:
-            results = self.service.files().list(
-                q=query,
-                spaces="drive",
-                fields="files(id, name, size, mimeType, md5Checksum, createdTime)",
-                pageSize=50,
-                orderBy="createdTime",
-            ).execute()
+            files = []
+            page_token = None
+            while True:
+                results = self.service.files().list(
+                    q=query,
+                    spaces="drive",
+                    fields="nextPageToken, files(id, name, size, mimeType, md5Checksum, createdTime)",
+                    pageSize=100,
+                    pageToken=page_token,
+                    orderBy="createdTime",
+                ).execute()
+                files.extend(results.get("files", []))
+                page_token = results.get("nextPageToken")
+                if not page_token:
+                    break
 
-            files = results.get("files", [])
             if not files:
                 return []
 
@@ -297,7 +334,24 @@ class GoogleDriveClient(BaseIngestionClient):
                         "md5Checksum": md5,
                     })
 
-            logger.info(f"Found {len(pending_videos)} pending video(s) in Drive Input folder (after deduplication)")
+            # Sort pending videos strictly chronologically by mobile device recording date
+            def _recording_sort_key(item: Dict[str, Any]):
+                name = item.get("name", "")
+                dt = parse_recording_timestamp(name)
+                if dt:
+                    return (0, dt.timestamp(), name)
+                c_time = item.get("createdTime", "")
+                return (1, c_time, name)
+
+            pending_videos.sort(key=_recording_sort_key)
+            logger.info(
+                f"Found and sorted {len(pending_videos)} pending video(s) in Drive Input chronologically by recording date.",
+                extra_data={
+                    "total_pending": len(pending_videos),
+                    "first_to_process": pending_videos[0]["name"] if pending_videos else None,
+                    "latest_recording": pending_videos[-1]["name"] if pending_videos else None,
+                },
+            )
             return pending_videos
 
         except Exception as e:

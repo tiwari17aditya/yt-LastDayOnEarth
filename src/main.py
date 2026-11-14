@@ -1071,7 +1071,31 @@ def main() -> None:
 
     if args.command == "process":
         local_flag = not args.upload
-        run_pipeline(Path(args.input), local_only=local_flag, force=args.force, delete_input=args.delete_input)
+        input_target = Path(args.input)
+        if input_target.is_dir():
+            from src.ingestion.drive_client import parse_recording_timestamp, VIDEO_EXTENSIONS
+            # Collect all supported video files in the input directory
+            video_files = [p for p in input_target.iterdir() if p.is_file() and p.suffix.lower() in VIDEO_EXTENSIONS]
+            # Sort chronologically by recording timestamp to guarantee strict series continuity
+            def _local_sort_key(p: Path):
+                dt = parse_recording_timestamp(p.name)
+                if dt:
+                    return (0, dt.timestamp(), p.name)
+                return (1, p.stat().st_mtime, p.name)
+            video_files.sort(key=_local_sort_key)
+            logger.info(
+                f"Discovered {len(video_files)} video(s) in local directory '{input_target}' to process serially in chronological sequence.",
+                extra_data={
+                    "total_videos": len(video_files),
+                    "first_video": video_files[0].name if video_files else None,
+                    "last_video": video_files[-1].name if video_files else None,
+                },
+            )
+            for idx, vf in enumerate(video_files, start=1):
+                logger.info(f"[{idx}/{len(video_files)}] Processing serial video: {vf.name}")
+                run_pipeline(vf, local_only=local_flag, force=args.force, delete_input=args.delete_input)
+        else:
+            run_pipeline(input_target, local_only=local_flag, force=args.force, delete_input=args.delete_input)
     elif args.command == "drive-cron":
         upload_flag = not args.no_upload
         exit_code = run_drive_cron(dry_run=args.dry_run, limit=args.limit, upload=upload_flag, force=args.force)

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.16.0] - 2026-11-14
+
+### Added
+- **Chronological Mobile Recording Timestamp Parser (`src/ingestion/drive_client.py`)**:
+  - Implemented `parse_recording_timestamp(filename)` supporting both iOS mobile recording format (`ScreenRecording_MM-DD-YYYY HH-MM-SS`) and Android/ISO format (`ScreenRecording_YYYY-MM-DD HH-MM-SS`).
+  - Added strict chronological sorting to `GoogleDriveClient.list_pending_videos()`, ensuring pending input files are queued by actual mobile capture time rather than Drive upload timestamp.
+  - Guarantees sequential gameplay processing (`#129`, `#130`, `#131`), storyline continuity, and consistent base progression.
+- **Google Drive Ingestion Pagination (`src/ingestion/drive_client.py`)**:
+  - Enhanced Drive query iteration using `nextPageToken` loop, resolving the previous 50-file single-page limit and discovering all files across large batches of 60+ recordings.
+- **Local Directory Serial Ingestion (`src/main.py`)**:
+  - Enhanced `process` CLI command to accept either a single file or an entire input directory.
+  - Discovers all video files in a directory, orders them chronologically by recording timestamp, and processes them serially.
+- **Automated Scheduling & Queue Verification**:
+  - Confirmed immediate post-processing scheduling via YouTube Data API v3 (`publishAt` with initial `privacyStatus: private`), queued for IST audience peak slots (2/day weekdays, 3/day weekends) tracked via `data/publishing_queue.json`.
+- **Unit Test Coverage (`tests/test_processor_and_config.py`)**:
+  - Added unit tests for `parse_recording_timestamp` across multiple naming patterns and verified out-of-order Drive input sorting (64/64 tests passing).
+
 ## [1.15.0] - 2026-11-12
 
 ### Added
