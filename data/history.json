@@ -4318,5 +4318,45 @@
       "ads_removed": [],
       "md5_checksum": "20f18bdf4687dfd336a713c5aa315f5a"
     }
+  },
+  {
+    "job_id": "job_20261114_125729",
+    "timestamp": "2026-11-14T12:57:29.673331+00:00",
+    "input_filename": "ScreenRecording_11-05-2026 14-00-22_1.mp4",
+    "output_filename": "ScreenRecording_11-05-2026_14-00-22_1_Processed_14112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "jQnGS0WlTNc",
+    "youtube_url": "https://youtu.be/jQnGS0WlTNc",
+    "details": {
+      "video_id": "jQnGS0WlTNc",
+      "youtube_url": "https://youtu.be/jQnGS0WlTNc",
+      "scheduled_publish_time_utc": "2026-11-14T14:30:00Z",
+      "scheduled_publish_time_ist": "14 Nov 2026, 08:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-05-2026_14-00-22_1_Processed_14112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-05-2026_14-00-22_1_Processed_14112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-05-2026_14-00-22_1_Processed_14112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Base Storage Optimization! | LDoE Survival #131",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Organizing Storage & Chests Plus... #131",
+        "walkthrough": "Surviving Day 131: Entering Home Base And Organizing Storage & Chests Plus Inventory &... #131",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #131"
+      },
+      "duration_seconds": 1010.651248,
+      "soundtrack_tracks": [
+        "Wallpaper",
+        "Decisions",
+        "Groove Grove",
+        "Volatile Reaction",
+        "Decisions",
+        "Somewhere Sunny",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "4113538491d67e748b77164e7971ff26"
+    }
   }
 ]

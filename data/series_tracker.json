@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 131,
+  "current_episode": 132,
   "completed_episodes": [
     {
       "episode": 1,
@@ -880,6 +880,13 @@
       "video_id": "wU3F0VHV8mc",
       "youtube_url": "https://youtu.be/wU3F0VHV8mc",
       "job_id": "wU3F0VHV8mc"
+    },
+    {
+      "episode": 131,
+      "title": "Entering Home Base & Base Storage Optimization! | LDoE Survival #131",
+      "video_id": "jQnGS0WlTNc",
+      "youtube_url": "https://youtu.be/jQnGS0WlTNc",
+      "job_id": "jQnGS0WlTNc"
     }
   ]
 }

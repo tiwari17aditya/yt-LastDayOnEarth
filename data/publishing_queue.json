@@ -38,11 +38,22 @@
       "title": "Crooked Creek Farm Clearing & Combat! | LDoE Survival #130",
       "scheduled_publish_time_utc": "2026-11-14T05:30:00Z",
       "scheduled_publish_time_ist": "14 Nov 2026, 11:00 AM IST",
-      "privacy_status": "private",
-      "status": "SCHEDULED",
+      "privacy_status": "public",
+      "status": "PUBLISHED",
       "youtube_url": "https://youtu.be/wU3F0VHV8mc",
       "enqueued_at_utc": "2026-11-13T17:46:22Z"
+    },
+    {
+      "episode_number": 131,
+      "video_id": "jQnGS0WlTNc",
+      "title": "Entering Home Base & Base Storage Optimization! | LDoE Survival #131",
+      "scheduled_publish_time_utc": "2026-11-14T14:30:00Z",
+      "scheduled_publish_time_ist": "14 Nov 2026, 08:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/jQnGS0WlTNc",
+      "enqueued_at_utc": "2026-11-14T12:57:25Z"
     }
   ],
-  "last_updated_utc": "2026-11-13T17:46:22Z"
+  "last_updated_utc": "2026-11-14T12:57:25Z"
 }
