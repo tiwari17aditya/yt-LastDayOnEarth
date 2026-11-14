@@ -4358,5 +4358,51 @@
       "ads_removed": [],
       "md5_checksum": "4113538491d67e748b77164e7971ff26"
     }
+  },
+  {
+    "job_id": "job_20261114_210004",
+    "timestamp": "2026-11-14T21:00:04.947314+00:00",
+    "input_filename": "ScreenRecording_11-05-2026 12-13-57_1.mp4",
+    "output_filename": "ScreenRecording_11-05-2026_12-13-57_1_Processed_14112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "4t3sNTqKMrI",
+    "youtube_url": "https://youtu.be/4t3sNTqKMrI",
+    "details": {
+      "video_id": "4t3sNTqKMrI",
+      "youtube_url": "https://youtu.be/4t3sNTqKMrI",
+      "scheduled_publish_time_utc": "2026-11-15T05:30:00Z",
+      "scheduled_publish_time_ist": "15 Nov 2026, 11:00 AM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-05-2026_12-13-57_1_Processed_14112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-05-2026_12-13-57_1_Processed_14112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-05-2026_12-13-57_1_Processed_14112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Home Base Operations! | LDoE Survival #132",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Home Base Operations Plus Base Defense &... #132",
+        "walkthrough": "Surviving Day 132: Entering Home Base And Home Base Operations Plus Base Defense &... #132",
+        "search_guide": "How to Farm & Master Entering Home Base & Home Base Operations Fast | LDoE #132"
+      },
+      "duration_seconds": 2724.335034,
+      "soundtrack_tracks": [
+        "Urban Gauntlet",
+        "Wallpaper",
+        "Groove Grove",
+        "Sneaky Snitch",
+        "Clean Soul",
+        "Monkeys Spinning Monkeys",
+        "Electro Cabello",
+        "Daily Beetle",
+        "Clear Waters",
+        "Fretless",
+        "Clear Waters",
+        "Bossa Antigua",
+        "Pamgaea"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "422b53b7e9e259aabcf34094030d7bae"
+    }
   }
 ]
