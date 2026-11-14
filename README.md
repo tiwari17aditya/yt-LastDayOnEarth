@@ -5,7 +5,7 @@ An automated, modular, cloud-friendly workflow for processing and publishing *La
 ## Overview
 
 The pipeline automates the end-to-end publishing journey:
-1. **Google Drive Ingestion**: Monitors incoming gameplay video uploads (`Input/Input 1`).
+1. **Google Drive & Local Ingestion**: Monitors incoming gameplay video uploads (`Input/Input 1`), paginating Drive queries and sorting chronologically by mobile device recording timestamp (`ScreenRecording_MM-DD-YYYY HH-MM-SS`) with automatic historical backfill priority to preserve series storyline continuity and sequential episode numbering.
 2. **Privacy Protection & Automated Ad Cutting**: Scans video frames to detect and cleanly excise in-game mobile commercial advertisements (rewarded ads, countdown timers) and redacts sensitive personal popups while strictly preserving the player username and game HUD.
 3. **Gameplay Context & Subtitles**: Generates synchronized in-game commentary and authentic chapter markers using Gemini 2.5 Flash Vision multimodal keyframe analysis, backed by a Title History Anti-Repetition Guard preventing consecutive duplicate episode phrasings.
 4. **Interactive AI Voice Commentary & Multi-Language Dubbing**: Generates continuous, soft-spoken survival walkthrough commentary dynamically ducked over royalty-free background music via FFmpeg sidechain compression, with automated companion multi-language dubs and closed captions for German, Spanish, Russian, and French.
