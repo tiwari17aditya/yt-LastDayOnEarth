@@ -4452,5 +4452,39 @@
       "ads_removed": [],
       "md5_checksum": "a3ca131c407f7f8e32d68e43e31c0341"
     }
+  },
+  {
+    "job_id": "job_20261115_200021",
+    "timestamp": "2026-11-15T20:00:21.957095+00:00",
+    "input_filename": "ScreenRecording_11-05-2026 22-14-57_1.mp4",
+    "output_filename": "ScreenRecording_11-05-2026_22-14-57_1_Processed_15112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "M7Su6xjiaww",
+    "youtube_url": "https://youtu.be/M7Su6xjiaww",
+    "details": {
+      "video_id": "M7Su6xjiaww",
+      "youtube_url": "https://youtu.be/M7Su6xjiaww",
+      "scheduled_publish_time_utc": "2026-11-16T13:30:00Z",
+      "scheduled_publish_time_ist": "16 Nov 2026, 07:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-05-2026_22-14-57_1_Processed_15112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-05-2026_22-14-57_1_Processed_15112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-05-2026_22-14-57_1_Processed_15112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Blueprint Upgrades! | LDoE Survival #134",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Workbench & Blueprints Plus Workshop &... #134",
+        "walkthrough": "Surviving Day 134: Home Base Operations And Workbench & Blueprints Plus Workshop &... #134",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #134"
+      },
+      "duration_seconds": 207.826485,
+      "soundtrack_tracks": [
+        "Life of Riley"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "6abc7a24f13f57fd16214485a2944df9"
+    }
   }
 ]
