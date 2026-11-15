@@ -60,11 +60,22 @@
       "title": "Zombie Horde Survival & Base Fortification! | LDoE Survival #132",
       "scheduled_publish_time_utc": "2026-11-15T05:30:00Z",
       "scheduled_publish_time_ist": "15 Nov 2026, 11:00 AM IST",
-      "privacy_status": "private",
-      "status": "SCHEDULED",
+      "privacy_status": "public",
+      "status": "PUBLISHED",
       "youtube_url": "https://youtu.be/4t3sNTqKMrI",
       "enqueued_at_utc": "2026-11-14T21:00:00Z"
+    },
+    {
+      "episode_number": 133,
+      "video_id": "yjKRB9IMRLA",
+      "title": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #133",
+      "scheduled_publish_time_utc": "2026-11-16T09:30:00Z",
+      "scheduled_publish_time_ist": "16 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/yjKRB9IMRLA",
+      "enqueued_at_utc": "2026-11-15T14:14:52Z"
     }
   ],
-  "last_updated_utc": "2026-11-14T21:00:00Z"
+  "last_updated_utc": "2026-11-15T14:14:52Z"
 }

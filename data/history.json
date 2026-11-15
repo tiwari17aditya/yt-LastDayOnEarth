@@ -4404,5 +4404,53 @@
       "ads_removed": [],
       "md5_checksum": "422b53b7e9e259aabcf34094030d7bae"
     }
+  },
+  {
+    "job_id": "job_20261115_141457",
+    "timestamp": "2026-11-15T14:14:57.846481+00:00",
+    "input_filename": "ScreenRecording_11-05-2026 21-27-42_1.mp4",
+    "output_filename": "ScreenRecording_11-05-2026_21-27-42_1_Processed_15112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "yjKRB9IMRLA",
+    "youtube_url": "https://youtu.be/yjKRB9IMRLA",
+    "details": {
+      "video_id": "yjKRB9IMRLA",
+      "youtube_url": "https://youtu.be/yjKRB9IMRLA",
+      "scheduled_publish_time_utc": "2026-11-16T09:30:00Z",
+      "scheduled_publish_time_ist": "16 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-05-2026_21-27-42_1_Processed_15112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-05-2026_21-27-42_1_Processed_15112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-05-2026_21-27-42_1_Processed_15112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades + Woodcraft & Planks! | LDoE Survival #133",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #133",
+        "walkthrough": "Surviving Day 133: Workbench & Blueprints And Crafting Planks & Upgrades Plus Organizing... #133",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #133"
+      },
+      "duration_seconds": 2826.95288,
+      "soundtrack_tracks": [
+        "Groove Grove",
+        "Monkeys Spinning Monkeys",
+        "Somewhere Sunny",
+        "Clean Soul",
+        "Daily Beetle",
+        "Urban Gauntlet",
+        "Volatile Reaction",
+        "Life of Riley",
+        "Decisions",
+        "Wallpaper",
+        "Fretless",
+        "Monkeys Spinning Monkeys",
+        "Groove Grove",
+        "Volatile Reaction",
+        "Bossa Antigua"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "a3ca131c407f7f8e32d68e43e31c0341"
+    }
   }
 ]
