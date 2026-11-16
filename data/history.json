@@ -4486,5 +4486,93 @@
       "ads_removed": [],
       "md5_checksum": "6abc7a24f13f57fd16214485a2944df9"
     }
+  },
+  {
+    "job_id": "job_20261116_205538",
+    "timestamp": "2026-11-16T20:55:38.098509+00:00",
+    "input_filename": "ScreenRecording_11-06-2026 01-56-15_1.mp4",
+    "output_filename": "ScreenRecording_11-06-2026_01-56-15_1_Processed_16112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "cpZ_EXLFago",
+    "youtube_url": "https://youtu.be/cpZ_EXLFago",
+    "details": {
+      "video_id": "cpZ_EXLFago",
+      "youtube_url": "https://youtu.be/cpZ_EXLFago",
+      "scheduled_publish_time_utc": "2026-11-17T09:30:00Z",
+      "scheduled_publish_time_ist": "17 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-06-2026_01-56-15_1_Processed_16112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-06-2026_01-56-15_1_Processed_16112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-06-2026_01-56-15_1_Processed_16112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Base Storage Optimization! | LDoE Survival #135",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Organizing Storage & Chests Plus Home... #135",
+        "walkthrough": "Surviving Day 135: Workbench & Blueprints And Organizing Storage & Chests Plus Home Base... #135",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #135"
+      },
+      "duration_seconds": 3023.068344,
+      "soundtrack_tracks": [
+        "Pamgaea",
+        "Daily Beetle",
+        "Fretless",
+        "Carefree",
+        "Urban Gauntlet",
+        "Wallpaper",
+        "Fretless",
+        "Constance",
+        "Decisions",
+        "Carefree",
+        "Volatile Reaction",
+        "Shores of Avalon",
+        "Somewhere Sunny",
+        "Daily Beetle",
+        "Monkeys Spinning Monkeys"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "d3f8f56fee3740cfa1246781e54c66ec"
+    }
+  },
+  {
+    "job_id": "job_20261116_212958",
+    "timestamp": "2026-11-16T21:29:58.004366+00:00",
+    "input_filename": "ScreenRecording_11-06-2026 02-46-45_1.mp4",
+    "output_filename": "ScreenRecording_11-06-2026_02-46-45_1_Processed_16112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "ecjW-7ac2rw",
+    "youtube_url": "https://youtu.be/ecjW-7ac2rw",
+    "details": {
+      "video_id": "ecjW-7ac2rw",
+      "youtube_url": "https://youtu.be/ecjW-7ac2rw",
+      "scheduled_publish_time_utc": "2026-11-17T13:30:00Z",
+      "scheduled_publish_time_ist": "17 Nov 2026, 07:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-06-2026_02-46-45_1_Processed_16112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-06-2026_02-46-45_1_Processed_16112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-06-2026_02-46-45_1_Processed_16112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Blueprint Upgrades! | LDoE Survival #136",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Workbench & Blueprints Plus... #136",
+        "walkthrough": "Surviving Day 136: Workshop & Smelting Furnaces And Workbench & Blueprints Plus Entering... #136",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #136"
+      },
+      "duration_seconds": 1473.173016,
+      "soundtrack_tracks": [
+        "Daily Beetle",
+        "Groove Grove",
+        "Clear Waters",
+        "Monkeys Spinning Monkeys",
+        "Pamgaea",
+        "Fretless",
+        "Carefree"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "7ce2e246ff51ff545befedab7a5e4105"
+    }
   }
 ]

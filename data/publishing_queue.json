@@ -71,8 +71,8 @@
       "title": "Can We Survive & Upgrade? Workbench & Blueprints And Crafting Planks & Upgrades Plus... #133",
       "scheduled_publish_time_utc": "2026-11-16T09:30:00Z",
       "scheduled_publish_time_ist": "16 Nov 2026, 03:00 PM IST",
-      "privacy_status": "private",
-      "status": "SCHEDULED",
+      "privacy_status": "public",
+      "status": "PUBLISHED",
       "youtube_url": "https://youtu.be/yjKRB9IMRLA",
       "enqueued_at_utc": "2026-11-15T14:14:52Z"
     },
@@ -82,11 +82,33 @@
       "title": "High-Value Resource Scavenge & Smelting! | LDoE Survival #134",
       "scheduled_publish_time_utc": "2026-11-16T13:30:00Z",
       "scheduled_publish_time_ist": "16 Nov 2026, 07:00 PM IST",
-      "privacy_status": "private",
-      "status": "SCHEDULED",
+      "privacy_status": "public",
+      "status": "PUBLISHED",
       "youtube_url": "https://youtu.be/M7Su6xjiaww",
       "enqueued_at_utc": "2026-11-15T20:00:17Z"
+    },
+    {
+      "episode_number": 135,
+      "video_id": "cpZ_EXLFago",
+      "title": "Best Base Storage & Workshop Layout Guide | LDoE #135",
+      "scheduled_publish_time_utc": "2026-11-17T09:30:00Z",
+      "scheduled_publish_time_ist": "17 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/cpZ_EXLFago",
+      "enqueued_at_utc": "2026-11-16T20:55:33Z"
+    },
+    {
+      "episode_number": 136,
+      "video_id": "ecjW-7ac2rw",
+      "title": "Surviving Day 136: Workshop & Smelting Furnaces And Workbench & Blueprints Plus Entering... #136",
+      "scheduled_publish_time_utc": "2026-11-17T13:30:00Z",
+      "scheduled_publish_time_ist": "17 Nov 2026, 07:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/ecjW-7ac2rw",
+      "enqueued_at_utc": "2026-11-16T21:29:53Z"
     }
   ],
-  "last_updated_utc": "2026-11-15T20:00:17Z"
+  "last_updated_utc": "2026-11-16T21:29:53Z"
 }

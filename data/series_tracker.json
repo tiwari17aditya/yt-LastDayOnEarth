@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 135,
+  "current_episode": 137,
   "completed_episodes": [
     {
       "episode": 1,
@@ -908,6 +908,20 @@
       "video_id": "M7Su6xjiaww",
       "youtube_url": "https://youtu.be/M7Su6xjiaww",
       "job_id": "M7Su6xjiaww"
+    },
+    {
+      "episode": 135,
+      "title": "Best Base Storage & Workshop Layout Guide | LDoE #135",
+      "video_id": "cpZ_EXLFago",
+      "youtube_url": "https://youtu.be/cpZ_EXLFago",
+      "job_id": "cpZ_EXLFago"
+    },
+    {
+      "episode": 136,
+      "title": "Surviving Day 136: Workshop & Smelting Furnaces And Workbench & Blueprints Plus Entering... #136",
+      "video_id": "ecjW-7ac2rw",
+      "youtube_url": "https://youtu.be/ecjW-7ac2rw",
+      "job_id": "ecjW-7ac2rw"
     }
   ]
 }
