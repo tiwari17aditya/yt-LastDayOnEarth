@@ -266,6 +266,151 @@ class VideoProcessor:
 
         return output_video
 
+    def apply_intro(
+        self,
+        main_video: Path,
+        output_video: Path,
+        intro_style: str = "bumper",
+        intro_audio: Optional[Path] = None,
+        intro_bg_image: Optional[Path] = None,
+        episode_number: Optional[int] = None,
+        episode_title: Optional[str] = None,
+        player_name: str = "adistar656",
+        player_id: str = "#9045",
+        clan_name: str = "Stark029",
+        duration: float = 3.5,
+        preset: str = "veryfast",
+    ) -> Path:
+        """Applies either a Cinematic Intro Bumper (Option A) or an In-Game HUD Overlay (Option B)."""
+        from src.processor.intro_generator import IntroGenerator
+
+        style = (intro_style or "none").lower()
+        if style == "none":
+            return main_video
+
+        generator = IntroGenerator(
+            player_name=player_name,
+            player_id=player_id,
+            clan_name=clan_name,
+            intro_style=style,
+            intro_duration=duration,
+            bg_image_path=intro_bg_image,
+        )
+
+        audio_file = intro_audio
+        if not audio_file or not Path(audio_file).exists():
+            audio_file = generator.get_prebaked_intro_audio(language="hi")
+
+        output_video.parent.mkdir(parents=True, exist_ok=True)
+
+        if style == "bumper":
+            bg_path = intro_bg_image if (intro_bg_image and Path(intro_bg_image).exists()) else Path("assets/backgrounds/ldoe_cover_art.jpg")
+            if not bg_path.exists():
+                logger.warning(f"Intro cover art background not found at {bg_path}; falling back to raw video.")
+                return main_video
+
+            bumper_filters = generator.build_bumper_filters(
+                episode_num=episode_number,
+                episode_title=episode_title,
+            )
+            vf_bumper = ",".join(bumper_filters)
+            fade_offset = max(1.0, duration - 0.5)
+
+            if audio_file and Path(audio_file).exists():
+                delay_ms = int(fade_offset * 1000)
+                filter_complex = (
+                    f"[0:v]loop=loop=210:size=1:start=0,{vf_bumper},settb=AVTB,setpts=PTS-STARTPTS[vbumper];"
+                    f"[1:v]fps=60,scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,settb=AVTB,setpts=PTS-STARTPTS[vgame];"
+                    f"[vbumper][vgame]xfade=transition=fade:duration=0.5:offset={fade_offset:.2f}[vout];"
+                    f"[1:a]adelay={delay_ms}|{delay_ms},volume=-4dB[agame_delayed];"
+                    f"[2:a]adelay=300|300,volume=1.0[avoice];"
+                    f"[agame_delayed][avoice]amix=inputs=2:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
+                )
+                cmd = [
+                    "ffmpeg", "-y", "-nostdin",
+                    "-loop", "1", "-t", f"{duration:.2f}", "-i", str(bg_path),
+                    "-i", str(main_video),
+                    "-i", str(audio_file),
+                    "-filter_complex", filter_complex,
+                    "-map", "[vout]", "-map", "[aout]",
+                    "-c:v", "libx264", "-preset", preset, "-crf", "20",
+                    "-c:a", "aac", "-b:a", "192k",
+                    "-movflags", "+faststart",
+                    str(output_video)
+                ]
+            else:
+                filter_complex = (
+                    f"[0:v]loop=loop=210:size=1:start=0,{vf_bumper},settb=AVTB,setpts=PTS-STARTPTS[vbumper];"
+                    f"[1:v]fps=60,scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,settb=AVTB,setpts=PTS-STARTPTS[vgame];"
+                    f"[vbumper][vgame]xfade=transition=fade:duration=0.5:offset={fade_offset:.2f}[vout];"
+                    f"[1:a]adelay={int(fade_offset*1000)}|{int(fade_offset*1000)},aformat=sample_rates=44100:channel_layouts=stereo[aout]"
+                )
+                cmd = [
+                    "ffmpeg", "-y", "-nostdin",
+                    "-loop", "1", "-t", f"{duration:.2f}", "-i", str(bg_path),
+                    "-i", str(main_video),
+                    "-filter_complex", filter_complex,
+                    "-map", "[vout]", "-map", "[aout]",
+                    "-c:v", "libx264", "-preset", preset, "-crf", "20",
+                    "-c:a", "aac", "-b:a", "192k",
+                    "-movflags", "+faststart",
+                    str(output_video)
+                ]
+
+        elif style == "overlay":
+            hud_filters = generator.build_overlay_filters(episode_num=episode_number)
+            vf_hud = ",".join(hud_filters)
+
+            if audio_file and Path(audio_file).exists():
+                filter_complex = (
+                    f"{vf_hud}[hud];"
+                    f"[0:v]fps=60,scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1[vgame];"
+                    f"[vgame][hud]overlay=0:0:enable='between(t,0,4.0)'[vout];"
+                    f"[0:a]volume=-10dB[agame_ducked];"
+                    f"[1:a]adelay=200|200,volume=1.0[avoice];"
+                    f"[agame_ducked][avoice]amix=inputs=2:duration=first:dropout_transition=2,aformat=sample_rates=44100:channel_layouts=stereo[aout]"
+                )
+                cmd = [
+                    "ffmpeg", "-y", "-nostdin",
+                    "-i", str(main_video),
+                    "-i", str(audio_file),
+                    "-filter_complex", filter_complex,
+                    "-map", "[vout]", "-map", "[aout]",
+                    "-c:v", "libx264", "-preset", preset, "-crf", "20",
+                    "-c:a", "aac", "-b:a", "192k",
+                    "-movflags", "+faststart",
+                    str(output_video)
+                ]
+            else:
+                filter_complex = (
+                    f"{vf_hud}[hud];"
+                    f"[0:v]fps=60,scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1[vgame];"
+                    f"[vgame][hud]overlay=0:0:enable='between(t,0,4.0)'[vout]"
+                )
+                cmd = [
+                    "ffmpeg", "-y", "-nostdin",
+                    "-i", str(main_video),
+                    "-filter_complex", filter_complex,
+                    "-map", "[vout]", "-map", "0:a?",
+                    "-c:v", "libx264", "-preset", preset, "-crf", "20",
+                    "-c:a", "copy",
+                    "-movflags", "+faststart",
+                    str(output_video)
+                ]
+        else:
+            return main_video
+
+        logger.info(f"Applying intro ({style}) to {output_video.name}")
+        res = subprocess.run(cmd, capture_output=True, text=True, check=False, stdin=subprocess.DEVNULL)
+        if res.returncode != 0:
+            raise VideoProcessingError(
+                operation="apply_intro",
+                root_cause=f"FFmpeg intro rendering failed: {res.stderr[-400:]}",
+                recovery_action="Check intro fonts, background image, and audio files.",
+                file_path=str(output_video),
+            )
+        return output_video
+
     def render(
         self,
         input_video: Path,

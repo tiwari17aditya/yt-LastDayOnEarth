@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import shutil
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -536,6 +537,32 @@ def run_pipeline(
                 status="FAILED",
                 details={"sub_path": str(sub_path), "music_file": str(music_file)},
             )
+
+        # Step 4.5: Apply Intro Bumper Card / HUD Overlay (if configured)
+        intro_style = getattr(settings.processing, "intro_style", "bumper").lower()
+        if intro_style != "none" and output_path.exists():
+            staged_intro_path = output_path.parent / f"intro_{output_path.name}"
+            try:
+                current_ep = title_mgr.get_current_episode()
+                processor.apply_intro(
+                    main_video=output_path,
+                    output_video=staged_intro_path,
+                    intro_style=intro_style,
+                    intro_bg_image=getattr(settings.processing, "intro_bg_path", None),
+                    episode_number=current_ep,
+                    player_name=getattr(settings.processing, "ldoe_player_name", "adistar656"),
+                    player_id=getattr(settings.processing, "ldoe_player_id", "#9045"),
+                    clan_name=getattr(settings.processing, "ldoe_clan_name", "Stark029"),
+                    duration=getattr(settings.processing, "intro_duration", 3.5),
+                    preset=settings.processing.video_preset,
+                )
+                if staged_intro_path.exists() and staged_intro_path.stat().st_size > 0:
+                    shutil.move(str(staged_intro_path), str(output_path))
+                    logger.info(f"Successfully applied {intro_style.upper()} intro to {output_path.name}")
+            except Exception as ie:
+                logger.warning(f"Could not apply intro screen ({ie}); continuing with base rendered video.")
+                if staged_intro_path.exists():
+                    staged_intro_path.unlink(missing_ok=True)
 
         # Step 5: Custom HD Thumbnail & YouTube Publishing Metadata Generation
         logger.info("Step 5/6: Generating custom HD thumbnail and YouTube publishing metadata")

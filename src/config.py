@@ -177,6 +177,24 @@ class ProcessingSettings(BaseModel):
     max_ad_duration: float = Field(
         default_factory=lambda: _safe_float(os.getenv("MAX_AD_DURATION"), 120.0)
     )
+    ldoe_player_name: str = Field(
+        default_factory=lambda: os.getenv("LDOE_PLAYER_NAME", "adistar656")
+    )
+    ldoe_player_id: str = Field(
+        default_factory=lambda: os.getenv("LDOE_PLAYER_ID", "#9045")
+    )
+    ldoe_clan_name: str = Field(
+        default_factory=lambda: os.getenv("LDOE_CLAN_NAME", "Stark029")
+    )
+    intro_style: str = Field(
+        default_factory=lambda: os.getenv("INTRO_STYLE", "bumper")
+    )
+    intro_duration: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("INTRO_DURATION"), 3.5)
+    )
+    intro_bg_path: Path = Field(
+        default_factory=lambda: Path(os.getenv("INTRO_BG_PATH", "assets/backgrounds/ldoe_cover_art.jpg"))
+    )
 
 
 class CommentarySettings(BaseModel):
@@ -206,9 +224,27 @@ class CommentarySettings(BaseModel):
     multilingual_languages: List[str] = Field(
         default_factory=lambda: [
             l.strip().lower()
-            for l in os.getenv("COMMENTARY_MULTILINGUAL_LANGUAGES", "de,es,ru,fr").split(",")
+            for l in os.getenv("COMMENTARY_MULTILINGUAL_LANGUAGES", "de,es,ru,fr,hi").split(",")
             if l.strip()
         ]
+    )
+    voice_cloning_enabled: bool = Field(
+        default_factory=lambda: os.getenv("VOICE_CLONING_ENABLED", "false").lower() == "true"
+    )
+    voice_cloning_endpoint: Optional[str] = Field(
+        default_factory=lambda: os.getenv("VOICE_CLONING_ENDPOINT")
+    )
+    voice_cloning_timeout_sec: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("VOICE_CLONING_TIMEOUT_SEC"), 10.0)
+    )
+    regional_hinglish_voice: str = Field(
+        default_factory=lambda: os.getenv("REGIONAL_HINGLISH_VOICE", "en-IN-PrabhatNeural")
+    )
+    regional_hinglish_rate: str = Field(
+        default_factory=lambda: os.getenv("REGIONAL_HINGLISH_RATE", "+12%")
+    )
+    regional_hinglish_pitch: str = Field(
+        default_factory=lambda: os.getenv("REGIONAL_HINGLISH_PITCH", "+22Hz")
     )
 
 

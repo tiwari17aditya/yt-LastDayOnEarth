@@ -60,9 +60,12 @@ downloads/
 *.webm
 *.wav
 *.mp3
+*.ogg
 !config/audio/*.mp3
 !config/audio_samples/*.mp3
 !assets/animations/*.mp4
+!assets/voice_reference/*.wav
+!assets/audio/intros/*.mp3
 
 # Testing & Coverage
 .pytest_cache/
