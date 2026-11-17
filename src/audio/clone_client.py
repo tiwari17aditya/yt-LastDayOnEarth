@@ -95,3 +95,4 @@ class VoiceCloningClient:
                 extra_data={"error": str(e), "endpoint": self.endpoint_url}
             )
             return False
+

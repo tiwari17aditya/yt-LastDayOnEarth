@@ -145,3 +145,4 @@ def test_config_player_profile_and_intro_defaults():
     assert settings.processing.ldoe_clan_name == "Stark029"
     assert settings.processing.intro_style in ["bumper", "overlay", "none"]
     assert "hi" in settings.commentary.multilingual_languages
+

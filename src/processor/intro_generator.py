@@ -148,3 +148,4 @@ class IntroGenerator:
             f"fade=t=out:st={fade_out_start:.2f}:d={fade_out_duration:.2f}:alpha=1",
         ]
         return filters
+

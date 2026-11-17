@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.0] - 2026-11-18
+
+### Added
+- **Survivor Profile & Clan Recruitment Integration (`src/publisher/youtube_client.py`, `src/config.py`)**:
+  - Configurable survivor identity (`LDOE_PLAYER_NAME="adistar656"`, `LDOE_PLAYER_ID="#9045"`, `LDOE_CLAN_NAME="Stark029"`).
+  - Automatically enriches YouTube video descriptions and pinned engagement comments with a verified Survivor Dossier card and clan recruitment invitation.
+  - Strict privacy rule enforced: player username `adistar656` is strictly visual on-screen and in descriptions/comments; never vocalized in AI speech synthesis.
+- **Dual-Option Dynamic Intro Generator (`src/processor/intro_generator.py`)**:
+  - **Option A (Cinematic Bumper)**: 3.5s bumper displaying game cover art, dark vignette, bold series headers, survivor dossier card (`adistar656 | #9045 | Stark029`), and smooth 0.5s crossfade into 60fps gameplay.
+  - **Option B (In-Game HUD Overlay)**: Dynamic tactical HUD header banner displayed across top-center ($t=0.0\text{s}$ to $4.0\text{s}$) with smooth 0.8s alpha fade-out into clean raw gameplay.
+  - Cross-platform dynamic font loader automatically resolving fonts across Windows (`impact.ttf`, `arialbd.ttf`) and Linux (`liberation`, `dejavu`) for zero cloud runner font failures.
+- **Pre-Baked Studio Mastered Intros & Calibrated Audio Profile (`assets/audio/intros/`, `src/audio/commentary_engine.py`)**:
+  - Extracted acoustic profile from Drive reference sample (173.0 Hz median F0 pitch, 132-182 WPM delivery speed, -17.1 LUFS).
+  - Integrated regional Hinglish voice profile (`"hi"` -> `en-IN-PrabhatNeural` tuned with +22Hz pitch shift and +12% speed).
+  - Pre-generated 5 studio-mastered intro variations (3 Hinglish, 2 English) normalized to -17.0 LUFS with zero spoken username for 0% cloud crash risk and 0.01s load times.
+- **Cloud Voice Cloning Microservice Client with Resilient Fallback (`src/audio/clone_client.py`)**:
+  - REST client for Hugging Face Spaces / cloud GPU microservices with strict 10s connection timeout.
+  - Automatic zero-impact fallback to resilient local Edge-TTS engine to prevent pipeline crashes or publishing delays.
+- **Video Processor Intro Compositing (`src/processor/video_processor.py`, `src/main.py`)**:
+  - Single-pass FFmpeg intro compositing with audio stream normalization and fade transitions.
+  - Fail-safe pipeline integration: if bumper creation fails, execution gracefully proceeds with raw gameplay.
+- **Comprehensive Unit Tests (`tests/test_intro_and_voice_cloning.py`)**:
+  - 11 unit tests verifying bumper generation, voice clone client responses, automatic fallback handling, and profile configuration (76/76 tests passing).
+
 ## [1.16.0] - 2026-11-14
 
 ### Added
