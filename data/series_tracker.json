@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 132,
+  "current_episode": 133,
   "completed_episodes": [
     {
       "episode": 1,
@@ -887,6 +887,13 @@
       "video_id": "jQnGS0WlTNc",
       "youtube_url": "https://youtu.be/jQnGS0WlTNc",
       "job_id": "jQnGS0WlTNc"
+    },
+    {
+      "episode": 132,
+      "title": "Bunker Alfa Raid + High-Tier Crate Looting & Outro Callout! | LDoE Survival #132",
+      "video_id": "zoHHxmqi5BA",
+      "youtube_url": "https://youtu.be/zoHHxmqi5BA",
+      "job_id": "zoHHxmqi5BA"
     }
   ]
 }

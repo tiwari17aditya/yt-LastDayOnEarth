@@ -79,26 +79,37 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `generate_subtitles(events: List[GameplayEvent], output_path: Path) -> Path`
 
 ### 3.4 Audio & AI Commentary Engine (`src/audio/`)
-- **Responsibility**: Select appropriate music track from the 20 royalty-free catalog, loop seamlessly, duck audio under gameplay sound effects, synthesize continuous AI companion voice walkthroughs, generate synchronized dialogue subtitles, and produce multi-lingual companion dub packages.
+- **Responsibility**: Select appropriate music track from the 20 royalty-free catalog, loop seamlessly, duck audio under gameplay sound effects, synthesize continuous AI companion voice walkthroughs, generate synchronized dialogue subtitles, manage pre-baked studio intros, support cloud voice cloning microservices, and produce multi-lingual companion dub packages.
 - **Components**:
   - `AudioMixer`: Manages royalty-free music library selection, duration probing, and multi-track concatenation loops (`create_random_loop_sequence`).
   - `CommentaryEngine` (`src/audio/commentary_engine.py`):
     - Synthesizes dynamic, domain-grounded commentary dialogue across video durations using `edge-tts`.
     - Personas: Casual (`en-US-GuyNeural`), Soft Walkthrough Companion (`CommentaryPersona.SOFT`), Energetic (`en-US-ChristopherNeural`), and Tactical (`en-US-AndrewNeural`).
+    - Regional & Hinglish Voice Profiles: Added calibrated regional Hinglish profile (`"hi"` -> `en-IN-PrabhatNeural` tuned with +22Hz pitch shift and +12% speed matching reference video acoustic specs), alongside German (`de`), Spanish (`es`), Russian (`ru`), and French (`fr`).
     - Soft Voice Acoustics: Warm vocal EQ curve (`highpass=75,lowpass=7800,equalizer=3200Hz -2dB`), -16 LUFS loudness target, gentle -22dB BGM bed, and 3.5 sidechain ducking ratio.
     - Synchronized Subtitles: Emits burned-in Full HD (`1920x1080`) ASS dialogue subtitles (`Style: Commentary`) and matching `.srt` closed caption files for spoken walkthrough narration.
     - Multi-Language Regional Dubs: Translates cues into German (`de`), Spanish (`es`), Russian (`ru`), and French (`fr`) using Gemini AI with gaming vocabulary fallback, synthesizing companion `.m4a` dubs and `.srt` caption files indexed via `multilingual_manifest.json`.
     - Fills timeline silence gaps during gameplay downtime/roaming with 36+ survival strategy and advancement topics (~25s interval).
     - Dynamic FFmpeg Sidechain Compression: Routes voice through `asplit=2` to trigger `sidechaincompress(threshold=0.02, ratio=3.5)` against ambient background music (`-22dB`), ducking it smoothly while keeping spoken voice at `-16 LUFS` broadcast level via `amix(normalize=0)`.
     - Fail-Safe Fallback: Degradation path catches synthesis errors and automatically falls back to standard background music loop without halting video rendering or publishing.
+  - `VoiceCloningClient` (`src/audio/clone_client.py`):
+    - Zero-risk cloud microservice client interfacing with cloud GPUs (e.g., Hugging Face Spaces ZeroGPU) with a strict 10-second timeout.
+    - Automatic safe fallback: seamlessly routes back to local engine if cloud service is unavailable, ensuring zero pipeline halts.
+  - `Pre-Baked Studio Intros` (`assets/audio/intros/`):
+    - Calibrated studio audio assets normalized to -17.0 LUFS with zero spoken username for 0% compute overhead and 0.01s load times in GitHub Actions runners.
 - **Interface**:
   - `BaseAudioMixer`: `select_track(mood: str, target_duration: float) -> MusicTrack`, `build_audio_filter(...) -> str`
   - `CommentaryEngine`: `generate_script(...) -> List[CommentaryCue]`, `synthesize_all_cues(...)`, `generate_subtitles(...)`, `translate_cues(...)`, `synthesize_regional_audio_track(...)`, `generate_multilingual_package(...)`, `mix_commentary_with_bgm(...)`, `generate_commentary_track(...)`
+  - `VoiceCloningClient`: `synthesize(...) -> Optional[Path]`, `is_service_available() -> bool`
 
 ### 3.5 Video Processor & Outro Animation Engine (`src/processor/`)
-- **Responsibility**: Assemble video streams, blur filters, burned-in styled subtitles, mixed audio, and animated brand outro tails using FFmpeg into a broadcast-standard YouTube-ready MP4.
+- **Responsibility**: Assemble video streams, blur filters, burned-in styled subtitles, mixed audio, dynamic intro bumpers/HUD overlays, and animated brand outro tails using FFmpeg into a broadcast-standard YouTube-ready MP4.
 - **Components**:
   - `VideoProcessor`: Single-pass composite FFmpeg rendering pipeline synthesizing resolution normalization, blur filters, subtitle burning, background music ducking, and outro tail concatenation in a single filter graph, with fallback to two-pass stitching (`append_outro_tail`).
+  - `IntroGenerator` (`src/processor/intro_generator.py`):
+    - Option A (Cinematic Bumper): Generates 3.5s bumper with dark vignette, series headers, verified Survivor Dossier card (`adistar656 | #9045 | Stark029`), and smooth 0.5s crossfade into gameplay.
+    - Option B (HUD Overlay): Dynamic tactical HUD header banner fading into gameplay with 0.8s alpha decay.
+    - Cross-platform dynamic font loader automatically resolving fonts across Windows (`impact.ttf`, `arialbd.ttf`) and Linux (`liberation`, `dejavu`).
   - `Silent Mode Defense (`mute_raw_audio`)`: Eliminates microphone ambient noise and rogue audio leakage by routing isolated royalty-free background music directly when gaming in silent mode (`MUTE_RAW_AUDIO=true`).
   - `OutroTailGenerator` (`src/processor/outro_generator.py`): Generates 5–8 second high-energy 1080p animated outro videos featuring interactive dynamic buttons (Like, Share, Subscribe, Bell) with visual cursor interaction, neon pulse effects, and energetic audio stings.
   - `EndScreenGenerator` (`src/processor/endscreen_generator.py`): Visual template slate generator matching YouTube interactive card layout dimensions.

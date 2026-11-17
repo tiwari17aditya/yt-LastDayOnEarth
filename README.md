@@ -8,12 +8,13 @@ The pipeline automates the end-to-end publishing journey:
 1. **Google Drive & Local Ingestion**: Monitors incoming gameplay video uploads (`Input/Input 1`), paginating Drive queries and sorting chronologically by mobile device recording timestamp (`ScreenRecording_MM-DD-YYYY HH-MM-SS`) with automatic historical backfill priority to preserve series storyline continuity and sequential episode numbering.
 2. **Privacy Protection & Automated Ad Cutting**: Scans video frames to detect and cleanly excise in-game mobile commercial advertisements (rewarded ads, countdown timers) and redacts sensitive personal popups while strictly preserving the player username and game HUD.
 3. **Gameplay Context & Subtitles**: Generates synchronized in-game commentary and authentic chapter markers using Gemini 2.5 Flash Vision multimodal keyframe analysis, backed by a Title History Anti-Repetition Guard preventing consecutive duplicate episode phrasings.
-4. **Interactive AI Voice Commentary & Multi-Language Dubbing**: Generates continuous, soft-spoken survival walkthrough commentary dynamically ducked over royalty-free background music via FFmpeg sidechain compression, with automated companion multi-language dubs and closed captions for German, Spanish, Russian, and French.
-5. **Royalty-Free Audio Engine**: Integrates a curated catalog of 20 royalty-free survival and gaming tracks, seamlessly looping and ducking background music.
-6. **FFmpeg Video Composite**: Hardcodes stylized subtitles and renders high-definition, YouTube-optimized video with standardized naming convention (`<Title>_Processed_<DDMMYYYY>.mp4`).
-7. **AI Metadata Generation**: Crafts tailored YouTube titles, structured descriptions with concise chapter timestamps, game tags, and music licensing attributions.
-8. **YouTube Publishing**: Uploads directly to YouTube via YouTube Data API v3.
-9. **Notifications & Periodic Reporting**: Delivers immediate email alerts upon completion/failure, plus automated weekly and monthly aggregation reports.
+4. **Interactive AI Voice Commentary, Hinglish & Multi-Language Dubbing**: Generates continuous, domain-grounded survival walkthrough commentary dynamically ducked over royalty-free background music via FFmpeg sidechain compression. Features calibrated regional Hinglish voice narration (+22Hz pitch, +12% speed) matching human acoustic specs, automated companion multi-language dubs and closed captions for German, Spanish, Russian, and French, and a zero-risk cloud voice cloning client with automatic local fallback.
+5. **Survivor Profile Branding & Clan Recruitment**: Displays verified Survivor Dossier branding (`adistar656 | #9045 | Stark029`) via Option A (3.5s cinematic bumper) or Option B (tactical HUD overlay) while strictly protecting privacy by keeping the username visual only (never spoken aloud), with automatic clan recruitment invitations in descriptions and comments.
+6. **Royalty-Free Audio Engine**: Integrates a curated catalog of 20 royalty-free survival and gaming tracks, seamlessly looping and ducking background music.
+7. **FFmpeg Video Composite**: Hardcodes stylized subtitles and renders high-definition, YouTube-optimized video with standardized naming convention (`<Title>_Processed_<DDMMYYYY>.mp4`).
+8. **AI Metadata Generation**: Crafts tailored YouTube titles, structured descriptions with concise chapter timestamps, game tags, and music licensing attributions.
+9. **YouTube Publishing**: Uploads directly to YouTube via YouTube Data API v3 with automated custom HD thumbnail generation and multi-language closed captions.
+10. **Notifications & Periodic Reporting**: Delivers immediate email alerts upon completion/failure, plus automated weekly and monthly aggregation reports.
 
 ---
 
