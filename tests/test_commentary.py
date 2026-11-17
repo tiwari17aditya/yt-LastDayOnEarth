@@ -266,8 +266,9 @@ def test_soft_voice_persona_script_generation():
     assert "relaxing" in outro or "calm" in outro
 
 
-def test_main_pipeline_attaches_commentary_subtitles(tmp_path):
-    """Verify that run_pipeline passes the commentary-generated ASS subtitle file to the renderer."""
+def test_main_pipeline_attaches_commentary_subtitles(tmp_path, monkeypatch):
+    """Verify that run_pipeline passes the commentary-generated ASS subtitle file to the renderer when burn_in is enabled."""
+    monkeypatch.setenv("BURN_IN_SUBTITLES", "true")
     from src.main import run_pipeline
 
     input_v = tmp_path / "mock_video_subs.mp4"
@@ -303,4 +304,44 @@ def test_main_pipeline_attaches_commentary_subtitles(tmp_path):
         called_sub_file = mock_render.call_args[1].get("subtitle_file")
         assert called_sub_file is not None
         assert Path(called_sub_file).name.endswith("commentary_master.ass")
+
+
+def test_main_pipeline_respects_no_burn_in_subtitles(tmp_path, monkeypatch):
+    """Verify that run_pipeline passes subtitle_file=None to renderer when burn_in_subtitles is False (default)."""
+    monkeypatch.setenv("BURN_IN_SUBTITLES", "false")
+    from src.main import run_pipeline
+
+    input_v = tmp_path / "mock_video_clean.mp4"
+    input_v.write_bytes(b"dummy video for clean pipeline test")
+
+    mock_ass_path = tmp_path / "mock_video_clean_commentary_master.ass"
+    mock_ass_path.write_text("[Script Info]\nTitle: Test Subtitles", encoding="utf-8")
+    mock_audio_path = tmp_path / "mock_video_clean_commentary_master.m4a"
+    mock_audio_path.write_bytes(b"dummy audio")
+
+    with patch("src.processor.video_processor.VideoProcessor.get_video_duration", return_value=60.0), \
+         patch("src.privacy.detector.PrivacyDetector.scan_video", return_value=[]), \
+         patch("src.privacy.detector.PrivacyDetector.generate_ffmpeg_blur_filter", return_value=None), \
+         patch("src.subtitles.event_analyzer.SubtitleGenerator.analyze_events", return_value=[]), \
+         patch("src.subtitles.event_analyzer.SubtitleGenerator.generate_subtitles", return_value=None), \
+         patch("src.audio.selector.AudioMixer.create_random_loop_sequence", return_value=(tmp_path / "bgm.m4a", [{"title": "Ambient"}])), \
+         patch("src.audio.commentary_engine.CommentaryEngine.generate_commentary_track", return_value=mock_audio_path), \
+         patch("src.processor.video_processor.VideoProcessor.render") as mock_render, \
+         patch("src.processor.video_processor.VideoProcessor.get_output_path", return_value=tmp_path / "out.mp4"), \
+         patch("src.privacy.ad_detector.AdDetector.detect_ads", return_value=[]), \
+         patch("src.processor.thumbnail_generator.ThumbnailGenerator.generate_thumbnail", return_value=tmp_path / "thumb.jpg"), \
+         patch("src.storage.history_tracker.HistoryTracker.record_job"), \
+         patch("src.publisher.title_manager.TitleManager._update_current_episode"), \
+         patch("src.publisher.title_manager.TitleManager.advance_episode"), \
+         patch("src.main.get_notifier"):
+
+        (tmp_path / "out.mp4").write_bytes(b"dummy output")
+
+        result = run_pipeline(input_video_path=input_v, local_only=True, force=True)
+
+        assert mock_render.called
+        # Verify render received subtitle_file=None (clean frame, no burned captions)
+        called_sub_file = mock_render.call_args[1].get("subtitle_file")
+        assert called_sub_file is None
+
 

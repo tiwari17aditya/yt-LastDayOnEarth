@@ -387,3 +387,24 @@ class SubtitleGenerator(BaseSubtitleGenerator):
             f.writelines(lines)
 
         return output_path
+
+    def generate_srt(self, events: List[GameplayEvent], output_path: Path) -> Path:
+        """Generate standard SRT closed caption file for YouTube Closed Captions (CC) upload."""
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        def format_srt_time(seconds: float) -> str:
+            hrs = int(seconds // 3600)
+            mins = int((seconds % 3600) // 60)
+            secs = int(seconds % 60)
+            millis = int(round((seconds - int(seconds)) * 1000))
+            return f"{hrs:02d}:{mins:02d}:{secs:02d},{millis:03d}"
+
+        blocks = []
+        for i, ev in enumerate(events, 1):
+            st = format_srt_time(ev.start_time)
+            et = format_srt_time(ev.end_time)
+            desc = ev.description.strip()
+            blocks.append(f"{i}\n{st} --> {et}\n{desc}\n")
+
+        output_path.write_text("\n".join(blocks), encoding="utf-8")
+        return output_path

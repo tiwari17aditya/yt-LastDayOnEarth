@@ -195,6 +195,18 @@ class ProcessingSettings(BaseModel):
     intro_bg_path: Path = Field(
         default_factory=lambda: Path(os.getenv("INTRO_BG_PATH", "assets/backgrounds/ldoe_cover_art.jpg"))
     )
+    remove_idle_segments: bool = Field(
+        default_factory=lambda: os.getenv("REMOVE_IDLE_SEGMENTS", "true").lower() == "true"
+    )
+    min_idle_duration: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("MIN_IDLE_DURATION"), 7.0)
+    )
+    idle_motion_threshold: float = Field(
+        default_factory=lambda: _safe_float(os.getenv("IDLE_MOTION_THRESHOLD"), 0.015)
+    )
+    burn_in_subtitles: bool = Field(
+        default_factory=lambda: os.getenv("BURN_IN_SUBTITLES", "false").lower() == "true"
+    )
 
 
 class CommentarySettings(BaseModel):

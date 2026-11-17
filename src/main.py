@@ -283,6 +283,38 @@ def run_pipeline(
                 )
                 working_video_path = input_video_path
 
+        # Step 0b: Inactive / Idle Gameplay Motion Trimming
+        if getattr(settings.processing, "remove_idle_segments", True):
+            try:
+                logger.info("Step 0b/6: Scanning video for idle/frozen gameplay intervals...")
+                from src.processor.motion_detector import MotionDetector
+                motion_detector = MotionDetector(temp_dir=settings.processing.temp_dir)
+                idle_segments = motion_detector.detect_idle_segments(
+                    video_path=working_video_path,
+                    min_idle_duration=getattr(settings.processing, "min_idle_duration", 7.0),
+                    motion_threshold=getattr(settings.processing, "idle_motion_threshold", 0.015),
+                )
+                if idle_segments:
+                    logger.info(f"Detected {len(idle_segments)} inactivity segment(s). Trimming motionless footage...")
+                    active_output_path = settings.processing.temp_dir / f"{working_video_path.stem}_active{working_video_path.suffix}"
+                    working_video_path = motion_detector.remove_idle_segments(
+                        input_video=working_video_path,
+                        idle_segments=idle_segments,
+                        output_video=active_output_path,
+                    )
+                    logger.info(f"Active gameplay video ready for downstream processing: {working_video_path}")
+            except Exception as ide:
+                logger.warning(
+                    f"Idle motion trimming degraded: {ide}. Proceeding with current video.",
+                    extra_data={
+                        "operation": "remove_idle_segments",
+                        "component": "MotionDetector",
+                        "file": str(working_video_path),
+                        "root_cause": str(ide),
+                        "status": "DEGRADED",
+                    },
+                )
+
         # Step 1: Privacy Protection (Redacting sensitive popups, preserving username & chat)
         blur_filter = None
         try:
@@ -306,14 +338,18 @@ def run_pipeline(
 
         # Step 2: Gameplay Context & Subtitle Generation (Sleek 1-sec action cues)
         sub_path = None
+        caption_tracks = {}
         events = []
         try:
-            logger.info("Step 2/6: Analyzing gameplay events and generating styled action cues")
+            logger.info("Step 2/6: Analyzing gameplay events and generating action cues")
             events = subtitle_engine.analyze_events(working_video_path)
             settings.processing.temp_dir.mkdir(parents=True, exist_ok=True)
             sub_path = settings.processing.temp_dir / f"{input_video_path.stem}.ass"
+            srt_path = settings.processing.temp_dir / f"{input_video_path.stem}.srt"
             subtitle_engine.generate_subtitles(events, sub_path)
-            logger.info(f"Subtitles generated at: {sub_path}")
+            subtitle_engine.generate_srt(events, srt_path)
+            caption_tracks["en"] = (srt_path, "English (Gameplay Actions)")
+            logger.info(f"Subtitles generated: ASS at {sub_path}, SRT CC at {srt_path}")
         except Exception as se:
             logger.warning(
                 f"Subtitle generation degraded: {se}. Using fallback event markers.",
@@ -516,11 +552,16 @@ def run_pipeline(
             if outro_path.exists():
                 outro_tail_clip = outro_path
 
+        burn_in = getattr(settings.processing, "burn_in_subtitles", False)
+        subtitle_file_for_render = sub_path if burn_in else None
+        if not burn_in and sub_path:
+            logger.info("In-game caption burning disabled (BURN_IN_SUBTITLES=false). Subtitles will be attached as YouTube Closed Captions (CC) only.")
+
         try:
             processor.render(
                 input_video=working_video_path,
                 output_video=output_path,
-                subtitle_file=sub_path,
+                subtitle_file=subtitle_file_for_render,
                 music_file=music_file,
                 privacy_filter=blur_filter,
                 ducking_db=settings.processing.audio_ducking_db,

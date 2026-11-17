@@ -58,25 +58,31 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `cleanup_processed_folder() -> int`
   - `cleanup_old_output_videos(retention_days: int = 7) -> int`
 
-### 3.2 Privacy, PII Redaction & In-Game Advertisement Excision (src/privacy/ and src/processor/)
-- **Responsibility**: Detect personal identifiers in video frames, and automatically identify and excise mobile in-game commercial advertisements (rewarded ads, countdown banners, install endcards) watched during gameplay.
+### 3.2 Privacy, PII Redaction, Ad Excision & Inactivity Trimming (src/privacy/ and src/processor/)
+- **Responsibility**: Detect personal identifiers in video frames, automatically excise mobile commercial advertisements, and detect and trim player idle / frozen gameplay periods where the player stepped away from controls.
 - **Components**:
   - PrivacyDetector (src/privacy/detector.py): Scans video for sensitive notification popups while strictly preserving the player username, health bar, and in-game chat.
   - AdDetector (src/privacy/ad_detector.py): Scans gameplay keyframes to detect commercial breaks via Gemini 2.5 Flash Vision multimodal analysis, with zero-dependency native Windows OCR (Windows.Media.Ocr), EasyOCR, and OpenCV HUD absence/pillarbox signature heuristics.
-  - AdRemover (src/processor/ad_remover.py): Computes keep intervals and performs FFmpeg sample-accurate stream trimming (	rim/trim) and concatenation (concat) to seamlessly excise advertisement segments with zero A/V desync, and shifts subsequent subtitle cues and chapter timestamps backwards to maintain perfect synchronization.
+  - AdRemover (src/processor/ad_remover.py): Computes keep intervals and performs FFmpeg sample-accurate stream trimming and concatenation to seamlessly excise advertisement segments with zero A/V desync.
+  - MotionDetector (src/processor/motion_detector.py): Automatically detects motionless/frozen video intervals using adaptive OpenCV grayscale frame differencing (2 fps sampling) with native FFmpeg freezedetect fallback (n=-45dB). Computes keep intervals and clips out dead time, guaranteeing viewers only see active, engaging gameplay.
 - **Interface**:
   - AdDetector.detect_ads(video_path: Path) -> List[AdSegment]
   - AdRemover.remove_ads(input_video: Path, ad_segments: List[AdSegment], output_video: Optional[Path]) -> Path
-  - AdRemover.adjust_event_timestamps(events: List[GameplayEvent], ad_segments: List[AdSegment]) -> List[GameplayEvent]
-- **Safeguard**: Ignores fixed game HUD elements (character health bar, minimap, quick inventory, sneak button).
+  - MotionDetector.detect_idle_segments(video_path: Path, min_idle_duration: float, motion_threshold: float) -> List[IdleSegment]
+  - MotionDetector.remove_idle_segments(input_video: Path, idle_segments: List[IdleSegment], output_video: Optional[Path]) -> Path
+  - MotionDetector.adjust_event_timestamps(events: List[GameplayEvent], idle_segments: List[IdleSegment]) -> List[GameplayEvent]
+- **Safeguard**: Preserves fixed game HUD elements and only clips when lack of motion exceeds MIN_IDLE_DURATION (default 7.0s).
 
 ### 3.3 Subtitles & Context Engine (`src/subtitles/`)
-- **Responsibility**: Identify game locations (Motel, Bunker Alfa, Farm, Home Base) and actions (looting, sneak attack, zombie engagement) and format synchronized captions.
+- **Responsibility**: Identify game locations (Motel, Bunker Alfa, Farm, Home Base) and actions (looting, sneak attack, zombie engagement), formatting synchronized Closed Captions for native YouTube CC upload without burned-in visual clutter.
 - **Components**:
   - `SubtitleGenerator`: Integrates Gemini 2.5 Flash Vision (`google-genai` multimodal keyframe analysis) with fallback OpenCV color/HUD signature heuristics and diversified non-repeating procedural event rotation.
+  - Generates both styled `.ass` and standard `.srt` closed caption files via `generate_srt(events, output_path)`.
+  - Default configuration (`BURN_IN_SUBTITLES=false`) passes subtitles directly to YouTube's Closed Caption (CC) track instead of burning text into video frames, keeping gameplay pristine and unobstructed.
 - **Interface**: `BaseSubtitleGenerator`
   - `analyze_events(video_path: Path) -> List[GameplayEvent]`
   - `generate_subtitles(events: List[GameplayEvent], output_path: Path) -> Path`
+  - `generate_srt(events: List[GameplayEvent], output_path: Path) -> Path`
 
 ### 3.4 Audio & AI Commentary Engine (`src/audio/`)
 - **Responsibility**: Select appropriate music track from the 20 royalty-free catalog, loop seamlessly, duck audio under gameplay sound effects, synthesize continuous AI companion voice walkthroughs, generate synchronized dialogue subtitles, manage pre-baked studio intros, support cloud voice cloning microservices, and produce multi-lingual companion dub packages.

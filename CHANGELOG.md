@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.0] - 2026-11-18
+
+### Added
+- **Automated Idle / Inactivity Gameplay Motion Trimming (`src/processor/motion_detector.py`, `src/main.py`)**:
+  - Implemented `MotionDetector` combining adaptive OpenCV grayscale frame differencing (2 fps sampling) with native FFmpeg `freezedetect` fallback (`n=-45dB`).
+  - Automatically detects when the player remains idle/frozen for an extended period (`min_idle_duration: 7.0s`, configurable via `MIN_IDLE_DURATION` and `REMOVE_IDLE_SEGMENTS`).
+  - Seamlessly excises dead time and motionless gameplay using single-pass FFmpeg `trim/concat` filtergraphs, preserving only continuous, active, movable gameplay for viewer engagement.
+  - Automatically shifts downstream chapter markers and `GameplayEvent` timestamps to maintain exact timeline synchronization.
+- **Pristine Gameplay Canvas & YouTube Closed Captions (CC) Exclusivity (`src/config.py`, `src/subtitles/event_analyzer.py`, `src/main.py`)**:
+  - Disabled hardcoded in-game subtitle burning on the video frame canvas (`BURN_IN_SUBTITLES=false` by default).
+  - Generates standard `.srt` Closed Caption files via `SubtitleGenerator.generate_srt()` and uploads them directly to YouTube's player CC track.
+  - Viewers can toggle YouTube's native CC on or off without any text permanently obscuring the gameplay or game HUD.
+- **Expanded Unit Test Suite (`tests/test_motion_detector.py`, `tests/test_commentary.py`)**:
+  - Added 10 unit tests covering synthetic motion/idle generation, interval merging, freezedetect parsing, and SRT generation, plus tests for burn-in toggle semantics (87/87 tests passing).
+
 ## [1.17.0] - 2026-11-18
 
 ### Added
