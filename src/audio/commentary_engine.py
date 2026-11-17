@@ -111,6 +111,13 @@ REGIONAL_VOICE_MAP: Dict[str, Dict[str, str]] = {
         "pitch": "-2Hz",
         "volume": "-2%",
     },
+    "hi": {
+        "voice": os.getenv("REGIONAL_HINGLISH_VOICE", "en-IN-PrabhatNeural"),
+        "name": "Hindi / Hinglish",
+        "rate": os.getenv("REGIONAL_HINGLISH_RATE", "+12%"),
+        "pitch": os.getenv("REGIONAL_HINGLISH_PITCH", "+22Hz"),
+        "volume": "+0%",
+    },
 }
 
 

@@ -1,5 +1,6 @@
 """YouTube publishing client and AI metadata generator."""
 
+import os
 import json
 import re
 from abc import ABC, abstractmethod
@@ -146,9 +147,18 @@ class YouTubeClient(BasePublisher):
 
         # Natural, human-friendly presentation
         summary_clean = title_pkg.summary.strip()
+        player_name = os.getenv("LDOE_PLAYER_NAME", "adistar656")
+        player_id = os.getenv("LDOE_PLAYER_ID", "#9045")
+        clan_name = os.getenv("LDOE_CLAN_NAME", "Stark029")
+
         description_lines = [
             f"Welcome back to Last Day on Earth: Survival! In Episode #{title_pkg.episode_number}, we focus on {summary_clean}.",
             "Watch as we optimize our base layout, advance our workshop crafting, and prepare for the zombie wasteland.",
+            "",
+            "🎮 SURVIVOR PROFILE & CLAN RECRUITMENT:",
+            f"👤 In-Game Name: {player_name}",
+            f"🆔 Player ID: {player_id}",
+            f"⚔️ Clan: {clan_name} (Search Clan '{clan_name}' or Player ID '{player_id}' in Crater & Sector 7 to team up!)",
             "",
             "If you enjoyed the video, make sure to like and subscribe for more survival guides and wasteland runs! 🧟‍♂️🔨",
             "",
@@ -363,6 +373,9 @@ class YouTubeClient(BasePublisher):
                 "",
                 "Let me know in the comments below — reading and responding to all fellow survivors!",
             ]
+            clan_name = os.getenv("LDOE_CLAN_NAME", "Stark029")
+            player_id = os.getenv("LDOE_PLAYER_ID", "#9045")
+            comment_lines.append(f"⚔️ Join our clan! Search Clan '{clan_name}' or Player ID '{player_id}' in Crater / Sector 7 to raid together!")
             if playlist_url:
                 comment_lines.append(f"📺 Watch the Full Series Playlist: {playlist_url}")
             comment_lines.append("🔔 Don't forget to Subscribe & turn on notifications for daily survival raids!")
