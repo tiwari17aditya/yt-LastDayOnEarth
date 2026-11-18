@@ -1,10 +1,6 @@
 """Unit tests for automated motion detection, idle trimming, and YouTube CC generation."""
 
-import re
-from pathlib import Path
-from typing import List
 import numpy as np
-import pytest
 import cv2
 
 from src.processor.motion_detector import MotionDetector, IdleSegment
@@ -156,7 +152,7 @@ def test_opencv_motion_detection_synthetic(tmp_path):
 def test_config_idle_and_subtitle_defaults():
     settings = get_settings()
     assert settings.processing.remove_idle_segments is True
-    assert settings.processing.min_idle_duration == 7.0
+    assert settings.processing.min_idle_duration == 15.0
     assert settings.processing.idle_motion_threshold == 0.015
     # In-game caption burning is disabled by default for pristine video
     assert settings.processing.burn_in_subtitles is False

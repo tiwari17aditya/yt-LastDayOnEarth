@@ -5,6 +5,7 @@ import hashlib
 import json
 import shutil
 import sys
+import time
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
@@ -13,15 +14,9 @@ from src.config import get_settings
 from src.logging_config import get_logger
 from src.exceptions import (
     PipelineError,
-    ConfigurationError,
     IngestionError,
-    PrivacyRedactionError,
-    SubtitleGenerationError,
-    AudioProcessingError,
-    CommentaryError,
     VideoProcessingError,
     PublishingError,
-    NotificationError,
     QuotaExceededError,
 )
 
@@ -79,7 +74,7 @@ def calculate_file_md5(file_path: Path) -> str:
             hasher.update(chunk)
     return hasher.hexdigest()
 from src.privacy.detector import PrivacyDetector
-from src.privacy.ad_detector import AdDetector, AdSegment
+from src.privacy.ad_detector import AdDetector
 from src.processor.ad_remover import AdRemover
 from src.subtitles.event_analyzer import SubtitleGenerator
 from src.audio.selector import AudioMixer
@@ -937,12 +932,23 @@ def run_drive_cron(dry_run: bool = False, limit: int = 1, upload: bool = True, f
                     logger.info(f" - File: {v['name']} (Size: {v['size'] / (1024 * 1024):.1f} MB, ID: {v['id']})")
                 return 0
 
-            # Process up to limit
+            # Process up to limit with elapsed runner time safety guard
             to_process = pending_videos[:limit]
-            for video in to_process:
+            cron_start_time = time.time()
+            MAX_RUNNER_DURATION_SEC = 3000  # 50 minutes guard before starting another video
+
+            for i, video in enumerate(to_process):
+                if i > 0 and (time.time() - cron_start_time) > MAX_RUNNER_DURATION_SEC:
+                    logger.warning(
+                        f"Runner time safety threshold reached ({int(time.time() - cron_start_time)}s elapsed). "
+                        f"Concluding batch gracefully to prevent runner timeout. Remaining {len(to_process) - i} video(s) "
+                        f"will be processed in the next scheduled execution."
+                    )
+                    break
+
                 file_id = video["id"]
                 file_name = video["name"]
-                logger.info(f"Processing remote file: {file_name} ({file_id})")
+                logger.info(f"Processing remote file: {file_name} ({file_id}) [Job {i+1}/{len(to_process)}]")
 
                 # Download chunk-by-chunk to temp directory
                 local_download_path = settings.processing.temp_dir / file_name

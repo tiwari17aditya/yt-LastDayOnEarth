@@ -64,14 +64,14 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - PrivacyDetector (src/privacy/detector.py): Scans video for sensitive notification popups while strictly preserving the player username, health bar, and in-game chat.
   - AdDetector (src/privacy/ad_detector.py): Scans gameplay keyframes to detect commercial breaks via Gemini 2.5 Flash Vision multimodal analysis, with zero-dependency native Windows OCR (Windows.Media.Ocr), EasyOCR, and OpenCV HUD absence/pillarbox signature heuristics.
   - AdRemover (src/processor/ad_remover.py): Computes keep intervals and performs FFmpeg sample-accurate stream trimming and concatenation to seamlessly excise advertisement segments with zero A/V desync.
-  - MotionDetector (src/processor/motion_detector.py): Automatically detects motionless/frozen video intervals using adaptive OpenCV grayscale frame differencing (2 fps sampling) with native FFmpeg freezedetect fallback (n=-45dB). Computes keep intervals and clips out dead time, guaranteeing viewers only see active, engaging gameplay.
+  - MotionDetector (src/processor/motion_detector.py): High-performance idle trimmer. Uses native FFmpeg freezedetect with hardware downscaling (scale=320:180, fps=2, n=-45dB) as primary detector, with sequential OpenCV fallback. Excises dead pauses using single-pass ultrafast trimming while preserving downstream chapter and event timestamps.
 - **Interface**:
   - AdDetector.detect_ads(video_path: Path) -> List[AdSegment]
   - AdRemover.remove_ads(input_video: Path, ad_segments: List[AdSegment], output_video: Optional[Path]) -> Path
   - MotionDetector.detect_idle_segments(video_path: Path, min_idle_duration: float, motion_threshold: float) -> List[IdleSegment]
   - MotionDetector.remove_idle_segments(input_video: Path, idle_segments: List[IdleSegment], output_video: Optional[Path]) -> Path
   - MotionDetector.adjust_event_timestamps(events: List[GameplayEvent], idle_segments: List[IdleSegment]) -> List[GameplayEvent]
-- **Safeguard**: Preserves fixed game HUD elements and only clips when lack of motion exceeds MIN_IDLE_DURATION (default 7.0s).
+- **Safeguard**: Preserves fixed game HUD elements and only clips when lack of motion exceeds MIN_IDLE_DURATION (default 15.0s).
 
 ### 3.3 Subtitles & Context Engine (`src/subtitles/`)
 - **Responsibility**: Identify game locations (Motel, Bunker Alfa, Farm, Home Base) and actions (looting, sneak attack, zombie engagement), formatting synchronized Closed Captions for native YouTube CC upload without burned-in visual clutter.

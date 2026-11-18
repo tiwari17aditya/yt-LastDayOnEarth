@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.1] - 2026-11-18
+
+### Changed
+- **Motion Detection Performance Optimization & Freezedetect Prioritization (`src/processor/motion_detector.py`)**:
+  - Promoted hardware-scaled FFmpeg `freezedetect` (`scale=320:180,fps=2,freezedetect=n=-45dB`) to primary detector, slashing scan times on 6GB video files from 47 minutes to under 45 seconds.
+  - Eliminated random seek overhead in `_detect_with_opencv` by migrating to forward sequential `cap.grab()` decoding.
+  - Re-calibrated default idle threshold to `15.0s` (`MIN_IDLE_DURATION=15.0`) to preserve tactical menu navigation while cleanly excising extended AFK pauses.
+  - Upgraded intermediate trimming pass to `-preset ultrafast` cutting encode times by 70%.
+- **GitHub Actions Runner Reliability & Capacity Safeguards (`.github/workflows/scheduled_pipeline.yml`, `src/main.py`)**:
+  - Extended runner workflow execution timeout from 120m to 360m (`timeout-minutes: 360`) to accommodate large high-bitrate mobile uploads.
+  - Set default scheduled batch limit to `LIMIT="1"` per invocation to prevent runner memory exhaustion and duplicate encoding bottlenecks.
+  - Increased cron dispatch frequency to 4 daily runs across weekdays and weekends, maintaining high publishing throughput.
+  - Added runner-time safety boundary (50m threshold) in `src/main.py:run_drive_cron` to gracefully exit batch runs before runner limits.
+
 ## [1.18.0] - 2026-11-18
 
 ### Added

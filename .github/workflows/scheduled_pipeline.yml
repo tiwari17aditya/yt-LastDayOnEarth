@@ -3,9 +3,11 @@ name: Scheduled Last Day on Earth Video Pipeline
 on:
   # Scheduled Google Drive polling aligned with creator release rhythm
   schedule:
-    # Weekdays: 2 times a day (3:00 PM IST [09:30 UTC] & 7:00 PM IST [13:30 UTC])
-    - cron: '30 9,13 * * 1-5'
-    # Weekends: 4 times a day (11:00 AM [05:30 UTC], 2:00 PM [08:30 UTC], 5:00 PM [11:30 UTC], 8:00 PM [14:30 UTC] IST)
+    # Weekdays: 4 runs a day (1 video per run = 4 videos/day safely spread out):
+    # 11:00 AM [05:30 UTC], 2:30 PM [09:00 UTC], 6:00 PM [12:30 UTC], 9:30 PM [16:00 UTC] IST
+    - cron: '30 5,9,12,16 * * 1-5'
+    # Weekends: 4 times a day (1 video per run = 4 videos/day):
+    # 11:00 AM [05:30 UTC], 2:00 PM [08:30 UTC], 5:00 PM [11:30 UTC], 8:00 PM [14:30 UTC] IST
     - cron: '30 5,8,11,14 * * 6,0'
 
   # Allow manual trigger anytime via GitHub UI
@@ -34,7 +36,7 @@ jobs:
   check-and-process:
     name: Check Drive & Process Video
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 360
     permissions:
       contents: write
 
@@ -102,6 +104,9 @@ jobs:
           COMMENTARY_BGM_VOLUME_DB: "-22dB"
           COMMENTARY_DUCKING_RATIO: "3.5"
           COMMENTARY_MIN_CUE_INTERVAL: "25.0"
+          REMOVE_IDLE_SEGMENTS: "true"
+          MIN_IDLE_DURATION: "15.0"
+          BURN_IN_SUBTITLES: "false"
         run: |
           EXTRA_ARGS=""
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
@@ -112,14 +117,8 @@ jobs:
           fi
           LIMIT="${{ github.event.inputs.limit }}"
           if [ -z "$LIMIT" ] || [ "$LIMIT" = "null" ]; then
-            # Balanced release cadence & storage clearance: 2 videos on weekday runs (2 runs = 4/day),
-            # 1 video on weekend runs (4 runs = 4/day), strictly within 10,000 daily YouTube API quota.
-            DOW=$(date +%u)
-            if [ "$DOW" -le 5 ]; then
-              LIMIT="2"
-            else
-              LIMIT="1"
-            fi
+            # Default to 1 video per run to guarantee completion well within runner memory and timeout limits
+            LIMIT="1"
           else
             # Strip decimal fraction if passed as float by GitHub Actions (e.g. '3.0' -> '3')
             LIMIT="${LIMIT%.*}"

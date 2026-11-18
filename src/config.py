@@ -199,7 +199,7 @@ class ProcessingSettings(BaseModel):
         default_factory=lambda: os.getenv("REMOVE_IDLE_SEGMENTS", "true").lower() == "true"
     )
     min_idle_duration: float = Field(
-        default_factory=lambda: _safe_float(os.getenv("MIN_IDLE_DURATION"), 7.0)
+        default_factory=lambda: _safe_float(os.getenv("MIN_IDLE_DURATION"), 15.0)
     )
     idle_motion_threshold: float = Field(
         default_factory=lambda: _safe_float(os.getenv("IDLE_MOTION_THRESHOLD"), 0.015)

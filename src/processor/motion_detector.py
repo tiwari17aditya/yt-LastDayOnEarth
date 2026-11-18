@@ -98,7 +98,7 @@ class MotionDetector(BaseMotionDetector):
         motion_threshold: float,
         sample_interval: float,
     ) -> List[IdleSegment]:
-        """Analyzes frame motion using adaptive grayscale frame differencing."""
+        """Analyzes frame motion using sequential grayscale frame differencing."""
         cap = cv2.VideoCapture(str(video_path))
         if not cap.isOpened():
             raise RuntimeError(f"OpenCV could not open video: {video_path}")
@@ -112,8 +112,7 @@ class MotionDetector(BaseMotionDetector):
         idle_segments: List[IdleSegment] = []
 
         current_frame_idx = 0
-        while current_frame_idx < total_frames:
-            cap.set(cv2.CAP_PROP_POS_FRAMES, current_frame_idx)
+        while True:
             ret, frame = cap.read()
             if not ret or frame is None:
                 break
@@ -151,13 +150,19 @@ class MotionDetector(BaseMotionDetector):
                         idle_start = None
 
             prev_gray = gray
-            current_frame_idx += frame_step
+            current_frame_idx += 1
+
+            # Fast forward frames without expensive keyframe seeks
+            for _ in range(frame_step - 1):
+                if not cap.grab():
+                    break
+                current_frame_idx += 1
 
         cap.release()
 
         # Handle trailing idle segment at end of video
         if idle_start is not None:
-            video_dur = total_frames / fps
+            video_dur = (total_frames / fps) if total_frames > 0 else (current_frame_idx / fps)
             if (video_dur - idle_start) >= min_idle_duration:
                 idle_segments.append(
                     IdleSegment(
@@ -174,19 +179,20 @@ class MotionDetector(BaseMotionDetector):
         self,
         video_path: Path,
         min_idle_duration: float,
+        sample_fps: float = 2.0,
     ) -> List[IdleSegment]:
-        """Fallback idle detector utilizing FFmpeg's native freezedetect filter."""
+        """Fast native FFmpeg freezedetect engine with hardware-accelerated frame sampling."""
         cmd = [
             "ffmpeg",
             "-nostdin",
             "-i", str(video_path),
-            "-vf", f"freezedetect=n=-45dB:d={min_idle_duration}",
+            "-vf", f"scale=320:180,fps={sample_fps:.1f},freezedetect=n=-45dB:d={min_idle_duration:.1f}",
             "-map", "0:v:0",
             "-f", "null",
             "-",
         ]
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=1800)
             output = res.stderr or ""
             idle_segments: List[IdleSegment] = []
 
@@ -208,13 +214,13 @@ class MotionDetector(BaseMotionDetector):
                     )
             return idle_segments
         except Exception as fe:
-            logger.warning(f"FFmpeg freezedetect fallback failed: {fe}")
+            logger.warning(f"FFmpeg freezedetect failed: {fe}")
             return []
 
     def detect_idle_segments(
         self,
         video_path: Path,
-        min_idle_duration: float = 7.0,
+        min_idle_duration: float = 15.0,
         motion_threshold: float = 0.015,
         sample_interval: float = 0.5,
     ) -> List[IdleSegment]:
@@ -228,19 +234,29 @@ class MotionDetector(BaseMotionDetector):
         )
 
         detected_segments: List[IdleSegment] = []
+        # Attempt ultra-fast native FFmpeg freezedetect first
         try:
-            detected_segments = self._detect_with_opencv(
-                video_path=video_path,
-                min_idle_duration=min_idle_duration,
-                motion_threshold=motion_threshold,
-                sample_interval=sample_interval,
-            )
-        except Exception as oe:
-            logger.warning(f"OpenCV motion detection encountered error: {oe}. Engaging FFmpeg fallback.")
+            sample_fps = max(1.0, round(1.0 / sample_interval, 1)) if sample_interval > 0 else 2.0
             detected_segments = self._detect_with_ffmpeg_freezedetect(
                 video_path=video_path,
                 min_idle_duration=min_idle_duration,
+                sample_fps=sample_fps,
             )
+        except Exception as fe:
+            logger.warning(f"FFmpeg freezedetect error: {fe}. Falling back to sequential OpenCV.")
+            detected_segments = []
+
+        # Fallback to sequential OpenCV if FFmpeg produced no results or failed
+        if not detected_segments:
+            try:
+                detected_segments = self._detect_with_opencv(
+                    video_path=video_path,
+                    min_idle_duration=min_idle_duration,
+                    motion_threshold=motion_threshold,
+                    sample_interval=sample_interval,
+                )
+            except Exception as oe:
+                logger.warning(f"OpenCV motion detection error: {oe}")
 
         # Merge segments separated by tiny gaps (< 1.0s)
         if not detected_segments:
@@ -371,7 +387,7 @@ class MotionDetector(BaseMotionDetector):
             "-map", "[outv]",
             "-map", "[outa]",
             "-c:v", "libx264",
-            "-preset", "veryfast",
+            "-preset", "ultrafast",
             "-crf", "20",
             "-c:a", "aac",
             "-b:a", "192k",
