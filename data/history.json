@@ -4666,5 +4666,57 @@
       "ads_removed": [],
       "md5_checksum": "037d0f3a5aee54a42ebeaf0dc452e990"
     }
+  },
+  {
+    "job_id": "job_20261119_183726",
+    "timestamp": "2026-11-19T18:37:26.039106+00:00",
+    "input_filename": "ScreenRecording_11-06-2026 22-37-31_1.mp4",
+    "output_filename": "ScreenRecording_11-06-2026_22-37-31_1_Processed_19112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "crxCBGgqcS8",
+    "youtube_url": "https://youtu.be/crxCBGgqcS8",
+    "details": {
+      "video_id": "crxCBGgqcS8",
+      "youtube_url": "https://youtu.be/crxCBGgqcS8",
+      "scheduled_publish_time_utc": "2026-11-20T09:30:00Z",
+      "scheduled_publish_time_ist": "20 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-06-2026_22-37-31_1_Processed_19112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-06-2026_22-37-31_1_Processed_19112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-06-2026_22-37-31_1_Processed_19112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #139",
+        "curiosity": "Can We Survive & Upgrade? Workbench & Blueprints And Home Base Operations Plus Base... #139",
+        "walkthrough": "Surviving Day 139: Workbench & Blueprints And Home Base Operations Plus Base Defense &... #139",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #139"
+      },
+      "duration_seconds": 3237.75,
+      "soundtrack_tracks": [
+        "Urban Gauntlet",
+        "Pamgaea",
+        "Monkeys Spinning Monkeys",
+        "Fretless",
+        "Somewhere Sunny",
+        "Shores of Avalon",
+        "Sneaky Snitch",
+        "Life of Riley",
+        "Constance",
+        "Clear Waters",
+        "Shores of Avalon",
+        "Wallpaper",
+        "Electro Cabello",
+        "Groove Grove",
+        "Monkeys Spinning Monkeys",
+        "Somewhere Sunny",
+        "Wallpaper",
+        "Pamgaea",
+        "Local Forecast"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "81e381c6855c345733dbda8bd5e7d9e2"
+    }
   }
 ]

@@ -126,11 +126,22 @@
       "title": "Fastest Iron Smelting & Resource Farm Trick | LDoE #138",
       "scheduled_publish_time_utc": "2026-11-19T09:30:00Z",
       "scheduled_publish_time_ist": "19 Nov 2026, 03:00 PM IST",
-      "privacy_status": "private",
-      "status": "SCHEDULED",
+      "privacy_status": "public",
+      "status": "PUBLISHED",
       "youtube_url": "https://youtu.be/fSwP6GBfvEw",
       "enqueued_at_utc": "2026-11-19T01:20:44Z"
+    },
+    {
+      "episode_number": 139,
+      "video_id": "crxCBGgqcS8",
+      "title": "Blueprint Upgrades & Home Base Operations! | LDoE Survival #139",
+      "scheduled_publish_time_utc": "2026-11-20T09:30:00Z",
+      "scheduled_publish_time_ist": "20 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/crxCBGgqcS8",
+      "enqueued_at_utc": "2026-11-19T18:37:19Z"
     }
   ],
-  "last_updated_utc": "2026-11-19T01:20:44Z"
+  "last_updated_utc": "2026-11-19T18:37:19Z"
 }
