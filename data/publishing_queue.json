@@ -115,11 +115,22 @@
       "title": "Surviving Day 137: Workbench & Blueprints And Organizing Storage & Chests Plus Workshop &... #137",
       "scheduled_publish_time_utc": "2026-11-18T09:30:00Z",
       "scheduled_publish_time_ist": "18 Nov 2026, 03:00 PM IST",
-      "privacy_status": "private",
-      "status": "SCHEDULED",
+      "privacy_status": "public",
+      "status": "PUBLISHED",
       "youtube_url": "https://youtu.be/1EtCEP5Vsy0",
       "enqueued_at_utc": "2026-11-17T19:26:58Z"
+    },
+    {
+      "episode_number": 138,
+      "video_id": "fSwP6GBfvEw",
+      "title": "Fastest Iron Smelting & Resource Farm Trick | LDoE #138",
+      "scheduled_publish_time_utc": "2026-11-19T09:30:00Z",
+      "scheduled_publish_time_ist": "19 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/fSwP6GBfvEw",
+      "enqueued_at_utc": "2026-11-19T01:20:44Z"
     }
   ],
-  "last_updated_utc": "2026-11-17T19:26:58Z"
+  "last_updated_utc": "2026-11-19T01:20:44Z"
 }

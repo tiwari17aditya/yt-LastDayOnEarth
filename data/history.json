@@ -4616,5 +4616,55 @@
       "ads_removed": [],
       "md5_checksum": "3ef8450f1fc9b137989b4eb7d86588d2"
     }
+  },
+  {
+    "job_id": "job_20261119_012049",
+    "timestamp": "2026-11-19T01:20:49.451327+00:00",
+    "input_filename": "ScreenRecording_11-06-2026 18-31-19_1.mp4",
+    "output_filename": "ScreenRecording_11-06-2026_18-31-19_1_Processed_19112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "fSwP6GBfvEw",
+    "youtube_url": "https://youtu.be/fSwP6GBfvEw",
+    "details": {
+      "video_id": "fSwP6GBfvEw",
+      "youtube_url": "https://youtu.be/fSwP6GBfvEw",
+      "scheduled_publish_time_utc": "2026-11-19T09:30:00Z",
+      "scheduled_publish_time_ist": "19 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-06-2026_18-31-19_1_Processed_19112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-06-2026_18-31-19_1_Processed_19112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-06-2026_18-31-19_1_Processed_19112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Blueprint Upgrades! | LDoE Survival #138",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Workbench & Blueprints Plus Entering... #138",
+        "walkthrough": "Surviving Day 138: Home Base Operations And Workbench & Blueprints Plus Entering Home Base | LDoE",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #138"
+      },
+      "duration_seconds": 3096.135011,
+      "soundtrack_tracks": [
+        "Life of Riley",
+        "Monkeys Spinning Monkeys",
+        "Pamgaea",
+        "Somewhere Sunny",
+        "Local Forecast",
+        "Sneaky Snitch",
+        "Local Forecast",
+        "Clean Soul",
+        "Somewhere Sunny",
+        "Bossa Antigua",
+        "Groove Grove",
+        "Electro Cabello",
+        "Clean Soul",
+        "Bossa Antigua",
+        "Volatile Reaction",
+        "Monkeys Spinning Monkeys",
+        "Carefree"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "037d0f3a5aee54a42ebeaf0dc452e990"
+    }
   }
 ]
