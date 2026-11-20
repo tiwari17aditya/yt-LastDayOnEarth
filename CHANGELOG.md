@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.19.0] - 2026-11-20
+
+### Added
+- **Multi-Dimensional Diverse Thumbnail Batch Generation up to Episode #300 (`data/thumbnails/`, `scripts/generate_diverse_thumbnails.py`)**:
+  - Pre-generated 163 distinct, high-CTR episode thumbnails (`data/thumbnails/episode_138.jpg` to `episode_300.jpg`), reaching full staged coverage across all 300 series episodes.
+  - Eliminated repetitive/boring thumbnail layouts with multi-variable procedural differentiation:
+    - **Curated Action Base Imagery**: Rotates across 21 high-stakes action scenes (Bunker Alfa Frenzied Giant battles, toxic crawler ambushes, laboratory sectors, world map convoys) and fortified base/workshop templates.
+    - **Procedural Framing**: Alternating horizontal mirroring (`ImageOps.mirror`) and dynamic focal zoom (1.0x to 1.12x) for fresh composition angles.
+    - **8 Atmospheric Lighting Profiles**: Blood Moon (crimson), Bio-Hazard (toxic chartreuse), Cold Tundra (icy blue), Golden Sunset (amber warmth), Night Stalker (deep indigo), Bleach Bypass (gritty desaturated), Neon Cyan Lab (high-tech teal), and Molten Smelter (forge embers).
+    - **Depth Overlays & Floating Particles**: Radial dark edge vignettes and atmospheric glowing dust/ember particles matching scene color palettes.
+    - **Organic Paint Splatter Badges**: 12 survival palette colors with episode-seeded organic blotches, radial spikes, and drip lines.
+    - **Tactical Action Hook Banners**: 65+ distinct survival callouts docked under the episode badge (e.g. `BUNKER ALFA FL 4`, `ZOMBIE HORDE DEFENSE`, `CHOPPER GAS TANK`, `BLIND ONE SHOWDOWN`, `TITANIUM SMELTER`).
+  - Added standalone CLI generator utility `scripts/generate_diverse_thumbnails.py` with support for `--start`, `--end`, `--force`, and `--dry-run`.
+
 ## [1.18.1] - 2026-11-18
 
 ### Changed
