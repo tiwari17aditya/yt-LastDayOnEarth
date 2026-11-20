@@ -4765,5 +4765,42 @@
       "ads_removed": [],
       "md5_checksum": "5be2152e5130226708357becc336531f"
     }
+  },
+  {
+    "job_id": "job_20261120_145543",
+    "timestamp": "2026-11-20T14:55:43.903827+00:00",
+    "input_filename": "ScreenRecording_11-07-2026 14-08-54_1.mp4",
+    "output_filename": "ScreenRecording_11-07-2026_14-08-54_1_Processed_20112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "Rmj6rC7ZIGU",
+    "youtube_url": "https://youtu.be/Rmj6rC7ZIGU",
+    "details": {
+      "video_id": "Rmj6rC7ZIGU",
+      "youtube_url": "https://youtu.be/Rmj6rC7ZIGU",
+      "scheduled_publish_time_utc": "2026-11-21T05:30:00Z",
+      "scheduled_publish_time_ist": "21 Nov 2026, 11:00 AM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-07-2026_14-08-54_1_Processed_20112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-07-2026_14-08-54_1_Processed_20112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-07-2026_14-08-54_1_Processed_20112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #141",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Base Defense & Maintenance Plus Shelter... #141",
+        "walkthrough": "Surviving Day 141: Home Base Operations And Base Defense & Maintenance Plus Shelter... #141",
+        "search_guide": "How to Farm & Master Home Base Operations & Zombie Horde Defense Fast | LDoE #141"
+      },
+      "duration_seconds": 808.169002,
+      "soundtrack_tracks": [
+        "Bossa Antigua",
+        "Wallpaper",
+        "Life of Riley",
+        "Fretless"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "9407019c8eb9369b174cd8a91ebf0f43"
+    }
   }
 ]
