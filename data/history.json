@@ -4718,5 +4718,52 @@
       "ads_removed": [],
       "md5_checksum": "81e381c6855c345733dbda8bd5e7d9e2"
     }
+  },
+  {
+    "job_id": "job_20261120_032825",
+    "timestamp": "2026-11-20T03:28:25.348879+00:00",
+    "input_filename": "ScreenRecording_11-06-2026 23-33-44_1.mp4",
+    "output_filename": "ScreenRecording_11-06-2026_23-33-44_1_Processed_20112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "8TLmDFtXMTs",
+    "youtube_url": "https://youtu.be/8TLmDFtXMTs",
+    "details": {
+      "video_id": "8TLmDFtXMTs",
+      "youtube_url": "https://youtu.be/8TLmDFtXMTs",
+      "scheduled_publish_time_utc": "2026-11-20T13:30:00Z",
+      "scheduled_publish_time_ist": "20 Nov 2026, 07:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-06-2026_23-33-44_1_Processed_20112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-06-2026_23-33-44_1_Processed_20112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-06-2026_23-33-44_1_Processed_20112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Blueprint Upgrades! | LDoE Survival #140",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Workbench & Blueprints Plus Crafting... #140",
+        "walkthrough": "Surviving Day 140: Entering Home Base And Workbench & Blueprints Plus Crafting Planks &... #140",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #140"
+      },
+      "duration_seconds": 3189.2,
+      "soundtrack_tracks": [
+        "Groove Grove",
+        "Daily Beetle",
+        "Shores of Avalon",
+        "Sneaky Snitch",
+        "Electro Cabello",
+        "Daily Beetle",
+        "Clear Waters",
+        "Fretless",
+        "Groove Grove",
+        "Daily Beetle",
+        "Electro Cabello",
+        "Bossa Antigua",
+        "Urban Gauntlet",
+        "Bossa Antigua"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "5be2152e5130226708357becc336531f"
+    }
   }
 ]
