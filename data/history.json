@@ -4852,5 +4852,42 @@
       "ads_removed": [],
       "md5_checksum": "ffcdfad27dae2bd73cc46be8d1293fc0"
     }
+  },
+  {
+    "job_id": "job_20261121_142331",
+    "timestamp": "2026-11-21T14:23:31.444242+00:00",
+    "input_filename": "ScreenRecording_11-07-2026 15-13-34_1.mp4",
+    "output_filename": "ScreenRecording_11-07-2026_15-13-34_1_Processed_21112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "OBp7tUKwxnQ",
+    "youtube_url": "https://youtu.be/OBp7tUKwxnQ",
+    "details": {
+      "video_id": "OBp7tUKwxnQ",
+      "youtube_url": "https://youtu.be/OBp7tUKwxnQ",
+      "scheduled_publish_time_utc": "2026-11-22T05:30:00Z",
+      "scheduled_publish_time_ist": "22 Nov 2026, 11:00 AM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-07-2026_15-13-34_1_Processed_21112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-07-2026_15-13-34_1_Processed_21112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-07-2026_15-13-34_1_Processed_21112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Workshop & Smelting + Home Base Operations! | LDoE Survival #143",
+        "curiosity": "Can We Survive & Upgrade? Workshop & Smelting Furnaces And Home Base Operations Plus... #143",
+        "walkthrough": "Surviving Day 143: Workshop & Smelting Furnaces And Home Base Operations Plus Organizing... #143",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #143"
+      },
+      "duration_seconds": 784.361995,
+      "soundtrack_tracks": [
+        "Sneaky Snitch",
+        "Bossa Antigua",
+        "Monkeys Spinning Monkeys",
+        "Fretless"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "9c1359e7f9550f0cbe77b761c247c451"
+    }
   }
 ]
