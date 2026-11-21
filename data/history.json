@@ -4889,5 +4889,50 @@
       "ads_removed": [],
       "md5_checksum": "9c1359e7f9550f0cbe77b761c247c451"
     }
+  },
+  {
+    "job_id": "job_20261121_220002",
+    "timestamp": "2026-11-21T22:00:02.763856+00:00",
+    "input_filename": "ScreenRecording_11-07-2026 17-38-05_1.mp4",
+    "output_filename": "ScreenRecording_11-07-2026_17-38-05_1_Processed_21112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "adq6dFEgBAc",
+    "youtube_url": "https://youtu.be/adq6dFEgBAc",
+    "details": {
+      "video_id": "adq6dFEgBAc",
+      "youtube_url": "https://youtu.be/adq6dFEgBAc",
+      "scheduled_publish_time_utc": "2026-11-22T10:30:00Z",
+      "scheduled_publish_time_ist": "22 Nov 2026, 04:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-07-2026_17-38-05_1_Processed_21112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-07-2026_17-38-05_1_Processed_21112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-07-2026_17-38-05_1_Processed_21112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Home Base Operations! | LDoE Survival #144",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Home Base Operations Plus Wasteland... #144",
+        "walkthrough": "Surviving Day 144: Entering Home Base And Home Base Operations Plus Wasteland Transit | LDoE",
+        "search_guide": "How to Farm & Master Entering Home Base & Home Base Operations Fast | LDoE #144"
+      },
+      "duration_seconds": 2162.075011,
+      "soundtrack_tracks": [
+        "Somewhere Sunny",
+        "Electro Cabello",
+        "Life of Riley",
+        "Electro Cabello",
+        "Local Forecast",
+        "Bossa Antigua",
+        "Carefree",
+        "Sneaky Snitch",
+        "Fretless",
+        "Groove Grove",
+        "Clear Waters",
+        "Daily Beetle"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "f3d3527011510e4c806d0a643c5ed68a"
+    }
   }
 ]

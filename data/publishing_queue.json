@@ -185,7 +185,18 @@
       "status": "SCHEDULED",
       "youtube_url": "https://youtu.be/OBp7tUKwxnQ",
       "enqueued_at_utc": "2026-11-21T14:23:26Z"
+    },
+    {
+      "episode_number": 144,
+      "video_id": "adq6dFEgBAc",
+      "title": "High-Value Resource Scavenge & Smelting! | LDoE Survival #144",
+      "scheduled_publish_time_utc": "2026-11-22T10:30:00Z",
+      "scheduled_publish_time_ist": "22 Nov 2026, 04:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/adq6dFEgBAc",
+      "enqueued_at_utc": "2026-11-21T21:59:57Z"
     }
   ],
-  "last_updated_utc": "2026-11-21T14:23:26Z"
+  "last_updated_utc": "2026-11-21T21:59:57Z"
 }
