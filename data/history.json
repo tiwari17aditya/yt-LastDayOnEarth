@@ -4802,5 +4802,55 @@
       "ads_removed": [],
       "md5_checksum": "9407019c8eb9369b174cd8a91ebf0f43"
     }
+  },
+  {
+    "job_id": "job_20261121_014402",
+    "timestamp": "2026-11-21T01:44:02.380533+00:00",
+    "input_filename": "ScreenRecording_11-07-2026 14-23-19_1.mp4",
+    "output_filename": "ScreenRecording_11-07-2026_14-23-19_1_Processed_21112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "44GxUxoUACY",
+    "youtube_url": "https://youtu.be/44GxUxoUACY",
+    "details": {
+      "video_id": "44GxUxoUACY",
+      "youtube_url": "https://youtu.be/44GxUxoUACY",
+      "scheduled_publish_time_utc": "2026-11-21T10:30:00Z",
+      "scheduled_publish_time_ist": "21 Nov 2026, 04:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-07-2026_14-23-19_1_Processed_21112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-07-2026_14-23-19_1_Processed_21112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-07-2026_14-23-19_1_Processed_21112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Home Base Operations! | LDoE Survival #142",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Home Base Operations Plus... #142",
+        "walkthrough": "Surviving Day 142: Organizing Storage & Chests And Home Base Operations Plus Workbench &... #142",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #142"
+      },
+      "duration_seconds": 2976.681995,
+      "soundtrack_tracks": [
+        "Monkeys Spinning Monkeys",
+        "Volatile Reaction",
+        "Groove Grove",
+        "Sneaky Snitch",
+        "Somewhere Sunny",
+        "Groove Grove",
+        "Volatile Reaction",
+        "Clean Soul",
+        "Groove Grove",
+        "Life of Riley",
+        "Shores of Avalon",
+        "Sneaky Snitch",
+        "Somewhere Sunny",
+        "Constance",
+        "Sneaky Snitch",
+        "Wallpaper",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "ffcdfad27dae2bd73cc46be8d1293fc0"
+    }
   }
 ]

@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 142,
+  "current_episode": 143,
   "completed_episodes": [
     {
       "episode": 1,
@@ -957,6 +957,13 @@
       "video_id": "Rmj6rC7ZIGU",
       "youtube_url": "https://youtu.be/Rmj6rC7ZIGU",
       "job_id": "Rmj6rC7ZIGU"
+    },
+    {
+      "episode": 142,
+      "title": "Zombie Horde Survival & Base Fortification! | LDoE Survival #142",
+      "video_id": "44GxUxoUACY",
+      "youtube_url": "https://youtu.be/44GxUxoUACY",
+      "job_id": "44GxUxoUACY"
     }
   ]
 }

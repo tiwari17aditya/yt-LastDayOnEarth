@@ -163,7 +163,18 @@
       "status": "SCHEDULED",
       "youtube_url": "https://youtu.be/Rmj6rC7ZIGU",
       "enqueued_at_utc": "2026-11-20T14:55:39Z"
+    },
+    {
+      "episode_number": 142,
+      "video_id": "44GxUxoUACY",
+      "title": "Zombie Horde Survival & Base Fortification! | LDoE Survival #142",
+      "scheduled_publish_time_utc": "2026-11-21T10:30:00Z",
+      "scheduled_publish_time_ist": "21 Nov 2026, 04:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/44GxUxoUACY",
+      "enqueued_at_utc": "2026-11-21T01:43:57Z"
     }
   ],
-  "last_updated_utc": "2026-11-20T14:55:39Z"
+  "last_updated_utc": "2026-11-21T01:43:57Z"
 }
