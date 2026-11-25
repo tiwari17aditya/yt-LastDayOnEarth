@@ -280,6 +280,7 @@ def run_pipeline(
 
         # Step 0b: Inactive / Idle Gameplay Motion Trimming
         if getattr(settings.processing, "remove_idle_segments", True):
+            pre_idle_path = working_video_path
             try:
                 logger.info("Step 0b/6: Scanning video for idle/frozen gameplay intervals...")
                 from src.processor.motion_detector import MotionDetector
@@ -292,13 +293,21 @@ def run_pipeline(
                 if idle_segments:
                     logger.info(f"Detected {len(idle_segments)} inactivity segment(s). Trimming motionless footage...")
                     active_output_path = settings.processing.temp_dir / f"{working_video_path.stem}_active{working_video_path.suffix}"
-                    working_video_path = motion_detector.remove_idle_segments(
+                    trimmed_video = motion_detector.remove_idle_segments(
                         input_video=working_video_path,
                         idle_segments=idle_segments,
                         output_video=active_output_path,
                     )
+                    # Free prior intermediate file if ad-cleaner created one
+                    if pre_idle_path != input_video_path and pre_idle_path.exists():
+                        try:
+                            pre_idle_path.unlink()
+                        except Exception:
+                            pass
+                    working_video_path = trimmed_video
                     logger.info(f"Active gameplay video ready for downstream processing: {working_video_path}")
             except Exception as ide:
+                working_video_path = pre_idle_path
                 logger.warning(
                     f"Idle motion trimming degraded: {ide}. Proceeding with current video.",
                     extra_data={

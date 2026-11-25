@@ -112,49 +112,109 @@ class AdRemover:
         total_ad_duration = sum(ad.duration for ad in ad_segments)
         logger.info(
             f"Excising {len(ad_segments)} advertisement segment(s) totaling {total_ad_duration:.2f}s "
-            f"from {input_video.name} -> {target_output.name}"
+            f"from {input_video.name} -> {target_output.name} across {len(keep_intervals)} keep interval(s)"
         )
 
-        filter_chains: List[str] = []
-        v_inputs: List[str] = []
-        a_inputs: List[str] = []
-
-        for i, (st, et) in enumerate(keep_intervals):
-            filter_chains.append(f"[0:v]trim=start={st:.3f}:end={et:.3f},setpts=PTS-STARTPTS[v{i}]")
-            filter_chains.append(f"[0:a]atrim=start={st:.3f}:end={et:.3f},asetpts=PTS-STARTPTS[a{i}]")
-            v_inputs.append(f"[v{i}]")
-            a_inputs.append(f"[a{i}]")
-
-        concat_in = "".join(f"{v}{a}" for v, a in zip(v_inputs, a_inputs))
-        filter_chains.append(f"{concat_in}concat=n={len(keep_intervals)}:v=1:a=1[outv][outa]")
-
-        cmd = [
-            "ffmpeg",
-            "-y",
-            "-nostdin",
-            "-i", str(input_video),
-            "-filter_complex", ";".join(filter_chains),
-            "-map", "[outv]",
-            "-map", "[outa]",
-            "-c:v", "libx264",
-            "-preset", "veryfast",
-            "-crf", "20",
-            "-c:a", "aac",
-            "-b:a", "192k",
-            str(target_output),
-        ]
-
         target_output.parent.mkdir(parents=True, exist_ok=True)
-        res = subprocess.run(cmd, capture_output=True, text=True)
 
-        if res.returncode != 0:
-            logger.error(f"FFmpeg ad excision failed: {res.stderr}")
-            raise VideoProcessingError(
-                operation="remove_ads",
-                root_cause=res.stderr[-500:] if res.stderr else "FFmpeg error during ad excision",
-                recovery_action="Check FFmpeg filtergraph or video codec parameters.",
-                file_path=str(input_video),
-            )
+        # Single keep interval: extract directly with input seeking
+        if len(keep_intervals) == 1:
+            st, et = keep_intervals[0]
+            cmd = [
+                "ffmpeg",
+                "-y",
+                "-nostdin",
+                "-ss", f"{st:.3f}",
+                "-to", f"{et:.3f}",
+                "-i", str(input_video),
+                "-c:v", "libx264",
+                "-preset", "ultrafast",
+                "-crf", "20",
+                "-c:a", "aac",
+                "-b:a", "192k",
+                str(target_output),
+            ]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode != 0:
+                logger.error(f"FFmpeg single-interval ad excision failed: {res.stderr}")
+                raise VideoProcessingError(
+                    operation="remove_ads",
+                    root_cause=res.stderr[-500:] if res.stderr else "FFmpeg error during single-interval ad excision",
+                    recovery_action="Check FFmpeg filtergraph or video codec parameters.",
+                    file_path=str(input_video),
+                )
+        else:
+            # Multi-interval: Extract each keep segment sequentially with zero-RAM buffering,
+            # then stitch together in 1-2 seconds with the stream-copy Concat Demuxer.
+            segment_files: List[Path] = []
+            concat_list_file = self.output_dir / f"concat_ad_{input_video.stem}.txt"
+
+            try:
+                for idx, (st, et) in enumerate(keep_intervals):
+                    seg_path = self.output_dir / f"seg_ad_{idx}_{input_video.stem}{input_video.suffix}"
+                    segment_files.append(seg_path)
+
+                    seg_cmd = [
+                        "ffmpeg",
+                        "-y",
+                        "-nostdin",
+                        "-ss", f"{st:.3f}",
+                        "-to", f"{et:.3f}",
+                        "-i", str(input_video),
+                        "-c:v", "libx264",
+                        "-preset", "ultrafast",
+                        "-crf", "20",
+                        "-c:a", "aac",
+                        "-b:a", "192k",
+                        str(seg_path),
+                    ]
+                    seg_res = subprocess.run(seg_cmd, capture_output=True, text=True)
+                    if seg_res.returncode != 0:
+                        logger.error(f"FFmpeg trim for ad keep segment {idx} ({st:.1f}s-{et:.1f}s) failed: {seg_res.stderr}")
+                        raise VideoProcessingError(
+                            operation="remove_ads",
+                            root_cause=seg_res.stderr[-500:] if seg_res.stderr else f"FFmpeg ad segment {idx} failed",
+                            recovery_action="Check input video integrity and storage.",
+                            file_path=str(input_video),
+                        )
+
+                # Write concat demuxer manifest
+                lines = [f"file '{p.resolve().as_posix()}'" for p in segment_files]
+                concat_list_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+                # Concat with stream-copy: instantaneous, no re-encoding, constant O(1) RAM
+                concat_cmd = [
+                    "ffmpeg",
+                    "-y",
+                    "-nostdin",
+                    "-f", "concat",
+                    "-safe", "0",
+                    "-i", str(concat_list_file),
+                    "-c", "copy",
+                    str(target_output),
+                ]
+                concat_res = subprocess.run(concat_cmd, capture_output=True, text=True)
+                if concat_res.returncode != 0:
+                    logger.error(f"FFmpeg concat demuxer failed: {concat_res.stderr}")
+                    raise VideoProcessingError(
+                        operation="remove_ads",
+                        root_cause=concat_res.stderr[-500:] if concat_res.stderr else "FFmpeg concat failed",
+                        recovery_action="Verify segment codecs match.",
+                        file_path=str(input_video),
+                    )
+            finally:
+                # Always clean up temporary segment files and manifest
+                for sf in segment_files:
+                    if sf.exists():
+                        try:
+                            sf.unlink()
+                        except Exception:
+                            pass
+                if concat_list_file.exists():
+                    try:
+                        concat_list_file.unlink()
+                    except Exception:
+                        pass
 
         new_duration = self.get_video_duration(target_output)
         logger.info(

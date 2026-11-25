@@ -163,9 +163,15 @@ def test_remove_ads_ffmpeg_call(tmp_path):
         )
 
         assert out == dummy_clean
-        mock_run.assert_called_once()
-        cmd = mock_run.call_args[0][0]
-        cmd_str = " ".join(cmd)
-        assert "trim=start=0.000:end=20.000" in cmd_str
-        assert "trim=start=50.000:end=100.000" in cmd_str
-        assert "concat=n=2:v=1:a=1" in cmd_str
+        # Expect 3 calls: segment 0 (0-20s), segment 1 (50-100s), and stream-copy concat demuxer
+        assert mock_run.call_count == 3
+        cmd0 = " ".join(mock_run.call_args_list[0][0][0])
+        cmd1 = " ".join(mock_run.call_args_list[1][0][0])
+        cmd_concat = " ".join(mock_run.call_args_list[2][0][0])
+
+        assert "-ss 0.000" in cmd0
+        assert "-to 20.000" in cmd0
+        assert "-ss 50.000" in cmd1
+        assert "-to 100.000" in cmd1
+        assert "-f concat" in cmd_concat
+        assert "-c copy" in cmd_concat

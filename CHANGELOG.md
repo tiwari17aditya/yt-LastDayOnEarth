@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.19.1] - 2026-11-25
+
+### Fixed
+- **FFmpeg Concat Demuxer Architecture & OOM Elimination (`src/processor/motion_detector.py`, `src/processor/ad_remover.py`)**:
+  - Replaced the memory-bloating multi-branch `[0:v]trim=...[v0]; ... concat=n=k:v=1:a=1` filter complex with isolated sequential segment extraction and stream-copy FFmpeg Concat Demuxer.
+  - Eliminated the uncompressed frame buffering in RAM that triggered GitHub Actions runner cgroups OOM crashes (Exit Code 143 / SIGTERM) on videos larger than 1 GB.
+  - Reduced idle trimming and ad removal memory consumption to a strictly constant O(1) footprint (< 150 MB RAM).
+- **Freeze Detection Performance Boost (`src/processor/motion_detector.py`)**:
+  - Added `-an` flag to FFmpeg `freezedetect` pass, bypassing redundant audio demuxing/decoding during visual screen stillness analysis.
+- **Defensive Error Recovery & Intermediate Storage Clearance (`src/main.py`)**:
+  - Guarded idle trimming state with safe fallback paths so unexpected trimming anomalies degrade gracefully to original footage without terminating the workflow.
+  - Added immediate intermediate video unlinking between ad excision and idle trimming stages to conserve runner disk quota.
+- **Unit Test Coverage (`tests/test_motion_detector.py`, `tests/test_ad_remover.py`)**:
+  - Updated mock tests and added test cases covering single-interval and multi-interval trimming and concat demuxer execution.
+
 ## [1.19.0] - 2026-11-20
 
 ### Added

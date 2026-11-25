@@ -171,3 +171,56 @@ def test_subtitle_generator_generate_srt(tmp_path):
     content = srt_out.read_text(encoding="utf-8")
     assert "1\n00:00:00,000 --> 00:00:04,500\nEntering Base" in content
     assert "2\n00:00:15,200 --> 00:00:20,800\nBunker Alfa Infiltration" in content
+
+
+def test_remove_idle_segments_no_idles(tmp_path):
+    md = MotionDetector(temp_dir=tmp_path)
+    fake_video = tmp_path / "gameplay.mp4"
+    fake_video.touch()
+
+    out = md.remove_idle_segments(fake_video, idle_segments=[])
+    assert out == fake_video
+
+
+def test_remove_idle_segments_multi_interval_mock(tmp_path, monkeypatch):
+    from unittest.mock import MagicMock
+    md = MotionDetector(temp_dir=tmp_path)
+    fake_video = tmp_path / "gameplay.mp4"
+    fake_video.touch()
+    target_output = tmp_path / "gameplay_active.mp4"
+
+    idles = [
+        IdleSegment(start_time=10.0, end_time=25.0),
+        IdleSegment(start_time=50.0, end_time=65.0),
+    ]
+
+    monkeypatch.setattr(md, "get_video_duration", lambda p: 100.0)
+
+    mock_run = MagicMock(returncode=0, stderr="")
+    run_calls = []
+
+    def fake_subprocess_run(cmd, *args, **kwargs):
+        run_calls.append(cmd)
+        return mock_run
+
+    monkeypatch.setattr("subprocess.run", fake_subprocess_run)
+
+    out = md.remove_idle_segments(fake_video, idle_segments=idles, output_video=target_output)
+    assert out == target_output
+
+    # 3 keep intervals: (0.0-10.0), (25.0-50.0), (65.0-100.0) + 1 concat demuxer call = 4 calls total
+    assert len(run_calls) == 4
+    cmd0 = " ".join(run_calls[0])
+    cmd1 = " ".join(run_calls[1])
+    cmd2 = " ".join(run_calls[2])
+    cmd_concat = " ".join(run_calls[3])
+
+    assert "-ss 0.000" in cmd0
+    assert "-to 10.000" in cmd0
+    assert "-ss 25.000" in cmd1
+    assert "-to 50.000" in cmd1
+    assert "-ss 65.000" in cmd2
+    assert "-to 100.000" in cmd2
+
+    assert "-f concat" in cmd_concat
+    assert "-c copy" in cmd_concat

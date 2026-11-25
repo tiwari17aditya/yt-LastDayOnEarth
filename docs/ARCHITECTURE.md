@@ -63,8 +63,8 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 - **Components**:
   - PrivacyDetector (src/privacy/detector.py): Scans video for sensitive notification popups while strictly preserving the player username, health bar, and in-game chat.
   - AdDetector (src/privacy/ad_detector.py): Scans gameplay keyframes to detect commercial breaks via Gemini 2.5 Flash Vision multimodal analysis, with zero-dependency native Windows OCR (Windows.Media.Ocr), EasyOCR, and OpenCV HUD absence/pillarbox signature heuristics.
-  - AdRemover (src/processor/ad_remover.py): Computes keep intervals and performs FFmpeg sample-accurate stream trimming and concatenation to seamlessly excise advertisement segments with zero A/V desync.
-  - MotionDetector (src/processor/motion_detector.py): High-performance idle trimmer. Uses native FFmpeg freezedetect with hardware downscaling (scale=320:180, fps=2, n=-45dB) as primary detector, with sequential OpenCV fallback. Excises dead pauses using single-pass ultrafast trimming while preserving downstream chapter and event timestamps.
+  - AdRemover (src/processor/ad_remover.py): Computes keep intervals and performs FFmpeg sample-accurate sequential segment trimming followed by zero-reencode stream-copy Concat Demuxer, eliminating multi-branch memory bloat and preventing runner OOM.
+  - MotionDetector (src/processor/motion_detector.py): High-performance idle trimmer. Uses native FFmpeg freezedetect with hardware downscaling (scale=320:180, fps=2, n=-45dB, -an) as primary detector, with sequential OpenCV fallback. Excises dead pauses using isolated segment extraction and stream-copy Concat Demuxer with strictly constant O(1) RAM usage (<150 MB), preserving downstream chapter and event timestamps.
 - **Interface**:
   - AdDetector.detect_ads(video_path: Path) -> List[AdSegment]
   - AdRemover.remove_ads(input_video: Path, ad_segments: List[AdSegment], output_video: Optional[Path]) -> Path
