@@ -5006,5 +5006,44 @@
       "ads_removed": [],
       "md5_checksum": "99fd94e8b8d5eacd948c9f097cadc537"
     }
+  },
+  {
+    "job_id": "job_20261125_190658",
+    "timestamp": "2026-11-25T19:06:58.135791+00:00",
+    "input_filename": "ScreenRecording_11-07-2026 21-52-54_1.mp4",
+    "output_filename": "ScreenRecording_11-07-2026_21-52-54_1_Processed_25112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "SD5SqkxL3yI",
+    "youtube_url": "https://youtu.be/SD5SqkxL3yI",
+    "details": {
+      "video_id": "SD5SqkxL3yI",
+      "youtube_url": "https://youtu.be/SD5SqkxL3yI",
+      "scheduled_publish_time_utc": "2026-11-26T09:30:00Z",
+      "scheduled_publish_time_ist": "26 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-07-2026_21-52-54_1_Processed_25112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-07-2026_21-52-54_1_Processed_25112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-07-2026_21-52-54_1_Processed_25112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations & Zombie Horde Defense! | LDoE Survival #147",
+        "curiosity": "Can We Survive & Upgrade? Home Base Operations And Base Defense & Maintenance Plus... #147",
+        "walkthrough": "Surviving Day 147: Home Base Operations And Base Defense & Maintenance Plus Wasteland Transit | LDoE",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #147"
+      },
+      "duration_seconds": 864.756304,
+      "soundtrack_tracks": [
+        "Somewhere Sunny",
+        "Clear Waters",
+        "Carefree",
+        "Clear Waters",
+        "Decisions",
+        "Daily Beetle"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "f21fad188d9a41849214ebec351b697e"
+    }
   }
 ]
