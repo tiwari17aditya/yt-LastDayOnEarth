@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 149,
+  "current_episode": 150,
   "completed_episodes": [
     {
       "episode": 1,
@@ -1006,6 +1006,13 @@
       "video_id": "_7s9LD3ElkU",
       "youtube_url": "https://youtu.be/_7s9LD3ElkU",
       "job_id": "_7s9LD3ElkU"
+    },
+    {
+      "episode": 149,
+      "title": "Fastest Iron Smelting & Resource Farm Trick | LDoE #149",
+      "video_id": "zjqEos2cjOU",
+      "youtube_url": "https://youtu.be/zjqEos2cjOU",
+      "job_id": "zjqEos2cjOU"
     }
   ]
 }

@@ -5082,5 +5082,40 @@
       "ads_removed": [],
       "md5_checksum": "4f974157eeeeb1bb0f11b9bfc51bdb25"
     }
+  },
+  {
+    "job_id": "job_20261126_155233",
+    "timestamp": "2026-11-26T15:52:33.036706+00:00",
+    "input_filename": "ScreenRecording_11-07-2026 23-52-03_1.mp4",
+    "output_filename": "ScreenRecording_11-07-2026_23-52-03_1_Processed_26112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "zjqEos2cjOU",
+    "youtube_url": "https://youtu.be/zjqEos2cjOU",
+    "details": {
+      "video_id": "zjqEos2cjOU",
+      "youtube_url": "https://youtu.be/zjqEos2cjOU",
+      "scheduled_publish_time_utc": "2026-11-27T09:30:00Z",
+      "scheduled_publish_time_ist": "27 Nov 2026, 03:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-07-2026_23-52-03_1_Processed_26112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-07-2026_23-52-03_1_Processed_26112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-07-2026_23-52-03_1_Processed_26112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Entering Home Base & Blueprint Upgrades! | LDoE Survival #149",
+        "curiosity": "Can We Survive & Upgrade? Entering Home Base And Workbench & Blueprints Plus Organizing... #149",
+        "walkthrough": "Surviving Day 149: Entering Home Base And Workbench & Blueprints Plus Organizing Storage &... #149",
+        "search_guide": "Fastest Iron Smelting & Resource Farm Trick | LDoE #149"
+      },
+      "duration_seconds": 330.739649,
+      "soundtrack_tracks": [
+        "Urban Gauntlet",
+        "Life of Riley"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "md5_checksum": "4b3732a2b8313bfc49a682038a836d59"
+    }
   }
 ]
