@@ -5,9 +5,8 @@ with blurred gameplay backdrop, centered high-def gameplay, and custom branding 
 """
 
 import subprocess
-import shutil
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 from PIL import Image, ImageDraw, ImageFont
 
 from src.logging_config import get_logger
@@ -103,7 +102,13 @@ class ShortsGenerator:
         btn_y = 1680
 
         # CTA Button
-        draw.rounded_rectangle([btn_x, btn_y, btn_x + btn_w, btn_y + btn_h], radius=15, fill=(220, 38, 38, 240), outline=(255, 255, 255, 230), width=3)
+        draw.rounded_rectangle(
+            [btn_x, btn_y, btn_x + btn_w, btn_y + btn_h],
+            radius=15,
+            fill=(220, 38, 38, 240),
+            outline=(255, 255, 255, 230),
+            width=3,
+        )
         draw.text((btn_x + 30, btn_y + 12), ft_text, fill=(255, 255, 255, 255), font=font_footer)
 
         # Bottom channel hint
@@ -267,3 +272,109 @@ class ShortsGenerator:
 
         logger.info(f"Successfully generated YouTube Short: {output_path}")
         return output_path
+
+    def build_shorts_metadata(
+        self,
+        headline: str,
+        subtitle: str,
+        episode_number: Optional[int] = None,
+        main_video_url: Optional[str] = None,
+        playlist_url: Optional[str] = None,
+        publish_at: Optional[str] = None,
+        privacy_status: str = "scheduled",
+    ) -> Any:
+        """Constructs optimized YouTube Shorts publishing metadata with CTA links back to the full episode."""
+        from src.publisher.youtube_client import VideoPublishMetadata
+
+        ep_tag = f" - Ep #{episode_number}" if episode_number else ""
+        raw_title = f"{headline.strip()}{ep_tag} | LDoE Survival #Shorts"
+        # Strictly clamp title <= 100 chars (YouTube max title limit is 100 characters)
+        if len(raw_title) > 100:
+            allowed_len = 100 - len(f"{ep_tag} | LDoE Survival #Shorts")
+            raw_title = f"{headline.strip()[:allowed_len].strip()}{ep_tag} | LDoE Survival #Shorts"
+
+        desc_lines = [
+            f"🔥 {headline.upper()}: {subtitle}",
+            "",
+        ]
+        if main_video_url and "youtu" in str(main_video_url):
+            ep_ref = f"Episode #{episode_number}" if episode_number else "full walkthrough"
+            desc_lines.append(f"🎬 Watch the FULL {ep_ref} here:")
+            desc_lines.append(f"👉 {main_video_url}")
+            desc_lines.append("")
+
+        if playlist_url:
+            desc_lines.append("🏆 Watch the Entire Survival Series Playlist:")
+            desc_lines.append(f"👉 {playlist_url}")
+            desc_lines.append("")
+
+        desc_lines.extend([
+            "🔴 Subscribe for daily Last Day on Earth survival guides and base builds!",
+            "",
+            "#Shorts #LastDayOnEarth #LDoE #SurvivalGaming #ZombieSurvival #ShortsFeed",
+        ])
+
+        description = "\n".join(desc_lines)
+        tags = [
+            "Shorts",
+            "Last Day on Earth",
+            "LDoE",
+            "Last Day on Earth Survival",
+            "Survival Gaming",
+            "Zombie Survival",
+            "Mobile Gaming",
+            "ShortsFeed",
+        ]
+
+        actual_privacy = "private" if publish_at else privacy_status
+
+        return VideoPublishMetadata(
+            title=raw_title,
+            description=description,
+            tags=tags,
+            category_id="20",
+            privacy_status=actual_privacy,
+            episode_number=episode_number,
+            publish_at=publish_at,
+        )
+
+    def extract_and_render_companion_short(
+        self,
+        source_video_path: Path,
+        output_path: Optional[Path] = None,
+        events: Optional[List[Any]] = None,
+        episode_number: Optional[int] = None,
+        duration: float = 35.0,
+    ) -> Tuple[Path, Dict[str, Any]]:
+        """Extracts the peak viral moment from the source video and renders a 9:16 vertical Short."""
+        if not source_video_path.exists():
+            raise VideoProcessingError(
+                operation="extract_and_render_companion_short",
+                root_cause=f"Source video not found: {source_video_path}",
+                recovery_action="Ensure source video is rendered before extracting Short.",
+                file_path=str(source_video_path),
+            )
+
+        viral_info = self.auto_detect_viral_moment(events=events, min_start=30.0, default_duration=duration)
+        start_time = float(viral_info.get("start_time", 30.0))
+        clip_duration = float(viral_info.get("duration", duration))
+        headline = str(viral_info.get("headline", "LAST DAY ON EARTH"))
+        subtitle = str(viral_info.get("subtitle", "SURVIVAL INTENSIFIES"))
+
+        if not output_path:
+            ep_tag = f"_ep{episode_number}" if episode_number else ""
+            target_output = self.output_dir / f"short{ep_tag}_{source_video_path.stem}.mp4"
+        else:
+            target_output = output_path
+
+        rendered_short = self.generate_short(
+            input_video=source_video_path,
+            output_path=target_output,
+            start_time=start_time,
+            duration=clip_duration,
+            headline=headline,
+            subtitle=subtitle,
+            episode_number=episode_number,
+        )
+
+        return rendered_short, viral_info

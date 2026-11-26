@@ -116,6 +116,9 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
     - Option A (Cinematic Bumper): Generates 3.5s bumper with dark vignette, series headers, verified Survivor Dossier card (`adistar656 | #9045 | Stark029`), and smooth 0.5s crossfade into gameplay. Intro audio is disabled by default (`INTRO_AUDIO_ENABLED=false`) to ensure the unified `CommentaryEngine` voice (`en-US-GuyNeural`) speaks without voice collisions or double intros.
     - Option B (HUD Overlay): Dynamic tactical HUD header banner fading into gameplay with 0.8s alpha decay.
     - Cross-platform dynamic font loader automatically resolving fonts across Windows (`impact.ttf`, `arialbd.ttf`) and Linux (`liberation`, `dejavu`).
+  - `ShortsGenerator` (`src/processor/shorts_generator.py`):
+    - Automatically extracts 30–50s peak viral moments (boss fights, panic escapes, red crate loot) and renders 1080x1920 vertical videos with blurred backdrop, branded header/footer overlays, and full episode CTA links.
+    - Integrated directly into `src/main.py` (Step 5.5) with non-blocking error boundaries and delayed scheduled release (+8h) to funnel mobile viewers into the main episode playlist.
   - `Silent Mode Defense (`mute_raw_audio`)`: Eliminates microphone ambient noise and rogue audio leakage by routing isolated royalty-free background music directly when gaming in silent mode (`MUTE_RAW_AUDIO=true`).
   - `OutroTailGenerator` (`src/processor/outro_generator.py`): Generates 5–8 second high-energy 1080p animated outro videos featuring interactive dynamic buttons (Like, Share, Subscribe, Bell) with visual cursor interaction, neon pulse effects, and energetic audio stings.
   - `EndScreenGenerator` (`src/processor/endscreen_generator.py`): Visual template slate generator matching YouTube interactive card layout dimensions.
