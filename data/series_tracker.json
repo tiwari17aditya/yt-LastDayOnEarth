@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 148,
+  "current_episode": 149,
   "completed_episodes": [
     {
       "episode": 1,
@@ -999,6 +999,13 @@
       "video_id": "SD5SqkxL3yI",
       "youtube_url": "https://youtu.be/SD5SqkxL3yI",
       "job_id": "SD5SqkxL3yI"
+    },
+    {
+      "episode": 148,
+      "title": "Crooked Creek Farm Clearing & Combat! | LDoE Survival #148",
+      "video_id": "_7s9LD3ElkU",
+      "youtube_url": "https://youtu.be/_7s9LD3ElkU",
+      "job_id": "_7s9LD3ElkU"
     }
   ]
 }
