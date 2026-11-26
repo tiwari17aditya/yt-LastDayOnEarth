@@ -54,6 +54,7 @@ scratch/
 output/
 downloads/
 data/shorts/
+data/samples/
 *.mp4
 *.mkv
 *.mov

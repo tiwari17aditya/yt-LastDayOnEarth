@@ -1148,6 +1148,7 @@ class CommentaryEngine:
             f"volume={voice_volume_boost_db},loudnorm=I=-16:TP=-1.5:LRA=11"
         )
 
+        audio_codec = "libmp3lame" if output_audio_path.suffix.lower() == ".mp3" else "aac"
         if raw_game_audio and raw_game_audio.exists():
             filtergraph = (
                 f"[1:a]{soft_voice_filter},asplit=2[voice_sc][voice_mix];"
@@ -1163,7 +1164,7 @@ class CommentaryEngine:
                 "-i", str(raw_game_audio),
                 "-filter_complex", filtergraph,
                 "-map", "[aout]",
-                "-c:a", "aac",
+                "-c:a", audio_codec,
                 "-b:a", "256k",
             ]
         else:
@@ -1179,7 +1180,7 @@ class CommentaryEngine:
                 "-i", str(commentary_audio),
                 "-filter_complex", filtergraph,
                 "-map", "[aout]",
-                "-c:a", "aac",
+                "-c:a", audio_codec,
                 "-b:a", "256k",
             ]
 
@@ -1208,7 +1209,7 @@ class CommentaryEngine:
             "ffmpeg", "-y",
             "-i", str(raw_voice_audio),
             "-filter:a", soft_voice_filter,
-            "-c:a", "aac",
+            "-c:a", "libmp3lame" if output_audio_path.suffix.lower() == ".mp3" else "aac",
             "-b:a", "192k",
             str(output_audio_path),
         ]
