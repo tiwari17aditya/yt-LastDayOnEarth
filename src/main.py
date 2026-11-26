@@ -7,7 +7,7 @@ import shutil
 import sys
 import time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from src.config import get_settings
@@ -756,6 +756,93 @@ def run_pipeline(
                         },
                     )
 
+        # Step 5.5: Automated Companion YouTube Shorts Pipeline Hook (Priority 8)
+        companion_short_data = None
+        shorts_settings = getattr(settings, "shorts", None)
+        if shorts_settings and shorts_settings.enabled and output_path.exists():
+            logger.info("Step 5.5/6: Processing automated companion YouTube Short (9:16 vertical)")
+            try:
+                min_src_dur = getattr(shorts_settings, "min_video_duration_for_shorts", 60.0)
+                if video_duration >= min_src_dur:
+                    from src.processor.shorts_generator import ShortsGenerator
+                    shorts_gen = ShortsGenerator(output_dir=shorts_settings.output_dir)
+                    short_path, viral_meta = shorts_gen.extract_and_render_companion_short(
+                        source_video_path=output_path,
+                        events=events,
+                        episode_number=ep_num_for_publishing,
+                        duration=shorts_settings.duration,
+                    )
+                    short_youtube_url = "N/A (Local execution)"
+                    short_video_id = ""
+                    if not local_only and shorts_settings.upload_shorts and uploaded_to_youtube:
+                        short_publish_at = None
+                        if getattr(metadata, "publish_at", None):
+                            try:
+                                base_time = datetime.fromisoformat(metadata.publish_at.replace("Z", "+00:00"))
+                                delay = timedelta(hours=shorts_settings.schedule_delay_hours)
+                                short_publish_at = (base_time + delay).strftime("%Y-%m-%dT%H:%M:%SZ")
+                            except Exception as pe:
+                                logger.warning(f"Could not calculate publish_at for companion Short: {pe}")
+                        if not short_publish_at:
+                            delay = timedelta(hours=shorts_settings.schedule_delay_hours)
+                            short_publish_at = (datetime.now(timezone.utc) + delay).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+                        short_metadata = shorts_gen.build_shorts_metadata(
+                            headline=viral_meta.get("headline", "LAST DAY ON EARTH"),
+                            subtitle=viral_meta.get("subtitle", "SURVIVAL INTENSIFIES"),
+                            episode_number=ep_num_for_publishing,
+                            main_video_url=youtube_url,
+                            playlist_url=getattr(settings.youtube, "playlist_title", None),
+                            publish_at=short_publish_at,
+                            privacy_status=shorts_settings.privacy_status,
+                        )
+
+                        logger.info(f"Uploading companion YouTube Short to YouTube: {short_path.name}")
+                        short_youtube_url = publisher.upload_video(short_path, short_metadata)
+                        if short_youtube_url and "youtu" in short_youtube_url:
+                            cleaned_sid = short_youtube_url.rstrip("/").split("/")[-1].split("?v=")[-1]
+                            if cleaned_sid and cleaned_sid not in ("N/A (Local execution)", "mock_ldoe_video"):
+                                short_video_id = cleaned_sid
+                                try:
+                                    if hasattr(publisher, "post_engagement_comment"):
+                                        publisher.post_engagement_comment(
+                                            video_id=short_video_id,
+                                            episode_number=ep_num_for_publishing,
+                                            events=events,
+                                            clan_name=getattr(settings.processing, "ldoe_clan_name", "Stark029"),
+                                            player_id=getattr(settings.processing, "ldoe_player_id", "#9045"),
+                                            playlist_url=youtube_url,
+                                        )
+                                except Exception as pce:
+                                    logger.warning(
+                                        f"Could not post engagement comment on Short {short_video_id}: {pce}"
+                                    )
+
+                    companion_short_data = {
+                        "path": str(short_path),
+                        "youtube_url": short_youtube_url,
+                        "video_id": short_video_id,
+                        "viral_moment": viral_meta,
+                    }
+                    logger.info(f"Companion YouTube Short processed successfully: {short_youtube_url}")
+                else:
+                    logger.info(
+                        f"Video duration ({video_duration:.1f}s) is below threshold "
+                        f"({min_src_dur:.1f}s) for Shorts; skipping."
+                    )
+            except Exception as se:
+                logger.warning(
+                    f"Automated companion Short generation degraded: {se}. Main long-form video unaffected.",
+                    extra_data={
+                        "operation": "generate_companion_short",
+                        "component": "ShortsGenerator",
+                        "file": str(output_path),
+                        "root_cause": str(se),
+                        "recovery_action": "Check FFmpeg filters or disk space. Main video is preserved.",
+                        "status": "DEGRADED",
+                    },
+                )
+
         # Step 6: History Logging & Notifications
         logger.info("Step 6/6: Recording job execution to history")
         if not video_id and youtube_url and "youtu" in youtube_url:
@@ -788,6 +875,7 @@ def run_pipeline(
                     "privacy_redacted": blur_filter is not None,
                     "ads_removed_count": len(detected_ads),
                     "ads_removed": [a.to_dict() for a in detected_ads],
+                    "companion_short": companion_short_data,
                 },
             )
         except Exception as he:
@@ -812,6 +900,7 @@ def run_pipeline(
                     "soundtrack_tracks": [t["title"] for t in track_sequence],
                     "scheduled_release": scheduled_slot_ist_str or "Immediate",
                     "privacy_status": metadata.privacy_status,
+                    "companion_short": companion_short_data.get("youtube_url") if companion_short_data else None,
                 },
             )
         except Exception as ne:
