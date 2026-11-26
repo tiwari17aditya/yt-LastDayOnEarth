@@ -113,7 +113,7 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
 - **Components**:
   - `VideoProcessor`: Single-pass composite FFmpeg rendering pipeline synthesizing resolution normalization, blur filters, subtitle burning, background music ducking, and outro tail concatenation in a single filter graph, with fallback to two-pass stitching (`append_outro_tail`).
   - `IntroGenerator` (`src/processor/intro_generator.py`):
-    - Option A (Cinematic Bumper): Generates 3.5s bumper with dark vignette, series headers, verified Survivor Dossier card (`adistar656 | #9045 | Stark029`), and smooth 0.5s crossfade into gameplay.
+    - Option A (Cinematic Bumper): Generates 3.5s bumper with dark vignette, series headers, verified Survivor Dossier card (`adistar656 | #9045 | Stark029`), and smooth 0.5s crossfade into gameplay. Intro audio is disabled by default (`INTRO_AUDIO_ENABLED=false`) to ensure the unified `CommentaryEngine` voice (`en-US-GuyNeural`) speaks without voice collisions or double intros.
     - Option B (HUD Overlay): Dynamic tactical HUD header banner fading into gameplay with 0.8s alpha decay.
     - Cross-platform dynamic font loader automatically resolving fonts across Windows (`impact.ttf`, `arialbd.ttf`) and Linux (`liberation`, `dejavu`).
   - `Silent Mode Defense (`mute_raw_audio`)`: Eliminates microphone ambient noise and rogue audio leakage by routing isolated royalty-free background music directly when gaming in silent mode (`MUTE_RAW_AUDIO=true`).

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.19.2] - 2026-11-26
+
+### Fixed
+- **Voice Collision & Accents Mismatch Elimination (`src/processor/video_processor.py`, `src/config.py`, `scripts/generate_prebaked_intros.py`)**:
+  - Eliminated the dual-voice collision where an unconfigured bumper intro unconditionally loaded Hinglish prebaked audio voiced by `en-IN-PrabhatNeural` ("Yo survivors... Aaj hum Bunker Alfa raid karenge") while the primary walkthrough commentary ran on `en-US-GuyNeural`.
+  - Added `intro_audio_enabled: bool = False` to `ProcessingSettings` (`src/config.py`). By default, the intro bumper remains visual-only with synchronized background audio and gameplay delay, allowing the single canonical series voice (`en-US-GuyNeural`) to deliver the walkthrough intro naturally without collisions.
+  - Added `intro_audio_language: str = "en"` defaulting to English if bumper audio is explicitly enabled, preventing accidental Hinglish injection into English series uploads.
+  - Harmonized `scripts/generate_prebaked_intros.py` English variants to synthesize using `en-US-GuyNeural` at broadcast-calibrated `-17.0 LUFS` so any prebaked audio matches the series walkthrough voice.
+  - Conducted historical audit identifying exactly 11 episodes (#138–#148) published with the bumper audio feature since commit `9d4a985`.
+
 ## [1.19.1] - 2026-11-25
 
 ### Fixed

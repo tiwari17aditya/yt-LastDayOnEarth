@@ -195,6 +195,12 @@ class ProcessingSettings(BaseModel):
     intro_bg_path: Path = Field(
         default_factory=lambda: Path(os.getenv("INTRO_BG_PATH", "assets/backgrounds/ldoe_cover_art.jpg"))
     )
+    intro_audio_enabled: bool = Field(
+        default_factory=lambda: os.getenv("INTRO_AUDIO_ENABLED", "false").lower() == "true"
+    )
+    intro_audio_language: str = Field(
+        default_factory=lambda: os.getenv("INTRO_AUDIO_LANGUAGE", "en")
+    )
     remove_idle_segments: bool = Field(
         default_factory=lambda: os.getenv("REMOVE_IDLE_SEGMENTS", "true").lower() == "true"
     )

@@ -600,6 +600,8 @@ def run_pipeline(
                     clan_name=getattr(settings.processing, "ldoe_clan_name", "Stark029"),
                     duration=getattr(settings.processing, "intro_duration", 3.5),
                     preset=settings.processing.video_preset,
+                    intro_audio_enabled=getattr(settings.processing, "intro_audio_enabled", False),
+                    intro_audio_language=getattr(settings.processing, "intro_audio_language", "en"),
                 )
                 if staged_intro_path.exists() and staged_intro_path.stat().st_size > 0:
                     shutil.move(str(staged_intro_path), str(output_path))

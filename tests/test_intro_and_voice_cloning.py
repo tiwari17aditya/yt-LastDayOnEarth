@@ -1,9 +1,7 @@
 """Unit tests for Intro Screen Generation, Profile Branding, and Resilient Voice Cloning Client."""
 
-import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-import pytest
 
 from src.config import get_settings
 from src.processor.intro_generator import IntroGenerator, escape_drawtext, resolve_system_font
@@ -61,10 +59,17 @@ def test_intro_generator_overlay_filters():
 
 def test_intro_generator_prebaked_intro_selection():
     gen = IntroGenerator(intros_dir=Path("assets/audio/intros"))
-    audio = gen.get_prebaked_intro_audio(language="hi")
-    assert audio is not None
-    assert audio.exists()
-    assert audio.suffix == ".mp3"
+    audio_hi = gen.get_prebaked_intro_audio(language="hi")
+    assert audio_hi is not None
+    assert audio_hi.exists()
+    assert audio_hi.suffix == ".mp3"
+    assert "hinglish" in audio_hi.name
+
+    audio_en = gen.get_prebaked_intro_audio(language="en")
+    assert audio_en is not None
+    assert audio_en.exists()
+    assert audio_en.suffix == ".mp3"
+    assert "english" in audio_en.name
 
 
 def test_voice_cloning_client_unconfigured():
@@ -144,5 +149,79 @@ def test_config_player_profile_and_intro_defaults():
     assert settings.processing.ldoe_player_id == "#9045"
     assert settings.processing.ldoe_clan_name == "Stark029"
     assert settings.processing.intro_style in ["bumper", "overlay", "none"]
+    assert settings.processing.intro_audio_enabled is False
+    assert settings.processing.intro_audio_language == "en"
     assert "hi" in settings.commentary.multilingual_languages
 
+
+def test_video_processor_apply_intro_bumper_no_audio_by_default(tmp_path):
+    from src.processor.video_processor import VideoProcessor
+
+    proc = VideoProcessor(output_dir=tmp_path)
+    main_v = tmp_path / "main.mp4"
+    main_v.write_bytes(b"dummy video")
+    bg_img = tmp_path / "cover.jpg"
+    bg_img.write_bytes(b"dummy image")
+    out_v = tmp_path / "out.mp4"
+
+    captured_cmds = []
+
+    def mock_run(cmd, *args, **kwargs):
+        captured_cmds.append(cmd)
+        mock_res = MagicMock()
+        mock_res.returncode = 0
+        return mock_res
+
+    with patch("subprocess.run", side_effect=mock_run):
+        proc.apply_intro(
+            main_video=main_v,
+            output_video=out_v,
+            intro_style="bumper",
+            intro_bg_image=bg_img,
+            intro_audio_enabled=False,
+        )
+
+    assert len(captured_cmds) == 1
+    cmd = captured_cmds[0]
+    # Verify no audio input file is added as input 2
+    cmd_str = " ".join(cmd)
+    assert "[2:a]" not in cmd_str
+    assert "avoice" not in cmd_str
+    # Verify single audio track delay is used
+    assert "adelay=3000|3000" in cmd_str
+
+
+def test_video_processor_apply_intro_bumper_with_audio_when_enabled(tmp_path):
+    from src.processor.video_processor import VideoProcessor
+
+    proc = VideoProcessor(output_dir=tmp_path)
+    main_v = tmp_path / "main.mp4"
+    main_v.write_bytes(b"dummy video")
+    bg_img = tmp_path / "cover.jpg"
+    bg_img.write_bytes(b"dummy image")
+    out_v = tmp_path / "out.mp4"
+
+    captured_cmds = []
+
+    def mock_run(cmd, *args, **kwargs):
+        captured_cmds.append(cmd)
+        mock_res = MagicMock()
+        mock_res.returncode = 0
+        return mock_res
+
+    with patch("subprocess.run", side_effect=mock_run):
+        proc.apply_intro(
+            main_video=main_v,
+            output_video=out_v,
+            intro_style="bumper",
+            intro_bg_image=bg_img,
+            intro_audio_enabled=True,
+            intro_audio_language="en",
+        )
+
+    assert len(captured_cmds) == 1
+    cmd = captured_cmds[0]
+    cmd_str = " ".join(cmd)
+    # Audio input should be present and should be an English asset
+    assert "[2:a]" in cmd_str
+    assert "intro_english" in cmd_str

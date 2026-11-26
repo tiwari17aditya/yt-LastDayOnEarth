@@ -15,53 +15,71 @@ INTRO_SCRIPTS = [
     {
         "filename": "intro_hinglish_variant_1.mp3",
         "voice": VOICE,
+        "rate": "+12%",
+        "pitch": "+22Hz",
         "text": (
             "Yo survivors! Welcome back to Last Day on Earth. "
-            "Aaj hum Bunker Alfa raid karenge aur Stark029 clan ke saath epic loot secure karenge. Let's get right into the action!"
+            "Aaj hum Bunker Alfa raid karenge aur Stark029 clan ke saath "
+            "epic loot secure karenge. Let's get right into the action!"
         )
     },
     {
         "filename": "intro_hinglish_variant_2.mp3",
         "voice": VOICE,
+        "rate": "+12%",
+        "pitch": "+22Hz",
         "text": (
             "Hey what is up survivors! Welcome to Last Day on Earth. "
-            "Aaj ke survival mission me hum high-tier zones explore karenge aur Stark029 clan ke saath survival dominance banayenge. Let's roll!"
+            "Aaj ke survival mission me hum high-tier zones explore karenge "
+            "aur Stark029 clan ke saath survival dominance banayenge. Let's roll!"
         )
     },
     {
         "filename": "intro_hinglish_variant_3.mp3",
         "voice": VOICE,
+        "rate": "+12%",
+        "pitch": "+22Hz",
         "text": (
             "Welcome back survivors to Last Day on Earth! "
-            "Aaj ka episode full intense hone wala hai. Ready ho jao aur Stark029 clan ke saath full loot nikalte hain. Let's do this!"
+            "Aaj ka episode full intense hone wala hai. Ready ho jao aur "
+            "Stark029 clan ke saath full loot nikalte hain. Let's do this!"
         )
     },
     {
         "filename": "intro_english_variant_1.mp3",
-        "voice": "en-US-ChristopherNeural",
+        "voice": "en-US-GuyNeural",
+        "rate": "-3%",
+        "pitch": "-2Hz",
         "text": (
             "Yo survivors! Welcome back to Last Day on Earth. "
-            "Today we are raiding Bunker Alfa and securing top-tier loot with Clan Stark029. Let's get right into the action!"
+            "Today we are raiding Bunker Alfa and securing top-tier loot "
+            "with Clan Stark029. Let's get right into the action!"
         )
     },
     {
         "filename": "intro_english_variant_2.mp3",
-        "voice": "en-US-AndrewMultilingualNeural",
+        "voice": "en-US-GuyNeural",
+        "rate": "-3%",
+        "pitch": "-2Hz",
         "text": (
-            "Hey what's up survivors! Welcome back to another episode of Last Day on Earth with Clan Stark029. "
-            "Let's gear up and survive together!"
+            "Hey what's up survivors! Welcome back to another episode "
+            "of Last Day on Earth with Clan Stark029. Let's gear up and survive together!"
         )
     }
 ]
 
+
 async def generate_and_master(item):
     temp_file = INTRO_DIR / f"temp_{item['filename']}"
     target_file = INTRO_DIR / item["filename"]
-    
+
+    rate = item.get("rate", RATE)
+    pitch = item.get("pitch", PITCH)
+
     # Synthesize
-    comm = edge_tts.Communicate(item["text"], voice=item["voice"], rate=RATE, pitch=PITCH)
+    comm = edge_tts.Communicate(item["text"], voice=item["voice"], rate=rate, pitch=pitch)
     await comm.save(str(temp_file))
-    
+
     # Master to broadcast standard -17.0 LUFS with crisp gaming EQ
     af = (
         "highpass=f=80,"
@@ -78,12 +96,13 @@ async def generate_and_master(item):
     temp_file.unlink(missing_ok=True)
     print(f"Mastered intro: {target_file.name} ({target_file.stat().st_size} bytes)")
 
+
 async def main():
     print(f"Generating {len(INTRO_SCRIPTS)} pre-baked intro audio files in {INTRO_DIR}...")
     tasks = [generate_and_master(item) for item in INTRO_SCRIPTS]
     await asyncio.gather(*tasks)
     print("All pre-baked intros successfully generated and mastered to -17 LUFS!")
 
+
 if __name__ == "__main__":
     asyncio.run(main())
-

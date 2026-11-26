@@ -280,6 +280,8 @@ class VideoProcessor:
         clan_name: str = "Stark029",
         duration: float = 3.5,
         preset: str = "veryfast",
+        intro_audio_enabled: bool = False,
+        intro_audio_language: str = "en",
     ) -> Path:
         """Applies either a Cinematic Intro Bumper (Option A) or an In-Game HUD Overlay (Option B)."""
         from src.processor.intro_generator import IntroGenerator
@@ -298,8 +300,13 @@ class VideoProcessor:
         )
 
         audio_file = intro_audio
-        if not audio_file or not Path(audio_file).exists():
-            audio_file = generator.get_prebaked_intro_audio(language="hi")
+        if audio_file and not Path(audio_file).exists():
+            audio_file = None
+
+        if not audio_file and intro_audio_enabled:
+            audio_file = generator.get_prebaked_intro_audio(language=intro_audio_language)
+        elif not intro_audio_enabled:
+            audio_file = None
 
         output_video.parent.mkdir(parents=True, exist_ok=True)
 
