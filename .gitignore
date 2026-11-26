@@ -53,6 +53,7 @@ tmp/
 scratch/
 output/
 downloads/
+data/shorts/
 *.mp4
 *.mkv
 *.mov
