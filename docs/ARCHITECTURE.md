@@ -26,7 +26,7 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
  │ 2. Privacy Guard: Redacts real phone/OS popups (preserves HUD/username)    │
  │ 3. Gameplay AI: 1-sec sleek action cues ("Global Map", "Crafting", etc.)   │
  │ 4. Audio Engine: CC-BY 4.0 tracks with dynamic sidechain ducking           │
- │ 5. Commentary Engine: Edge-TTS neural commentary walkthrough + downtime    │
+ │ 5. Commentary Engine: Edge-TTS neural commentary walkthrough (Hinglish/English switch) │
  │ 6. Video Processor: FFmpeg composite render (veryfast preset, 60fps)        │
  │ 7. Queue Manager: Calculates next open slot (2/day weekdays, 3/day weekends)│
  │ 8. Publisher: YouTube Data API v3 upload as Private with native publishAt  │

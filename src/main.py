@@ -435,6 +435,7 @@ def run_pipeline(
                 commentary_output_path = settings.processing.temp_dir / f"{input_video_path.stem}_commentary_master.m4a"
 
                 current_ep_num = title_mgr.get_current_episode()
+                active_lang = getattr(settings.commentary, "language", "hi")
 
                 final_commentary_track = commentary_engine.generate_commentary_track(
                     duration=video_duration,
@@ -448,6 +449,10 @@ def run_pipeline(
                     bgm_volume_db=getattr(settings.commentary, "bgm_volume_db", "-22dB"),
                     ducking_ratio=getattr(settings.commentary, "ducking_ratio", 3.5),
                     min_cue_interval=getattr(settings.commentary, "min_cue_interval", 25.0),
+                    language=active_lang,
+                    voice=settings.commentary.effective_voice,
+                    rate=settings.commentary.effective_rate,
+                    pitch=settings.commentary.effective_pitch,
                 )
 
                 if final_commentary_track and final_commentary_track.exists():
@@ -458,20 +463,29 @@ def run_pipeline(
                         logger.info(f"Attached synchronized commentary subtitles for video render: {sub_path}")
                     logger.info(
                         f"AI voice commentary synthesized and attached successfully: {music_file}",
-                        extra_data={"duration": video_duration, "persona": persona_enum.value},
+                        extra_data={
+                            "duration": video_duration,
+                            "persona": persona_enum.value,
+                            "language": active_lang,
+                            "voice": settings.commentary.effective_voice,
+                        },
                     )
 
-                    # Multi-Lingual Companion Dubs & Closed Captions (German, Spanish, Russian, French)
+                    # Multi-Lingual Companion Dubs & Closed Captions (German, Spanish, Russian, French, English)
                     caption_tracks = {}
-                    en_srt = final_commentary_track.with_suffix(".srt")
-                    if en_srt.exists():
-                        caption_tracks["en"] = (en_srt, "English (Original Walkthrough)")
+                    primary_srt = final_commentary_track.with_suffix(".srt")
+                    if primary_srt.exists():
+                        if active_lang in ("hi", "hinglish"):
+                            caption_tracks["hi"] = (primary_srt, "Hindi / Hinglish (Audio Walkthrough)")
+                        else:
+                            caption_tracks["en"] = (primary_srt, "English (Original Walkthrough)")
 
                     if getattr(settings.commentary, "multilingual_enabled", True) and getattr(commentary_engine, "last_cues", None):
                         try:
                             logger.info("Generating multi-lingual companion audio tracks and closed captions...")
                             multilingual_dir = settings.processing.output_dir / "multilingual" / f"ep_{current_ep_num}"
-                            target_langs = getattr(settings.commentary, "multilingual_languages", ["de", "es", "ru", "fr"])
+                            all_configured = getattr(settings.commentary, "multilingual_languages", ["de", "es", "ru", "fr", "hi"])
+                            target_langs = [l for l in all_configured if l != active_lang]
                             bgm_track_file = stitched_audio_path if ('stitched_audio_path' in locals() and stitched_audio_path.exists()) else None
                             multi_pkg = commentary_engine.generate_multilingual_package(
                                 duration=video_duration,
@@ -487,6 +501,8 @@ def run_pipeline(
                                 "es": "Español (Subtítulos en español)",
                                 "ru": "Русский (Русские субтитры)",
                                 "fr": "Français (Sous-titres français)",
+                                "en": "English (English Subtitles)",
+                                "hi": "Hindi (Hindi Subtitles)",
                             }
                             for lang_code, lang_assets in multi_pkg.items():
                                 if "srt" in lang_assets and lang_assets["srt"].exists():

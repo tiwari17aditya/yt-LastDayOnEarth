@@ -219,6 +219,9 @@ class CommentarySettings(BaseModel):
     enabled: bool = Field(
         default_factory=lambda: os.getenv("ENABLE_VOICE_COMMENTARY", "true").lower() == "true"
     )
+    language: str = Field(
+        default_factory=lambda: os.getenv("COMMENTARY_LANGUAGE", "hi").lower().strip()
+    )
     persona: str = Field(default_factory=lambda: os.getenv("COMMENTARY_PERSONA", "casual"))
     voice: str = Field(default_factory=lambda: os.getenv("COMMENTARY_VOICE", "en-US-GuyNeural"))
     rate: str = Field(default_factory=lambda: os.getenv("COMMENTARY_RATE", "-3%"))
@@ -264,6 +267,32 @@ class CommentarySettings(BaseModel):
     regional_hinglish_pitch: str = Field(
         default_factory=lambda: os.getenv("REGIONAL_HINGLISH_PITCH", "+22Hz")
     )
+
+    @property
+    def effective_voice(self) -> str:
+        """Resolve the active synthesis voice based on language switch and voice overrides."""
+        explicit_voice = os.getenv("COMMENTARY_VOICE")
+        if self.language in ("hi", "hinglish"):
+            if explicit_voice and any(explicit_voice.startswith(p) for p in ("en-IN-", "hi-IN-", "hi-")):
+                return explicit_voice
+            return self.regional_hinglish_voice
+        return explicit_voice if explicit_voice else self.voice
+
+    @property
+    def effective_rate(self) -> str:
+        """Resolve the active speech rate based on language switch."""
+        explicit_rate = os.getenv("COMMENTARY_RATE")
+        if self.language in ("hi", "hinglish"):
+            return os.getenv("REGIONAL_HINGLISH_RATE") or self.regional_hinglish_rate
+        return explicit_rate if explicit_rate else self.rate
+
+    @property
+    def effective_pitch(self) -> str:
+        """Resolve the active speech pitch based on language switch."""
+        explicit_pitch = os.getenv("COMMENTARY_PITCH")
+        if self.language in ("hi", "hinglish"):
+            return os.getenv("REGIONAL_HINGLISH_PITCH") or self.regional_hinglish_pitch
+        return explicit_pitch if explicit_pitch else self.pitch
 
 
 class ShortsSettings(BaseModel):

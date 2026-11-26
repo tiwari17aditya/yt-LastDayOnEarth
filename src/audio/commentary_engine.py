@@ -118,6 +118,13 @@ REGIONAL_VOICE_MAP: Dict[str, Dict[str, str]] = {
         "pitch": os.getenv("REGIONAL_HINGLISH_PITCH", "+22Hz"),
         "volume": "+0%",
     },
+    "en": {
+        "voice": "en-US-GuyNeural",
+        "name": "English",
+        "rate": "-3%",
+        "pitch": "-2Hz",
+        "volume": "+0%",
+    },
 }
 
 
@@ -377,6 +384,191 @@ PROCEDURAL_TACTICAL_TOPICS = [
     },
 ]
 
+# Comprehensive pool of procedural commentary dialogue in authentic conversational Hinglish (Latin / Romanized script)
+PROCEDURAL_CASUAL_TOPICS_HINGLISH = [
+    {
+        "category": "inventory",
+        "topic": "Storage & Inventory Sorting",
+        "text": "Bahar zone me nikalne se pehle base ke chests organize karna bohot zaroori hai. Wood, ores aur weapons ke alag chests rakhne se bohot time save hota hai.",
+    },
+    {
+        "category": "progression",
+        "topic": "Base Evolution & Memories",
+        "text": "Apne base ko dekh ke yaad aata hai jab ye sirf ek chhota sa three-by-three wooden box tha ek campfire ke sath. Aaj dekho kitna evolve ho chuka hai apna setup.",
+    },
+    {
+        "category": "smelting",
+        "topic": "Smelter Fuel Efficiency",
+        "text": "Smelters check karte hain. Ek pro tip dosto: raw wood jalane se behtar hai wood se pehle charcoal banao, uski fuel efficiency bohot zyada hoti hai.",
+    },
+    {
+        "category": "defense",
+        "topic": "Honeycomb Wall Defense",
+        "text": "Base ka perimeter upgrade kar rahe hain. Level two wooden planks lagane se daily zombie horde ka damage kaafi had tak control ho jata hai.",
+    },
+    {
+        "category": "horde",
+        "topic": "Horde Pathing Mechanics",
+        "text": "Daily horde jab aati hai toh outer walls tod ke nikal jati hai. Isliye jab tak inner core strong na ho, outer boundary pe stone waste mat karna.",
+    },
+    {
+        "category": "combat",
+        "topic": "Sneak Attack Melee Strategy",
+        "text": "Sneak attack karke perimeter clear karte hain. First strike pe 3x triple damage milta hai, jisse weapons ki durability bohot lambi chalti hai.",
+    },
+    {
+        "category": "durability",
+        "topic": "Weapon Durability Economy",
+        "text": "Weapon durability hamesha manage karni chahiye. Easy zones me cheap cleaver ya wooden spear use karo, katana aur guns bunker ke Frenzied Giants ke liye bacha ke rakho.",
+    },
+    {
+        "category": "vehicle",
+        "topic": "Chopper Motorcycle Assembly",
+        "text": "Chopper par ek nazar dalte hain. Wheels, gas tank aur engine parts assemble karke bike complete karna LDoE ka sabse satisfying milestone hai.",
+    },
+    {
+        "category": "watchtower",
+        "topic": "Northern Watchtower & Oak",
+        "text": "Chopper banne ke baad generator ko northern watchtower le jao. Wahan watchtower activate karte hi oak clearings aur winter snow zones unlock ho jate hain.",
+    },
+    {
+        "category": "recycler",
+        "topic": "Recycler Scrap & Electronics",
+        "text": "Recycler continuous chal raha hai. Old batteries aur broken flashlights daal ke electronics level upgrade karo, free copper aur steel lene ka ye best tarika hai.",
+    },
+    {
+        "category": "companion",
+        "topic": "Canine Companion Breeding",
+        "text": "Dog crate me puppies ko feed karte hain. Dogs breed karke Bloodhound ya True Friend traits milna field me bohot bada passive advantage deta hai.",
+    },
+    {
+        "category": "true_friend",
+        "topic": "True Friend Dog Ability",
+        "text": "True Friend dog milne me time lagta hai, par jab dog zombies par attack karta hai aur bunker ke secret vents kholta hai, toh maza aa jata hai.",
+    },
+    {
+        "category": "scouting",
+        "topic": "Zone Scouting & Minimap Pacing",
+        "text": "Minimap par hamesha nazar rakho. Achanak spitters ya roaming zombie packs se ghirne se bachne ke liye position maintain karna bohot zaroori hai.",
+    },
+    {
+        "category": "spitters",
+        "topic": "Toxic Spitter Evasion",
+        "text": "Toxic spitters se door raho guys! Green spit ko side-step karo. Agar teen baar spit lag gaya toh survivor se smell aane lagti hai aur saare zombies sprint karne lagte hain.",
+    },
+    {
+        "category": "bunker",
+        "topic": "Bunker Alfa Ticket Farming",
+        "text": "Bunker Alfa ke combat tickets stock kar rahe hain. Green, yellow aur red tickets exchange karke military weapons aur tactical gear paane ka ye best source hai.",
+    },
+    {
+        "category": "wall_trick",
+        "topic": "Wall Trick Doorway Technique",
+        "text": "Doorway ke peeche wall trick practice karna LDoE me ammo bachane ka sabse bada secret hai. Zombie ke attack ke theek baad melee swing karo bina damage liye.",
+    },
+    {
+        "category": "farm",
+        "topic": "Crooked Creek Farm Strategy",
+        "text": "Crooked Creek Farm me ammo conserve karne ke liye Diseased Giants se bachke sneak karo, aur saw cutter se blue crate araam se bina shor ke kholo.",
+    },
+    {
+        "category": "ravager",
+        "topic": "Farm Ravager Boss Tactics",
+        "text": "Farm ke Ravager boss se ladte waqt jab wo spit karne ke liye ruke, toh uske charon taraf circle ghumo. Lateral movement se wo zero damage deta hai.",
+    },
+    {
+        "category": "gunsmith",
+        "topic": "Gunsmith Weapon Modding",
+        "text": "Gunsmith bench par weapons mod kar rahe hain. Red dot optics aur extended magazines lagate hi basic pistols bhi dangerous clearing weapons ban jati hain.",
+    },
+    {
+        "category": "police",
+        "topic": "Blackport PD Wave Defense",
+        "text": "Blackport PD yard ke liye prep. Consecutive waves survive karke bina armor waste kiye purple inspector badges nikalna main strategy hai.",
+    },
+    {
+        "category": "winter",
+        "topic": "Winter Zone Thermal Prep",
+        "text": "Cold zones ke liye warm fur armor ready hai. Freezing se attack speed slow ho jati hai, isliye thermal flasks aur fur suits mandatory hain.",
+    },
+    {
+        "category": "oak",
+        "topic": "Oak Forest Woodcraft",
+        "text": "Oak zones me hamesha iron hatchet leke jao. Regular stone hatchet se oak trees cut nahi hote, isliye iron tools zaroori hain.",
+    },
+    {
+        "category": "healer",
+        "topic": "Healer Buff Strategy",
+        "text": "Truck ke paas khade healer ko kabhi mat bhoolo. Five percent rare weapon drop buff ya full energy refill kisi bhi raid se pehle solid boost deta hai.",
+    },
+    {
+        "category": "sorting",
+        "topic": "Fast-Drop Inventory Sorting",
+        "text": "Base ke entrance par ek dump chest rakhna bohot helpful rehta hai. Zone se aate hi sara samaan turant drop karo aur baad me araam se sort karo.",
+    },
+    {
+        "category": "gear_check",
+        "topic": "Armor Conservation Discipline",
+        "text": "Armor waste mat karo. Basic resource gathering ke time full tactical armor mat pehno, durability ko hamesha serious combat ke liye bacha ke rakho.",
+    },
+    {
+        "category": "community",
+        "topic": "Community Milestone Question",
+        "text": "Aapka LDoE me current goal kya hai dosto? Bunker Alfa grind kar rahe ho, Chopper assemble kar rahe ho, ya stone base bana rahe ho? Comments me zaroor batana!",
+    },
+]
+
+PROCEDURAL_ENERGETIC_TOPICS_HINGLISH = [
+    {
+        "category": "hype",
+        "topic": "Adrenaline & Action Momentum",
+        "text": "Chalo survivors, full energy ke sath aage badhte hain! Best melee weapons equip hain aur full alert pe play kar rahe hain!",
+    },
+    {
+        "category": "craft",
+        "topic": "Furnace & Production Rush",
+        "text": "Dekho furnaces full speed me chal rahe hain! Base ki production 24/7 on hai, iron bars lagatar ban rahe hain!",
+    },
+    {
+        "category": "combat",
+        "topic": "Rapid Zombie Elimination",
+        "text": "Spitters aur fast biters close aa rahe hain! Move karte raho, ghirna nahi hai. Sneak attack ka hit kya zabardast laga!",
+    },
+    {
+        "category": "loot",
+        "topic": "High-Tier Crate Looting",
+        "text": "Ye high tier crate open karte hain... engine parts, weapon mods aur tickets! Kya kamaal ki loot mili hai!",
+    },
+    {
+        "category": "clutch",
+        "topic": "Bandage Hotkey Clutch Recovery",
+        "text": "Health thodi kam hui par bandages quick slot me hain! Turant heal kiya aur fight me wapas clutch entry!",
+    },
+]
+
+PROCEDURAL_TACTICAL_TOPICS_HINGLISH = [
+    {
+        "category": "tactical_rule",
+        "topic": "Durability & Weapon Economy",
+        "text": "Golden survival rule: har enemy encounter par weapon durability calculate karo. Normal zombies par guns waste mat karo, firearms sirf Frenzied Giants ke liye hain.",
+    },
+    {
+        "category": "base_layout",
+        "topic": "Honeycomb Perimeter Defense",
+        "text": "Base design me honeycomb layout use karein. Daily horde outer do-teen walls destroy karti hai par reinforced core tak kabhi nahi pahunch sakti.",
+    },
+    {
+        "category": "wall_trick",
+        "topic": "Doorframe Wall-Trick Technique",
+        "text": "Doorframe ke sath engagement spacing dekho. Perfect timing se wall trick karke incoming damage zero ho jata hai aur medical supplies bach jati hain.",
+    },
+    {
+        "category": "loot_priority",
+        "topic": "High-Value Item Prioritization",
+        "text": "Priority loot extract kiya. Common raw wood aur stone ki jagah hamesha red combat tickets, aluminum wire aur factory parts ko inventory me space do.",
+    },
+]
+
 
 class CommentaryEngine:
     """Orchestrates script synthesis, voice generation, timeline alignment, and audio ducking."""
@@ -385,10 +577,41 @@ class CommentaryEngine:
         self.temp_dir = temp_dir
         self.temp_dir.mkdir(parents=True, exist_ok=True)
         self.last_cues: List[CommentaryCue] = []
+        self.primary_language: str = "hi"
 
-    def get_persona_config(self, persona: CommentaryPersona) -> PersonaConfig:
-        """Retrieve voice parameters for a specific persona."""
-        return PERSONA_PROFILES.get(persona, PERSONA_PROFILES[CommentaryPersona.CASUAL])
+    def get_persona_config(
+        self,
+        persona: CommentaryPersona,
+        language: str = "en",
+        voice: Optional[str] = None,
+        rate: Optional[str] = None,
+        pitch: Optional[str] = None,
+    ) -> PersonaConfig:
+        """Retrieve voice parameters for a specific persona and language."""
+        base_profile = PERSONA_PROFILES.get(persona, PERSONA_PROFILES[CommentaryPersona.CASUAL])
+        target_lang = (language or "en").lower().strip()
+
+        if target_lang in ("hi", "hinglish"):
+            target_voice = voice or os.getenv("REGIONAL_HINGLISH_VOICE", "en-IN-PrabhatNeural")
+            target_rate = rate or os.getenv("REGIONAL_HINGLISH_RATE", "+12%")
+            target_pitch = pitch or os.getenv("REGIONAL_HINGLISH_PITCH", "+22Hz")
+            return PersonaConfig(
+                persona=persona,
+                voice=target_voice,
+                rate=target_rate,
+                pitch=target_pitch,
+                volume=base_profile.volume,
+                description=f"Hinglish ({persona.value}) companion voice",
+            )
+
+        return PersonaConfig(
+            persona=persona,
+            voice=voice or base_profile.voice,
+            rate=rate or base_profile.rate,
+            pitch=pitch or base_profile.pitch,
+            volume=base_profile.volume,
+            description=base_profile.description,
+        )
 
     def generate_script(
         self,
@@ -397,68 +620,119 @@ class CommentaryEngine:
         episode_number: Optional[int] = None,
         persona: CommentaryPersona = CommentaryPersona.CASUAL,
         min_cue_interval: float = 25.0,
+        language: str = "hi",
     ) -> List[CommentaryCue]:
         """Synthesizes high-engagement, domain-grounded LDoE commentary cues matching video duration.
         
         Dynamically distributes cues across the timeline with comfortable breathing room,
         grounding dialogue in detected gameplay events or procedural survival walkthrough topics.
+        Supports both English and authentic Hinglish dialogue.
         Ensures continuous, interactive commentary during roaming and free-play downtime.
         """
         ep_label = f"Episode {episode_number}" if episode_number else "our survival series"
         cues: List[CommentaryCue] = []
+        is_hinglish = (language or "en").lower().strip() in ("hi", "hinglish")
 
         # 1. Intro Hook (starts at 2.0s)
-        if persona == CommentaryPersona.SOFT:
-            intro_text = (
-                f"Hey everyone, welcome back to Last Day on Earth. This is {ep_label}, and today we're taking a relaxed, "
-                "steady pace through our base routine, organizing supplies, and heading out into the wasteland. Let's get comfortable and get to it."
-            )
-            intro_topic = "Soothing Intro & Base Routine"
-        elif persona == CommentaryPersona.CASUAL:
-            intro_text = (
-                f"Hey everyone, welcome back to Last Day on Earth! In {ep_label}, we're diving into base optimization, "
-                "stocking up on essential survival supplies, and heading out into the wasteland. Let's see what we can accomplish today."
-            )
-            intro_topic = "Introduction & Base Prep"
-        elif persona == CommentaryPersona.ENERGETIC:
-            intro_text = (
-                f"What is up survivors! Welcome back to Last Day on Earth, {ep_label}! Today we are gearing up, "
-                "raiding deep into zombie territory, and testing our base defenses. Let's get right into it!"
-            )
-            intro_topic = "High-Energy Intro & Objectives"
-        else:  # TACTICAL
-            intro_text = (
-                f"Welcome survivors. This is {ep_label} of our Last Day on Earth strategic walkthrough. "
-                "Today's focus is resource economy, defense optimization, and risk-managed clearing."
-            )
-            intro_topic = "Strategic Mission Briefing"
+        if is_hinglish:
+            if persona == CommentaryPersona.SOFT:
+                intro_text = (
+                    f"Hey survivors, welcome back to Last Day on Earth. Aaj {ep_label} me hum ek relaxed aur steady pace me "
+                    "base routine handle karenge, supplies organize karenge aur wasteland me safe zone explore karenge. Shanti se survive karte hain."
+                )
+                intro_topic = "Soothing Intro & Base Routine"
+            elif persona == CommentaryPersona.CASUAL:
+                intro_text = (
+                    f"Hey survivors, welcome back to Last Day on Earth! Aaj {ep_label} me hum base optimize karenge, "
+                    "essential supplies stock karenge, aur wasteland explore karenge. Dekhte hain aaj ka run kaisa rehta hai!"
+                )
+                intro_topic = "Introduction & Base Prep"
+            elif persona == CommentaryPersona.ENERGETIC:
+                intro_text = (
+                    f"Kese ho survivors! Swagat hai Last Day on Earth ke {ep_label} me! Aaj full action hone wala hai, "
+                    "zombies ko pelenge aur base defense test karenge. Chalo shuru karte hain!"
+                )
+                intro_topic = "High-Energy Intro & Objectives"
+            else:  # TACTICAL
+                intro_text = (
+                    f"Welcome survivors. Ye hai Last Day on Earth ka {ep_label}. Aaj ka mission hai resource economy, "
+                    "defense optimization aur risk-managed clearing. Let's execute the strategy."
+                )
+                intro_topic = "Strategic Mission Briefing"
+        else:
+            if persona == CommentaryPersona.SOFT:
+                intro_text = (
+                    f"Hey everyone, welcome back to Last Day on Earth. This is {ep_label}, and today we're taking a relaxed, "
+                    "steady pace through our base routine, organizing supplies, and heading out into the wasteland. Let's get comfortable and get to it."
+                )
+                intro_topic = "Soothing Intro & Base Routine"
+            elif persona == CommentaryPersona.CASUAL:
+                intro_text = (
+                    f"Hey everyone, welcome back to Last Day on Earth! In {ep_label}, we're diving into base optimization, "
+                    "stocking up on essential survival supplies, and heading out into the wasteland. Let's see what we can accomplish today."
+                )
+                intro_topic = "Introduction & Base Prep"
+            elif persona == CommentaryPersona.ENERGETIC:
+                intro_text = (
+                    f"What is up survivors! Welcome back to Last Day on Earth, {ep_label}! Today we are gearing up, "
+                    "raiding deep into zombie territory, and testing our base defenses. Let's get right into it!"
+                )
+                intro_topic = "High-Energy Intro & Objectives"
+            else:  # TACTICAL
+                intro_text = (
+                    f"Welcome survivors. This is {ep_label} of our Last Day on Earth strategic walkthrough. "
+                    "Today's focus is resource economy, defense optimization, and risk-managed clearing."
+                )
+                intro_topic = "Strategic Mission Briefing"
 
         cues.append(CommentaryCue(start_time=2.0, text=intro_text, style=persona, topic=intro_topic))
 
         # 2. Outro Hook (starts ~20-22s before end)
         outro_time = max(15.0, duration - 22.0)
-        if persona == CommentaryPersona.SOFT:
-            outro_text = (
-                "Thank you so much for relaxing and spending some time with me on today's episode. If you enjoyed this calm walkthrough, "
-                "please leave a gentle like, subscribe to keep following our survival progress, and let me know your thoughts down below. "
-                "Take care, and see you next time."
-            )
-        elif persona == CommentaryPersona.CASUAL:
-            outro_text = (
-                "Thanks so much for hanging out and watching today's episode! If you enjoyed this walkthrough, "
-                "please drop a thumbs up, subscribe to follow the journey, and drop a comment below with your favorite survival setup. "
-                "Catch you all in the next one!"
-            )
-        elif persona == CommentaryPersona.ENERGETIC:
-            outro_text = (
-                "What a run! Drop a like if you enjoyed today's raid, hit that subscribe button for daily survival guides, "
-                "and let me know in the comments: what's your go-to bunker weapon? See you in the next one!"
-            )
-        else:  # TACTICAL
-            outro_text = (
-                "That concludes today's tactical breakdown. Remember to subscribe for more in-depth LDoE raid guides, "
-                "and leave your questions in the comments below. Stay sharp out there."
-            )
+        if is_hinglish:
+            if persona == CommentaryPersona.SOFT:
+                outro_text = (
+                    "Thank you so much aaj ka calm aur relaxed episode dekhne ke liye. Agar ye walkthrough pasand aaya toh please like karein, "
+                    "channel subscribe karein aur apne suggestions comments me share karein. Take care, milte hain agle video me."
+                )
+            elif persona == CommentaryPersona.CASUAL:
+                outro_text = (
+                    "Aaj ka episode dekhne ke liye thank you so much dosto! Agar walkthrough pasand aaya toh video ko like karo, "
+                    "subscribe karo daily survival updates ke liye, aur comments me batao aapka favorite base setup. Milte hain agle episode me!"
+                )
+            elif persona == CommentaryPersona.ENERGETIC:
+                outro_text = (
+                    "Kya dhamakedar raid thi guys! Agar maza aaya toh like thoko, daily guides ke liye subscribe karo "
+                    "aur comments me batao: aapka favorite weapon kaunsa hai? Catch you in the next one!"
+                )
+            else:  # TACTICAL
+                outro_text = (
+                    "Ye tha aaj ka tactical gameplay. Aise aur LDoE strategy guides ke liye subscribe karein "
+                    "aur apne doubts comments me drop karein. Stay sharp out there."
+                )
+        else:
+            if persona == CommentaryPersona.SOFT:
+                outro_text = (
+                    "Thank you so much for relaxing and spending some time with me on today's episode. If you enjoyed this calm walkthrough, "
+                    "please leave a gentle like, subscribe to keep following our survival progress, and let me know your thoughts down below. "
+                    "Take care, and see you next time."
+                )
+            elif persona == CommentaryPersona.CASUAL:
+                outro_text = (
+                    "Thanks so much for hanging out and watching today's episode! If you enjoyed this walkthrough, "
+                    "please drop a thumbs up, subscribe to follow the journey, and drop a comment below with your favorite survival setup. "
+                    "Catch you all in the next one!"
+                )
+            elif persona == CommentaryPersona.ENERGETIC:
+                outro_text = (
+                    "What a run! Drop a like if you enjoyed today's raid, hit that subscribe button for daily survival guides, "
+                    "and let me know in the comments: what's your go-to bunker weapon? See you in the next one!"
+                )
+            else:  # TACTICAL
+                outro_text = (
+                    "That concludes today's tactical breakdown. Remember to subscribe for more in-depth LDoE raid guides, "
+                    "and leave your questions in the comments below. Stay sharp out there."
+                )
         outro_cue = CommentaryCue(start_time=round(outro_time, 1), text=outro_text, style=persona, topic="Episode Recap & Outro")
 
         # 3. Middle Dialogue Cues (continuous pacing across video timeline)
@@ -481,7 +755,7 @@ class CommentaryEngine:
                     ev_type = getattr(ev, "action_type", getattr(ev, "event_type", "nav"))
                     ev_desc = getattr(ev, "description", "")
 
-                    cue_text, cue_topic = self._format_event_cue(ev_type, ev_desc, persona)
+                    cue_text, cue_topic = self._format_event_cue(ev_type, ev_desc, persona, language=language)
                     event_cues.append(
                         CommentaryCue(
                             start_time=float(ev_time),
@@ -497,13 +771,22 @@ class CommentaryEngine:
             anchor_cues.sort(key=lambda c: c.start_time)
 
             # Step 2: Fill gaps continuously so roaming/free time has active strategy/advancement talk
-            procedural_topics = (
-                PROCEDURAL_CASUAL_TOPICS
-                if persona in (CommentaryPersona.CASUAL, CommentaryPersona.SOFT)
-                else PROCEDURAL_ENERGETIC_TOPICS
-                if persona == CommentaryPersona.ENERGETIC
-                else PROCEDURAL_TACTICAL_TOPICS
-            )
+            if is_hinglish:
+                procedural_topics = (
+                    PROCEDURAL_CASUAL_TOPICS_HINGLISH
+                    if persona in (CommentaryPersona.CASUAL, CommentaryPersona.SOFT)
+                    else PROCEDURAL_ENERGETIC_TOPICS_HINGLISH
+                    if persona == CommentaryPersona.ENERGETIC
+                    else PROCEDURAL_TACTICAL_TOPICS_HINGLISH
+                )
+            else:
+                procedural_topics = (
+                    PROCEDURAL_CASUAL_TOPICS
+                    if persona in (CommentaryPersona.CASUAL, CommentaryPersona.SOFT)
+                    else PROCEDURAL_ENERGETIC_TOPICS
+                    if persona == CommentaryPersona.ENERGETIC
+                    else PROCEDURAL_TACTICAL_TOPICS
+                )
 
             final_cues: List[CommentaryCue] = [anchor_cues[0]]
             topic_idx = 0
@@ -541,14 +824,76 @@ class CommentaryEngine:
         else:
             cues.append(outro_cue)
 
+        # Survivor Privacy Protection: Ensure username 'adistar656' is strictly NEVER spoken aloud
+        for c in cues:
+            if "adistar656" in c.text.lower():
+                c.text = re.sub(r"(?i)\badistar656\b", "survivor", c.text)
+
         # Sort cues strictly chronologically
         cues.sort(key=lambda c: c.start_time)
         return cues
 
-    def _format_event_cue(self, event_type: str, description: str, persona: CommentaryPersona) -> Tuple[str, str]:
+    def _format_event_cue(
+        self,
+        event_type: str,
+        description: str,
+        persona: CommentaryPersona,
+        language: str = "en",
+    ) -> Tuple[str, str]:
         """Adapts a gameplay event into natural persona dialogue and returns (dialogue_text, topic_heading)."""
         desc_clean = description.strip() if description else "this objective"
         ev_type = (event_type or "").lower()
+        is_hinglish = (language or "en").lower().strip() in ("hi", "hinglish")
+
+        if is_hinglish:
+            if persona in (CommentaryPersona.CASUAL, CommentaryPersona.SOFT):
+                if any(k in ev_type for k in ["combat", "fight", "attack", "kill"]):
+                    return (
+                        f"Enemy movement spot kiya: {desc_clean}. Araam se play karenge, damage avoid karke armor bacha rahe hain.",
+                        "Combat & Defense Strategy",
+                    )
+                elif any(k in ev_type for k in ["craft", "smelt", "furnace", "workshop", "build"]):
+                    return (
+                        f"Production check karte hain: {desc_clean}. Resources ready rakhna aur workbenches run karna zaroori hai.",
+                        "Crafting & Smelting Queue",
+                    )
+                elif any(k in ev_type for k in ["loot", "crate", "chest", "storage"]):
+                    return (
+                        f"Ye stash open kar rahe hain: {desc_clean}. Future base upgrades ke liye bilkul aise hi valuable items chahiye.",
+                        "High-Value Loot Recovery",
+                    )
+                elif any(k in ev_type for k in ["defense", "base", "wall", "spike"]):
+                    return (
+                        f"Base security strengthen kar rahe hain: {desc_clean}. Horde aane se pehle perimeter reinforce karna smart move hai.",
+                        "Base Defense & Fortifications",
+                    )
+                else:
+                    return (
+                        f"Agle objective ki taraf move kar rahe hain: {desc_clean}. Cautious rehna hai aur vitals hamesha top-up rakhne hain.",
+                        "Wasteland Exploration",
+                    )
+            elif persona == CommentaryPersona.ENERGETIC:
+                if any(k in ev_type for k in ["combat", "fight", "attack", "kill"]):
+                    return (
+                        f"Zombies spotted! {desc_clean}! Chalo inko turant finish karte hain!",
+                        "High-Intensity Combat",
+                    )
+                elif any(k in ev_type for k in ["loot", "crate", "chest"]):
+                    return (
+                        f"Zabardast loot: {desc_clean}! Pure value items mil gaye!",
+                        "Loot Crate Opening",
+                    )
+                else:
+                    return (
+                        f"Zone me aage badhte hue: {desc_clean}! Let's get it done!",
+                        "Fast-Paced Zone Push",
+                    )
+            else:  # TACTICAL
+                return (
+                    f"Tactical engagement sequence: {desc_clean}. Positioning maintain karte hue weapon durability monitor karenge.",
+                    "Tactical Objective Execution",
+                )
+
         if persona in (CommentaryPersona.CASUAL, CommentaryPersona.SOFT):
             if any(k in ev_type for k in ["combat", "fight", "attack", "kill"]):
                 return (
@@ -663,15 +1008,19 @@ class CommentaryEngine:
         self,
         cues: List[CommentaryCue],
         persona: CommentaryPersona = CommentaryPersona.CASUAL,
+        language: str = "en",
+        voice: Optional[str] = None,
+        rate: Optional[str] = None,
+        pitch: Optional[str] = None,
     ) -> List[CommentaryCue]:
         """Asynchronously synthesizes all commentary audio cues."""
-        config = self.get_persona_config(persona)
+        config = self.get_persona_config(persona, language=language, voice=voice, rate=rate, pitch=pitch)
         for idx, cue in enumerate(cues):
-            cue_file = self.temp_dir / f"cue_{persona.value}_{idx:03d}.mp3"
+            cue_file = self.temp_dir / f"cue_{language}_{persona.value}_{idx:03d}.mp3"
             dur = await self._synthesize_single_cue(cue, config, cue_file)
             if dur > 0.0:
                 logger.info(
-                    f"Generated {persona.value} commentary cue #{idx+1} ({dur:.2f}s) at offset {cue.start_time:.1f}s"
+                    f"Generated {language.upper()} {persona.value} commentary cue #{idx+1} ({dur:.2f}s) at offset {cue.start_time:.1f}s"
                 )
         return cues
 
@@ -679,9 +1028,22 @@ class CommentaryEngine:
         self,
         cues: List[CommentaryCue],
         persona: CommentaryPersona = CommentaryPersona.CASUAL,
+        language: str = "en",
+        voice: Optional[str] = None,
+        rate: Optional[str] = None,
+        pitch: Optional[str] = None,
     ) -> List[CommentaryCue]:
         """Synchronous wrapper for synthesize_all_cues_async."""
-        return asyncio.run(self.synthesize_all_cues_async(cues, persona))
+        return asyncio.run(
+            self.synthesize_all_cues_async(
+                cues=cues,
+                persona=persona,
+                language=language,
+                voice=voice,
+                rate=rate,
+                pitch=pitch,
+            )
+        )
 
     def build_timeline_commentary_track(
         self,
@@ -962,9 +1324,14 @@ class CommentaryEngine:
         ducking_ratio: float = 3.5,
         min_cue_interval: float = 25.0,
         raw_game_audio: Optional[Path] = None,
+        language: str = "hi",
+        voice: Optional[str] = None,
+        rate: Optional[str] = None,
+        pitch: Optional[str] = None,
     ) -> Path:
         """One-stop workflow: Generates script, synthesizes neural voice, and produces final master audio track."""
         try:
+            self.primary_language = language
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
             # 1. Script generation
@@ -974,11 +1341,21 @@ class CommentaryEngine:
                 episode_number=episode_number,
                 persona=persona,
                 min_cue_interval=min_cue_interval,
+                language=language,
             )
-            logger.info(f"Generated {len(cues)} commentary cues for duration {duration:.1f}s ({persona.value})")
+            logger.info(
+                f"Generated {len(cues)} commentary cues ({language.upper()}) for duration {duration:.1f}s ({persona.value})"
+            )
 
             # 2. Synthesis
-            self.synthesize_all_cues(cues, persona=persona)
+            self.synthesize_all_cues(
+                cues,
+                persona=persona,
+                language=language,
+                voice=voice,
+                rate=rate,
+                pitch=pitch,
+            )
 
             # 3. Synchronized subtitles generation (.ass and .srt)
             self.last_cues = cues
@@ -1068,7 +1445,9 @@ class CommentaryEngine:
         Uses Gemini AI when an API key is available for authentic gaming idioms;
         falls back gracefully to offline deterministic gaming dictionary replacement.
         """
-        if not cues or target_lang == "en":
+        target_clean = (target_lang or "en").lower().strip()
+        current_primary = getattr(self, "primary_language", "hi")
+        if not cues or target_clean == current_primary:
             return [
                 CommentaryCue(
                     start_time=c.start_time,
@@ -1092,6 +1471,8 @@ class CommentaryEngine:
                     "es": "Spanish (Español)",
                     "ru": "Russian (Русский)",
                     "fr": "French (Français)",
+                    "en": "English",
+                    "hi": "Hindi / Hinglish",
                 }
                 target_name = lang_names.get(target_lang, target_lang)
 

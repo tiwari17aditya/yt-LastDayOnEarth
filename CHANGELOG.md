@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.0] - 2026-11-26
+
+### Added
+- **Configurable Commentary Language Switch & Hinglish Walkthrough Engine (Option B - `src/config.py`, `src/audio/commentary_engine.py`, `src/main.py`)**:
+  - Implemented `COMMENTARY_LANGUAGE` configurable switch toggling between `"hi"` (Hinglish) and `"en"` (English), defaulting to `"hi"`.
+  - Added dynamic voice and prosody resolution in `CommentarySettings`:
+    - When `language="hi"`: Voice defaults to `en-IN-PrabhatNeural` (or `REGIONAL_HINGLISH_VOICE`) with `+12%` rate and `+22Hz` pitch.
+    - When `language="en"`: Voice defaults to `en-US-GuyNeural` with `-3%` rate and `-2Hz` pitch.
+    - Explicit voice overrides (`COMMENTARY_VOICE`) continue to be fully respected.
+  - Added comprehensive pools of authentic conversational Hinglish procedural dialogue (`PROCEDURAL_CASUAL_TOPICS_HINGLISH`, `PROCEDURAL_ENERGETIC_TOPICS_HINGLISH`, `PROCEDURAL_TACTICAL_TOPICS_HINGLISH`) covering 25+ domain topics (Bunker Alfa, wall trick, Chopper, healer buff, recycler, dog breeding, etc.).
+  - Added Hinglish intro/outro hooks and event formatting across all 4 commentary personas (Casual, Soft, Energetic, Tactical).
+  - Strictly enforced survivor privacy: username `adistar656` is automatically sanitized/replaced with `survivor` across all dialogue cues so it is never spoken aloud.
+  - Updated multi-lingual dubbing & captions to support bidirectional translations (Hinglish primary walkthrough with English, German, Spanish, French companion tracks).
+  - Added 14 unit tests in `tests/test_commentary_language.py`. Full project test suite passing at 113/113.
+
 ## [1.20.0] - 2026-11-26
 
 ### Added

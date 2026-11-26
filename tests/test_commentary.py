@@ -51,8 +51,12 @@ def test_commentary_settings_defaults():
     settings = get_settings()
     assert hasattr(settings, "commentary")
     assert settings.commentary.enabled is True
+    assert settings.commentary.language == "hi"
     assert settings.commentary.persona == "casual"
     assert settings.commentary.voice == "en-US-GuyNeural"
+    assert settings.commentary.effective_voice == "en-IN-PrabhatNeural"
+    assert settings.commentary.effective_rate == "+12%"
+    assert settings.commentary.effective_pitch == "+22Hz"
     assert settings.commentary.rate == "-3%"
     assert settings.commentary.pitch == "-2Hz"
     assert settings.commentary.volume_boost_db == "+1dB"
