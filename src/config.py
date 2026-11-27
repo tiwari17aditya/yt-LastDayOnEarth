@@ -90,6 +90,9 @@ class YouTubeSettings(BaseModel):
     title_style: str = Field(
         default_factory=lambda: os.getenv("TITLE_STYLE", "action_hook")
     )
+    max_title_length: int = Field(
+        default_factory=lambda: _safe_int(os.getenv("MAX_TITLE_LENGTH"), 55)
+    )
     episode_numbering: bool = Field(
         default_factory=lambda: os.getenv("EPISODE_NUMBERING_ENABLED", "true").lower() == "true"
     )

@@ -37,7 +37,7 @@ class TitleManager:
         series_prefix: str = "LDoE",
         title_style: str = "action_hook",
         episode_numbering: bool = True,
-        max_title_length: int = 100,
+        max_title_length: int = 55,
         sync_youtube: bool = False,
     ) -> None:
         self.tracker_file = tracker_file
@@ -237,21 +237,25 @@ class TitleManager:
         return activities
 
     def synthesize_hook_phrases(self, activities: List[str]) -> tuple[str, str]:
-        """Transforms activity list into punchy, high-CTR action phrases in clean Title Case."""
-        if not activities:
-            return "Ultimate Base Survival & Workshop", "Crafting, Building & Resource Prep"
+        """Transforms activity list into punchy, high-CTR action phrases in clean Title Case.
 
-        # Map common activities into clean high-energy hook phrases
+        Front-loads the exciting payoff and strips redundant filler words (And, Plus, &, Organizing)
+        to keep titles under 55 characters for complete mobile screen visibility.
+        """
+        if not activities:
+            return "Ultimate Base Survival", "Base Prep"
+
+        # Map common activities into punchy high-energy hook phrases (<= 32 chars)
         enhancements = {
             "crafting planks": "Woodcraft & Planks",
-            "weapon bench": "Weapon Workbench Setup",
+            "weapon bench": "Weapon Modding",
             "workbench & blueprints": "Blueprint Upgrades",
             "workbench": "Workbench Crafting",
             "blueprints": "Blueprint Upgrades",
-            "organizing chests": "Base Storage Optimization",
-            "storage & chests": "Base Storage Optimization",
+            "organizing chests": "Base Storage Setup",
+            "storage & chests": "Base Storage Setup",
             "smelting iron": "Furnace Smelting",
-            "bunker alfa": "Bunker Alfa Raid",
+            "bunker alfa": "Bunker Alfa Clear",
             "chopping trees": "Pine Log Harvest",
             "mining iron": "Iron Ore Scavenge",
             "base defense": "Zombie Horde Defense",
@@ -270,20 +274,25 @@ class TitleManager:
                     break
             if not matched:
                 clean_title = act.strip().title()
-                if clean_title not in upgraded:
+                # Strip out repetitive filler words like "And", "Plus", "Organizing"
+                clean_title = re.sub(r"\b(And|Plus|Organizing)\b", "", clean_title, flags=re.IGNORECASE).strip()
+                clean_title = re.sub(r"\s+", " ", clean_title)
+                if clean_title and clean_title not in upgraded:
                     upgraded.append(clean_title)
 
-        # Select top 2 activities and combine naturally
+        # Select top 2 activities if combined length fits <= 34 chars, else take top 1
         if len(upgraded) >= 2:
             first, second = upgraded[0], upgraded[1]
             separator = " + " if ("&" in first or "&" in second) else " & "
-            hook_lead = f"{first}{separator}{second}"
-            sub_summary = f"{activities[0]} and {activities[1]}"
-            if len(activities) > 2:
-                sub_summary += f" plus {activities[2]}"
+            combined = f"{first}{separator}{second}"
+            if len(combined) <= 34:
+                hook_lead = combined
+            else:
+                hook_lead = first
+            sub_summary = f"{first} & {second}"
         else:
             hook_lead = upgraded[0] if upgraded else "Base Expansion"
-            sub_summary = activities[0] if activities else "Base Operations"
+            sub_summary = hook_lead
 
         return hook_lead, sub_summary
 
@@ -300,52 +309,56 @@ class TitleManager:
         ep_tag = f"#{ep}" if self.episode_numbering else ""
 
         # Formula 1: Action Hook (High CTR - Front-loads excitement)
-        # e.g.: "MAX BASE STORAGE & SMELTING! | LDoE Survival #1"
-        action_parts = [hook_lead]
+        # e.g.: "Max Base Storage Setup! | LDoE #148" (~35 chars)
         if ep_tag:
-            action_hook_raw = f"{hook_lead}! | {self.series_prefix} Survival {ep_tag}".strip()
+            action_hook_raw = f"{hook_lead}! | {self.series_prefix} {ep_tag}".strip()
         else:
-            action_hook_raw = f"{hook_lead}! | {self.series_name}".strip()
+            action_hook_raw = f"{hook_lead}! | {self.series_prefix}".strip()
         action_hook = self._fit_title_length(action_hook_raw, ep_tag)
 
-        # Formula 2: Curiosity / Challenge Hook
-        # e.g.: "Can We Upgrade Our Entire Base? Workshop & Smelting | LDoE #1"
-        curiosity_lead = f"Can We Survive & Upgrade? {sub_summary.title()}"
+        # Formula 2: Curiosity / Challenge Hook (Front-loaded question)
+        # e.g.: "Can We Survive Bunker Alfa? | LDoE #148" (~39 chars)
+        curiosity_lead = f"Can We Survive {hook_lead}?"
+        if len(curiosity_lead) > 42:
+            curiosity_lead = f"Can We Beat {hook_lead}?"
         if ep_tag:
             curiosity_raw = f"{curiosity_lead} | {self.series_prefix} {ep_tag}".strip()
         else:
             curiosity_raw = f"{curiosity_lead} | {self.series_prefix}".strip()
         curiosity = self._fit_title_length(curiosity_raw, ep_tag)
 
-        # Formula 3: Clean Series Walkthrough / Guide
-        # e.g.: "Surviving Day 1: Base Setup, Woodcraft & Smelting | LDoE"
-        walkthrough_lead = f"Surviving Day {ep}: {sub_summary.title()}" if ep_tag else f"Surviving & Thriving: {sub_summary.title()}"
-        walkthrough_raw = f"{walkthrough_lead} | {self.series_prefix}".strip()
+        # Formula 3: Clean Series Walkthrough / Guide (Zero filler words)
+        # e.g.: "Day 148: Base Storage Setup | LDoE #148" (~41 chars)
+        if ep_tag:
+            walkthrough_lead = f"Day {ep}: {hook_lead}"
+            walkthrough_raw = f"{walkthrough_lead} | {self.series_prefix} {ep_tag}".strip()
+        else:
+            walkthrough_lead = f"Surviving: {hook_lead}"
+            walkthrough_raw = f"{walkthrough_lead} | {self.series_prefix}".strip()
         walkthrough = self._fit_title_length(walkthrough_raw, ep_tag)
 
         # Formula 4: Search-Optimized Tutorial / How-To Guide (+37% viewer retention)
-        # e.g.: "Fastest Way to Clear Bunker Alfa (F2P Guide) | LDoE #5"
-        # e.g.: "Best Base Storage & Workshop Layout Guide | LDoE #1"
+        # e.g.: "Fastest Way to Clear Bunker Alfa | LDoE #148" (~44 chars)
         activities_lower = " ".join(activities).lower()
         if "bunker" in activities_lower:
-            guide_lead = "Fastest Way to Clear Bunker Alfa (F2P Guide)"
+            guide_lead = "Fastest Way to Clear Bunker Alfa"
         elif any(k in activities_lower for k in ["chopper", "bike", "motorcycle"]):
-            guide_lead = "How to Get the Chopper Fast (F2P Guide)"
+            guide_lead = "How to Get the Chopper Fast"
         elif any(k in activities_lower for k in ["smelt", "furnace", "iron"]):
-            guide_lead = "Fastest Iron Smelting & Resource Farm Trick"
+            guide_lead = "Fastest Iron Smelting Guide"
         elif any(k in activities_lower for k in ["storage", "chest", "organize"]):
-            guide_lead = "Best Base Storage & Workshop Layout Guide"
+            guide_lead = "Best Base Storage Layout Guide"
         elif any(k in activities_lower for k in ["weapon", "gun", "gunsmith"]):
-            guide_lead = "How to Save Weapon Durability & Craft Guns"
+            guide_lead = "How to Save Weapon Durability"
         elif any(k in activities_lower for k in ["farm", "crooked creek"]):
-            guide_lead = "How to Clear Crooked Creek Farm Solo (F2P)"
+            guide_lead = "How to Clear Farm Solo"
         else:
-            guide_lead = f"How to Farm & Master {hook_lead} Fast"
+            guide_lead = f"How to Master {hook_lead} Fast"
 
         if ep_tag:
             guide_raw = f"{guide_lead} | {self.series_prefix} {ep_tag}".strip()
         else:
-            guide_raw = f"{guide_lead} | {self.series_name}".strip()
+            guide_raw = f"{guide_lead} | {self.series_prefix}".strip()
         search_guide = self._fit_title_length(guide_raw, ep_tag)
 
         # Select primary title according to configured title_style
@@ -390,12 +403,12 @@ class TitleManager:
                 primary = chosen_candidate
             else:
                 thematic_rotations = [
-                    "Bunker Alfa Infiltration & Red Crate Run",
-                    "Crooked Creek Farm Clearing & Combat",
-                    "High-Value Resource Scavenge & Smelting",
-                    "Zombie Horde Survival & Base Fortification",
-                    "Chopper Motorcycle Assembly & Fuel Run",
-                    "Rare Blueprint & Workshop Blueprint Upgrades",
+                    "Bunker Alfa Infiltration",
+                    "Crooked Creek Farm Clear",
+                    "Resource Scavenge & Smelt",
+                    "Zombie Horde Base Defense",
+                    "Chopper Motorcycle Fuel Run",
+                    "Blueprint Workshop Upgrades",
                 ]
                 used_texts = " ".join(recent_titles[:5]).lower()
                 chosen_theme = None
@@ -406,7 +419,7 @@ class TitleManager:
                 chosen_theme = chosen_theme or thematic_rotations[ep % len(thematic_rotations)]
 
                 if ep_tag:
-                    primary = self._fit_title_length(f"{chosen_theme}! | {self.series_prefix} Survival {ep_tag}", ep_tag)
+                    primary = self._fit_title_length(f"{chosen_theme}! | {self.series_prefix} {ep_tag}", ep_tag)
                 else:
                     primary = self._fit_title_length(f"{chosen_theme}! | {self.series_name}", ep_tag)
                 logger.info(f"Anti-Repetition Guard synthesized fresh thematic hook: '{primary}'")
@@ -493,7 +506,28 @@ class TitleManager:
         if len(title) <= self.max_title_length:
             return title
 
-        # Truncate front while keeping suffix
-        allowed_main = self.max_title_length - len(ep_suffix) - 5
-        truncated = title[:allowed_main].rsplit(" ", 1)[0]
-        return f"{truncated}... {ep_suffix}".strip()
+        # Check if title has a pipe separator, e.g. "Lead Text! | LDoE #148"
+        if " | " in title:
+            main_part, suffix_part = title.rsplit(" | ", 1)
+            suffix_str = f" | {suffix_part}"
+        elif ep_suffix and ep_suffix in title:
+            main_part = title.replace(ep_suffix, "").strip().rstrip("|").strip()
+            suffix_str = f" | {ep_suffix}" if not ep_suffix.startswith("|") else f" {ep_suffix}"
+        else:
+            main_part = title
+            suffix_str = f" {ep_suffix}".strip() if ep_suffix else ""
+
+        allowed_main = self.max_title_length - len(suffix_str)
+        if allowed_main <= 0:
+            return title[: self.max_title_length]
+
+        # Truncate main part at word boundary
+        if len(main_part) > allowed_main:
+            target_len = max(allowed_main - 3, 5)
+            truncated = main_part[:target_len].rsplit(" ", 1)[0].rstrip(".,!?:;-")
+            main_part = f"{truncated}..."
+
+        fitted = f"{main_part}{suffix_str}".strip()
+        if len(fitted) > self.max_title_length:
+            return fitted[: self.max_title_length]
+        return fitted
