@@ -5164,5 +5164,56 @@
       },
       "md5_checksum": "928b0d514442170b9dbe17b0c965fbd6"
     }
+  },
+  {
+    "job_id": "job_20261127_160311",
+    "timestamp": "2026-11-27T16:03:11.214895+00:00",
+    "input_filename": "ScreenRecording_11-08-2026 00-56-24_1.mp4",
+    "output_filename": "ScreenRecording_11-08-2026_00-56-24_1_Processed_27112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "3TD4xBaAtxk",
+    "youtube_url": "https://youtu.be/3TD4xBaAtxk",
+    "details": {
+      "video_id": "3TD4xBaAtxk",
+      "youtube_url": "https://youtu.be/3TD4xBaAtxk",
+      "scheduled_publish_time_utc": "2026-11-28T05:30:00Z",
+      "scheduled_publish_time_ist": "28 Nov 2026, 11:00 AM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-08-2026_00-56-24_1_Processed_27112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-08-2026_00-56-24_1_Processed_27112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-08-2026_00-56-24_1_Processed_27112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Home Base Operations! | LDoE #152",
+        "curiosity": "Can We Survive Home Base Operations? | LDoE #152",
+        "walkthrough": "Day 152: Home Base Operations | LDoE #152",
+        "search_guide": "Fastest Iron Smelting Guide | LDoE #152"
+      },
+      "duration_seconds": 632.627098,
+      "soundtrack_tracks": [
+        "Sneaky Snitch",
+        "Pamgaea",
+        "Sneaky Snitch",
+        "Pamgaea",
+        "Electro Cabello"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "companion_short": {
+        "path": "data/shorts/short_ep152_ScreenRecording_11-08-2026_00-56-24_1_Processed_27112026.mp4",
+        "youtube_url": "https://youtu.be/WcNqModXavA",
+        "video_id": "WcNqModXavA",
+        "viral_moment": {
+          "start_time": 70.3,
+          "duration": 35.0,
+          "headline": "LAST DAY ON EARTH",
+          "subtitle": "EPIC SURVIVAL MOMENT",
+          "hook_type": "highlight",
+          "urgency_badge": "\ud83d\udea8 WAIT FOR IT... \ud83d\udea8"
+        }
+      },
+      "md5_checksum": "d97c98e6392da4ac37aa3d1e78f3aa00"
+    }
   }
 ]

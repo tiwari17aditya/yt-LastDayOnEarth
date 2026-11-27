@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 152,
+  "current_episode": 154,
   "completed_episodes": [
     {
       "episode": 1,
@@ -1027,6 +1027,20 @@
       "video_id": "9zkGll3rG1M",
       "youtube_url": "https://youtu.be/9zkGll3rG1M",
       "job_id": "9zkGll3rG1M"
+    },
+    {
+      "episode": 152,
+      "title": "Furnace Smelting Setup! | LDoE #152",
+      "video_id": "3TD4xBaAtxk",
+      "youtube_url": "https://youtu.be/3TD4xBaAtxk",
+      "job_id": "3TD4xBaAtxk"
+    },
+    {
+      "episode": 153,
+      "title": "LAST DAY ON EARTH - Ep #152 | LDoE Survival #Shorts",
+      "video_id": "WcNqModXavA",
+      "youtube_url": "https://youtu.be/WcNqModXavA",
+      "job_id": "WcNqModXavA"
     }
   ]
 }
