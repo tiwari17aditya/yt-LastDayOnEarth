@@ -5117,5 +5117,52 @@
       "ads_removed": [],
       "md5_checksum": "4b3732a2b8313bfc49a682038a836d59"
     }
+  },
+  {
+    "job_id": "job_20261127_010851",
+    "timestamp": "2026-11-27T01:08:51.087644+00:00",
+    "input_filename": "ScreenRecording_11-08-2026 00-28-34_1.mp4",
+    "output_filename": "ScreenRecording_11-08-2026_00-28-34_1_Processed_27112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "7z9wFMOpiVY",
+    "youtube_url": "https://youtu.be/7z9wFMOpiVY",
+    "details": {
+      "video_id": "7z9wFMOpiVY",
+      "youtube_url": "https://youtu.be/7z9wFMOpiVY",
+      "scheduled_publish_time_utc": "2026-11-27T13:30:00Z",
+      "scheduled_publish_time_ist": "27 Nov 2026, 07:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-08-2026_00-28-34_1_Processed_27112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-08-2026_00-28-34_1_Processed_27112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-08-2026_00-28-34_1_Processed_27112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Base Storage Optimization & Entering Home Base! | LDoE Survival #150",
+        "curiosity": "Can We Survive & Upgrade? Organizing Storage & Chests And Entering Home Base Plus... #150",
+        "walkthrough": "Surviving Day 150: Organizing Storage & Chests And Entering Home Base Plus Workbench &... #150",
+        "search_guide": "Best Base Storage & Workshop Layout Guide | LDoE #150"
+      },
+      "duration_seconds": 429.729683,
+      "soundtrack_tracks": [
+        "Urban Gauntlet",
+        "Clean Soul"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "companion_short": {
+        "path": "data/shorts/short_ep150_ScreenRecording_11-08-2026_00-28-34_1_Processed_27112026.mp4",
+        "youtube_url": "https://youtu.be/9zkGll3rG1M",
+        "video_id": "9zkGll3rG1M",
+        "viral_moment": {
+          "start_time": 184.2,
+          "duration": 35.0,
+          "headline": "RAREST LOOT DROP?!",
+          "subtitle": "OPENING RED CHEST",
+          "hook_type": "rare_loot"
+        }
+      },
+      "md5_checksum": "928b0d514442170b9dbe17b0c965fbd6"
+    }
   }
 ]

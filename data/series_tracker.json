@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 150,
+  "current_episode": 152,
   "completed_episodes": [
     {
       "episode": 1,
@@ -1013,6 +1013,20 @@
       "video_id": "zjqEos2cjOU",
       "youtube_url": "https://youtu.be/zjqEos2cjOU",
       "job_id": "zjqEos2cjOU"
+    },
+    {
+      "episode": 150,
+      "title": "Zombie Horde Survival & Base Fortification! | LDoE Survival #150",
+      "video_id": "7z9wFMOpiVY",
+      "youtube_url": "https://youtu.be/7z9wFMOpiVY",
+      "job_id": "7z9wFMOpiVY"
+    },
+    {
+      "episode": 151,
+      "title": "RAREST LOOT DROP?! - Ep #150 | LDoE Survival #Shorts",
+      "video_id": "9zkGll3rG1M",
+      "youtube_url": "https://youtu.be/9zkGll3rG1M",
+      "job_id": "9zkGll3rG1M"
     }
   ]
 }
