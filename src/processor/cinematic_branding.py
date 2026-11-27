@@ -142,6 +142,51 @@ def draw_paint_splatter_badge(
     draw.text((tx, ty), badge_text, font=font_num, fill=(255, 255, 255, 255))
 
 
+def draw_complementary_hook_badge(
+    draw: ImageDraw.Draw,
+    badge_text: str,
+    pos: Tuple[int, int] = (60, 545),
+    text_color: Tuple[int, int, int] = (255, 235, 59),  # High-impact neon yellow
+    bg_color: Tuple[int, int, int] = (15, 18, 24),     # Deep charcoal glass
+    border_color: Tuple[int, int, int] = (255, 179, 0), # Amber gold
+) -> None:
+    """Renders a 2-3 word high-contrast badge optimized for Suggested Videos small sidebar scale."""
+    if not badge_text:
+        return
+
+    words = badge_text.strip().split()
+    clean_badge = " ".join(words[:3]).upper()
+
+    x0, y0 = pos
+    font_badge = _load_font(["impact.ttf", "arialbd.ttf", "DejaVuSans-Bold.ttf"], 58)
+    tbox = draw.textbbox((0, 0), clean_badge, font=font_badge)
+    tw, th = tbox[2] - tbox[0], tbox[3] - tbox[1]
+
+    pad_x, pad_y = 26, 16
+    rect = [x0, y0, x0 + tw + pad_x * 2, y0 + th + pad_y * 2]
+
+    # Draw dark backing plate with vibrant gold border
+    draw.rounded_rectangle(
+        rect,
+        radius=12,
+        fill=(*bg_color, 240),
+        outline=(*border_color, 255),
+        width=4,
+    )
+
+    # Thick black stroke for ultra-high contrast against any background
+    tx = x0 + pad_x
+    ty = y0 + pad_y - int(th * 0.08)
+    stroke_w = 4
+    for dx in range(-stroke_w, stroke_w + 1):
+        for dy in range(-stroke_w, stroke_w + 1):
+            if dx * dx + dy * dy <= stroke_w * stroke_w:
+                draw.text((tx + dx, ty + dy), clean_badge, font=font_badge, fill=(0, 0, 0, 255))
+
+    # Foreground high-contrast vibrant text
+    draw.text((tx, ty), clean_badge, font=font_badge, fill=(*text_color, 255))
+
+
 def draw_distressed_last_day_logo(
     draw: ImageDraw.Draw,
     top_left: Tuple[int, int],
@@ -195,6 +240,7 @@ def apply_cinematic_grunge_branding(
     output_path: Optional[Path] = None,
     badge_corner: str = "top_right",
     include_logo: bool = True,
+    hook_badge_text: Optional[str] = None,
 ) -> Path:
     """Applies the Last Day On Earth grunge aesthetic (distressed logo & episode splatter badge)."""
     target = output_path or image_path
@@ -237,6 +283,14 @@ def apply_cinematic_grunge_branding(
             # Place on left or center-left
             logo_pos = (int(w * 0.05), int(h * 0.18))
             draw_distressed_last_day_logo(draw=draw, top_left=logo_pos, scale=1.1)
+
+        # Draw 2-3 Word Complementary Hook Badge (Suggested Videos optimization)
+        if hook_badge_text:
+            draw_complementary_hook_badge(
+                draw=draw,
+                badge_text=hook_badge_text,
+                pos=(int(w * 0.05), int(h * 0.76)),
+            )
 
         result = Image.alpha_composite(img, overlay).convert("RGB")
         target.parent.mkdir(parents=True, exist_ok=True)

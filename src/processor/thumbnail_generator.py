@@ -59,13 +59,13 @@ class ThumbnailGenerator:
         # 1. Crop to 16:9 centered (cuts extra ultrawide phone edges)
         # 2. Crop 28% symmetrically (crop=iw*0.72:ih*0.72) to eliminate mobile joystick & touch buttons
         # 3. Scale to YouTube standard 1280x720
-        # 4. Color grade: +15% contrast, +25% saturation, unsharp filter
+        # 4. Color grade: +20% contrast, +30% saturation, unsharp filter for 1 clear focal point
         vf = (
             "crop=min(iw\\,ih*16/9):min(ih\\,iw*9/16),"
             "crop=iw*0.72:ih*0.72,"
             "scale=1280:720,"
-            "eq=contrast=1.15:brightness=0.02:saturation=1.25,"
-            "unsharp=5:5:0.8:5:5:0.0"
+            "eq=contrast=1.20:brightness=0.03:saturation=1.30,"
+            "unsharp=5:5:1.0:5:5:0.0"
         )
 
         cmd = [
@@ -242,6 +242,64 @@ class ThumbnailGenerator:
             logger.warning(f"Could not apply badge overlay to thumbnail: {e}")
             return image_path
 
+    def generate_complementary_badge_text(
+        self,
+        events: Optional[List[Any]] = None,
+        title: Optional[str] = None,
+        episode_number: Optional[int] = None,
+    ) -> str:
+        """Synthesizes exactly 2 to 3 high-contrast words complementing the title for Suggested Videos."""
+        event_str = " ".join([getattr(ev, "description", "") for ev in (events or [])]).lower()
+        title_str = (title or "").lower()
+        combined = f"{event_str} {title_str}"
+
+        # 1. High-danger Boss / Combat Encounters
+        if any(k in combined for k in ["blind one", "ravager", "witch", "boss"]):
+            return "BOSS FIGHT!"
+        if any(k in combined for k in ["frenzy giant", "giant"]):
+            return "DON'T DIE!"
+        if any(k in combined for k in ["horde", "defense", "zombie wave"]):
+            return "SURVIVE THIS?!"
+
+        # 2. Zone-Specific Runs
+        if any(k in combined for k in ["bunker", "alfa", "bravo"]):
+            if "floor 3" in combined:
+                return "FLOOR 3 RUN!"
+            if "floor 2" in combined:
+                return "FLOOR 2 CLEAR!"
+            return "SOLO CLEAR!"
+        if any(k in combined for k in ["farm", "crooked creek", "barn"]):
+            return "FARM RUN!"
+        if any(k in combined for k in ["police", "blackport", "waves"]):
+            return "WAVE DEFENSE!"
+        if any(k in combined for k in ["motel"]):
+            return "SPEED CLEAR!"
+        if any(k in combined for k in ["sewer", "laboratory"]):
+            return "DEADLY SECTOR!"
+
+        # 3. High-Value Loot / Crates / Rare Drops
+        if any(k in combined for k in ["red crate", "yellow crate", "unboxing", "air drop"]):
+            return "INSANE LOOT!"
+        if any(k in combined for k in ["chopper", "motorcycle", "bike", "fuel"]):
+            return "CHOPPER UNLOCKED!"
+        if any(k in combined for k in ["c4", "titanium", "circuit"]):
+            return "RAREST DROP!"
+
+        # 4. Base Optimization & Crafting
+        if any(k in combined for k in ["storage", "chest", "organize"]):
+            return "MAX STORAGE!"
+        if any(k in combined for k in ["smelt", "furnace", "iron"]):
+            return "SPEED FARM!"
+        if any(k in combined for k in ["weapon bench", "gunsmith", "blueprint", "mod"]):
+            return "WEAPON MODS!"
+        if any(k in combined for k in ["workshop", "craft", "build"]):
+            return "BEST LAYOUT!"
+
+        # 5. Default High-CTR Fallbacks
+        fallbacks = ["PRO TIP!", "MUST WATCH!", "SURVIVE THIS!", "SOLO RUN!"]
+        ep_idx = (episode_number or 1) % len(fallbacks)
+        return fallbacks[ep_idx]
+
     def generate_thumbnail(
         self,
         video_path: Path,
@@ -257,7 +315,15 @@ class ThumbnailGenerator:
         """Full orchestration: checks pre-generated episode art, or extracts 16:9 focus frame and applies branding."""
         import shutil
 
-        # 1. Check if a high-CTR cinematic thumbnail already exists for this episode
+        # 1. Determine 2-3 word complementary badge text if not explicitly provided
+        if not hook_text:
+            hook_text = self.generate_complementary_badge_text(
+                events=events,
+                title=None,
+                episode_number=episode_number,
+            )
+
+        # 2. Check if a high-CTR cinematic thumbnail already exists for this episode
         if episode_number is not None:
             candidate_dirs = [
                 Path("data/thumbnails"),
@@ -272,7 +338,7 @@ class ThumbnailGenerator:
                     shutil.copy2(curated_file, output_path)
                     return output_path
 
-        # 2. Check for curated thematic scenario template background
+        # 3. Check for curated thematic scenario template background
         template_applied = False
         template_dirs = [
             Path("data/thumbnails/templates"),
@@ -326,8 +392,7 @@ class ThumbnailGenerator:
             ts = timestamp if timestamp is not None else self.select_best_timestamp(events=events, duration=duration)
             self.extract_enhanced_frame(video_path, output_path, ts)
 
-
-        # 3. Apply branding overlay
+        # 4. Apply branding overlay
         label = badge_text
         if not label and episode_number is not None:
             label = f"#{episode_number}"
@@ -340,6 +405,7 @@ class ThumbnailGenerator:
                     episode_number=episode_number,
                     badge_text=label,
                     output_path=output_path,
+                    hook_badge_text=hook_text,
                 )
                 logger.info(f"Applied cinematic grunge branding to {output_path.name}")
                 if episode_number is not None:
@@ -354,14 +420,6 @@ class ThumbnailGenerator:
         # Fallback to studio plate
         if not label and episode_number is not None:
             label = f"EPISODE #{episode_number:02d}"
-
-        if not hook_text and events:
-            action_keywords = ["bench", "crafting", "smelting", "storage", "chests", "workshop"]
-            for ev in events:
-                desc = getattr(ev, "description", "")
-                if any(kw in desc.lower() for kw in action_keywords):
-                    hook_text = desc.upper()
-                    break
 
         if label:
             self.apply_badge_overlay(output_path, badge_text=label, hook_text=hook_text)
