@@ -29,15 +29,15 @@ class ShortsGenerator:
         subtitle: str = "SURVIVAL INTENSIFIES",
         footer_text: str = "EPISODE • WATCH FULL VIDEO",
         episode_number: Optional[int] = None,
+        urgency_badge: Optional[str] = None,
     ) -> Path:
         """Creates a high-contrast 1080x1920 transparent PNG overlay with branding and callouts."""
         img = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
-        # Header Banner background (top 380px)
-        # Gradient or semi-transparent dark banner
-        for y in range(400):
-            alpha = int(230 * (1.0 - (y / 400.0) ** 2))
+        # Header Banner background (top 420px)
+        for y in range(420):
+            alpha = int(240 * (1.0 - (y / 420.0) ** 2))
             draw.line([(0, y), (1080, y)], fill=(12, 14, 18, alpha))
 
         # Footer Banner background (bottom 400px)
@@ -54,41 +54,52 @@ class ShortsGenerator:
 
         # Load fonts (fallback to default if system font not available)
         def _get_font(size: int):
-            for name in ["arialbd.ttf", "impact.ttf", "segoeui.ttf", "arial.ttf"]:
+            for name in ["impact.ttf", "arialbd.ttf", "segoeuib.ttf", "DejaVuSans-Bold.ttf", "arial.ttf"]:
                 try:
                     return ImageFont.truetype(name, size)
                 except Exception:
                     continue
             return ImageFont.load_default()
 
-        font_brand = _get_font(52)
-        font_sub = _get_font(38)
+        font_urgency = _get_font(38)
+        font_brand = _get_font(60)
+        font_sub = _get_font(42)
         font_badge = _get_font(44)
         font_footer = _get_font(40)
 
-        # Render Header Brand Text
+        # 1. Render Instant Frame-1 Urgency Badge Banner (Top-most visual anchor)
+        u_badge = (urgency_badge or "⚠️ WAIT FOR IT! ⚠️").upper().strip()
+        bbox_u = draw.textbbox((0, 0), u_badge, font=font_urgency)
+        uw = bbox_u[2] - bbox_u[0] + 44
+        uh = bbox_u[3] - bbox_u[1] + 20
+        ux = (1080 - uw) // 2
+        uy = 80
+        draw.rounded_rectangle([ux, uy, ux + uw, uy + uh], radius=10, fill=(220, 38, 38, 245), outline=(255, 235, 59, 240), width=3)
+        draw.text((ux + 22, uy + 8), u_badge, fill=(255, 255, 255, 255), font=font_urgency)
+
+        # 2. Render Header Brand Text
         brand_text = top_title.upper()
         bbox = draw.textbbox((0, 0), brand_text, font=font_brand)
         w = bbox[2] - bbox[0]
         # Text shadow
-        draw.text(((1080 - w) // 2 + 2, 160 + 2), brand_text, fill=(0, 0, 0, 220), font=font_brand)
-        draw.text(((1080 - w) // 2, 160), brand_text, fill=(255, 255, 255, 255), font=font_brand)
+        draw.text(((1080 - w) // 2 + 3, 165 + 3), brand_text, fill=(0, 0, 0, 240), font=font_brand)
+        draw.text(((1080 - w) // 2, 165), brand_text, fill=(255, 255, 255, 255), font=font_brand)
 
-        # Render Subtitle / Hook Text
+        # 3. Render Subtitle / Hook Text (High-contrast neon yellow)
         sub_text = subtitle.upper()
         bbox_sub = draw.textbbox((0, 0), sub_text, font=font_sub)
         w_sub = bbox_sub[2] - bbox_sub[0]
-        draw.text(((1080 - w_sub) // 2 + 2, 235 + 2), sub_text, fill=(0, 0, 0, 200), font=font_sub)
-        draw.text(((1080 - w_sub) // 2, 235), sub_text, fill=(239, 68, 68, 255), font=font_sub)
+        draw.text(((1080 - w_sub) // 2 + 2, 248 + 2), sub_text, fill=(0, 0, 0, 220), font=font_sub)
+        draw.text(((1080 - w_sub) // 2, 248), sub_text, fill=(255, 214, 0, 255), font=font_sub)
 
-        # Render Episode Badge if available
+        # 4. Render Episode Badge if available
         if episode_number:
             badge_text = f"EPISODE #{episode_number}"
             bbox_b = draw.textbbox((0, 0), badge_text, font=font_badge)
             bw = bbox_b[2] - bbox_b[0] + 40
             bh = bbox_b[3] - bbox_b[1] + 20
             bx = (1080 - bw) // 2
-            by = 310
+            by = 325
             draw.rectangle([bx, by, bx + bw, by + bh], fill=(185, 28, 28, 230), outline=(255, 255, 255, 200), width=2)
             draw.text((bx + 20, by + 8), badge_text, fill=(255, 255, 255, 255), font=font_badge)
 
@@ -157,6 +168,7 @@ class ShortsGenerator:
                 "headline": "LAST DAY ON EARTH",
                 "subtitle": "SURVIVAL INTENSIFIES",
                 "hook_type": "standard_gameplay",
+                "urgency_badge": "⚠️ WAIT FOR IT! ⚠️",
             }
 
         # Priority 1: High-stakes fail moments & intense combat panic
@@ -171,6 +183,7 @@ class ShortsGenerator:
                     "headline": "DISASTER MOMENT?!",
                     "subtitle": "RED ZONE CLOSE CALL",
                     "hook_type": "fail_panic",
+                    "urgency_badge": "⚠️ DO NOT MAKE THIS MISTAKE! ⚠️",
                 }
 
         # Priority 2: Rare loot unboxings and bunker raids
@@ -185,6 +198,7 @@ class ShortsGenerator:
                     "headline": "RAREST LOOT DROP?!",
                     "subtitle": "OPENING RED CHEST",
                     "hook_type": "rare_loot",
+                    "urgency_badge": "🔥 1 IN A MILLION DROP?! 🔥",
                 }
 
         # Priority 3: General highlight
@@ -195,6 +209,7 @@ class ShortsGenerator:
             "headline": "LAST DAY ON EARTH",
             "subtitle": "EPIC SURVIVAL MOMENT",
             "hook_type": "highlight",
+            "urgency_badge": "🚨 WAIT FOR IT... 🚨",
         }
 
     def generate_short(
@@ -206,6 +221,7 @@ class ShortsGenerator:
         headline: str = "LAST DAY ON EARTH",
         subtitle: str = "BASE SURVIVAL INTENSIFIES",
         episode_number: Optional[int] = None,
+        urgency_badge: Optional[str] = None,
     ) -> Path:
         """Renders a vertical 1080x1920 YouTube Short clip using FFmpeg."""
         if not input_video.exists():
@@ -224,6 +240,7 @@ class ShortsGenerator:
             subtitle=subtitle,
             footer_text="WATCH FULL EPISODE 🎬",
             episode_number=episode_number,
+            urgency_badge=urgency_badge,
         )
 
         filter_graph = (
@@ -246,6 +263,7 @@ class ShortsGenerator:
             "-filter_complex", filter_graph,
             "-map", "[outv]",
             "-map", "0:a?",
+            "-avoid_negative_ts", "make_zero",
             "-c:v", "libx264",
             "-preset", "faster",
             "-crf", "22",
@@ -375,6 +393,7 @@ class ShortsGenerator:
             headline=headline,
             subtitle=subtitle,
             episode_number=episode_number,
+            urgency_badge=viral_info.get("urgency_badge"),
         )
 
         return rendered_short, viral_info
