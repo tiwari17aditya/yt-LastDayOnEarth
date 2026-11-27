@@ -117,8 +117,11 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
     - Option B (HUD Overlay): Dynamic tactical HUD header banner fading into gameplay with 0.8s alpha decay.
     - Cross-platform dynamic font loader automatically resolving fonts across Windows (`impact.ttf`, `arialbd.ttf`) and Linux (`liberation`, `dejavu`).
   - `ShortsGenerator` (`src/processor/shorts_generator.py`):
-    - Automatically extracts 30–50s peak viral moments (boss fights, panic escapes, red crate loot) and renders 1080x1920 vertical videos with blurred backdrop, branded header/footer overlays, and full episode CTA links.
+    - Automatically extracts 30–50s peak viral moments (boss fights, panic escapes, red crate loot) and renders 1080x1920 vertical videos with blurred backdrop, zero-delay Frame-1 cuts (`-avoid_negative_ts make_zero`), dynamic top visual urgency banners (`⚠️ DO NOT MAKE THIS MISTAKE! ⚠️`, `🔥 1 IN A MILLION DROP?! 🔥`), branded overlays, and full episode CTA links.
     - Integrated directly into `src/main.py` (Step 5.5) with non-blocking error boundaries and delayed scheduled release (+8h) to funnel mobile viewers into the main episode playlist.
+  - `ThumbnailGenerator` (`src/processor/thumbnail_generator.py`):
+    - Optimized for Suggested Video sidebar click-through rates (168px scale) featuring 1 dominant focal point (+20% contrast, +30% saturation, unsharp filtering).
+    - Synthesizes strictly 2 to 3 words of bold complementary text (`MAX STORAGE!`, `SOLO CLEAR!`, `INSANE LOOT!`, `DON'T DIE!`, `BOSS FIGHT!`) rendered in high-contrast neon yellow / white with dark glass backing and gold borders in the lower-left quadrant.
   - `Silent Mode Defense (`mute_raw_audio`)`: Eliminates microphone ambient noise and rogue audio leakage by routing isolated royalty-free background music directly when gaming in silent mode (`MUTE_RAW_AUDIO=true`).
   - `OutroTailGenerator` (`src/processor/outro_generator.py`): Generates 5–8 second high-energy 1080p animated outro videos featuring interactive dynamic buttons (Like, Share, Subscribe, Bell) with visual cursor interaction, neon pulse effects, and energetic audio stings.
   - `EndScreenGenerator` (`src/processor/endscreen_generator.py`): Visual template slate generator matching YouTube interactive card layout dimensions.
@@ -137,7 +140,10 @@ The **Automated Last Day on Earth Video Pipeline** follows strict software engin
   - `PeerTubeClient`: Open-source decentralized video hosting client implementing `BasePublisher` via PeerTube REST API v1 (federated across the global ActivityPub Fediverse).
   - `FediverseBroadcaster`: Cross-posts rich release announcements with custom thumbnails, video links, and dynamic hashtags to Mastodon and Lemmy communities (automatically deferred for scheduled private videos until public).
   - `MultiPlatformPublisher`: Orchestrates primary publishing (YouTube) and non-blocking open-source mirrors and social broadcasts (PeerTube + Fediverse), preserving fail-safe pipeline semantics.
-  - `TitleManager` (`src/publisher/title_manager.py`): Front-loaded high-CTR title variations, search-intent tutorial formula (`search_guide`, +37% viewer retention), Title History Anti-Repetition Guard (`is_title_repetitive` vs last 10 episodes in `data/series_tracker.json`), persistent series episode tracking, and live YouTube channel/playlist episode auto-synchronization (`sync_with_youtube`).
+  - `TitleManager` (`src/publisher/title_manager.py`):
+    - Mobile-Optimized Titles ($\le 55$ Chars): Enforces strict 55-character budget via `MAX_TITLE_LENGTH`, compact suffix (`| LDoE #ep`), stripped filler conjunctions, and front-loaded excitement across 4 distinct formulas.
+    - Anti-Repetition Engine: 30-episode historical lookback window (`ANTI_REPETITION_LOOKBACK`), dynamic granular event extraction (floors, bosses, loot, weapons), dynamic fallback synthesis, and 2-word key bigram overlap penalties preventing repeated consecutive titles.
+    - Series synchronization and persistent episode tracking (`data/series_tracker.json`).
   - `MetadataLocalizer` (`src/publisher/localization.py`): Multi-language translation engine producing YouTube Data API v3 `localizations` payloads and synchronized `.srt` Closed Caption tracks for key player regions: German (`de`), Spanish (`es`), Russian (`ru`), French (`fr`), and Portuguese (`pt`).
   - `DynamicTagGenerator` (`src/publisher/metadata_generator.py`): Dynamically analyzes gameplay events and titles to synthesize ~50 trending hashtags via Gemini AI or multi-cluster contextual algorithmic selection with seeded rotation.
   - `scripts/resolve_copyright_claims.py`: Channel-wide copyright and territorial restriction auditing, batch-fixing, and YouTube Studio dispute resolution copy generator.

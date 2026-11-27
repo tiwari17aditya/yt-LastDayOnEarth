@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.0] - 2026-11-27
+
+### Added
+- **Mobile Title Optimization (P1 - `src/config.py`, `src/main.py`, `src/publisher/title_manager.py`)**:
+  - Implemented strict $\le 55$ character title length limit via `MAX_TITLE_LENGTH` configuration (defaulting to 55) to prevent ellipsis cutoff on mobile YouTube apps.
+  - Stripped redundant filler words (`And`, `Plus`, `&`, `Organizing`) and streamlined combined activity hooks under a 34-character budget.
+  - Compacted series suffix from `| LDoE Survival #ep` to `| LDoE #ep` (recovering 9 critical characters for the action lead).
+  - Front-loaded excitement and payoffs across all 4 title formulas: Action Hook, Curiosity Story, Clean Series Walkthrough, and Search Guide.
+  - Added unit test suite `tests/test_mobile_titles.py`.
+- **Anti-Repetition Engine Overhaul (P2 - `src/config.py`, `src/main.py`, `src/publisher/title_manager.py`)**:
+  - Expanded historical episode lookback window from 10 to 30 episodes via `ANTI_REPETITION_LOOKBACK` (defaulting to 30), filtered chronologically (`episode < target_episode`).
+  - Completely eliminated the hardcoded static fallback array (`Bunker Alfa Infiltration...`) in favor of dynamic event-driven title synthesis.
+  - Added `extract_granular_event_highlights` to dynamically identify sub-zones, floor numbers (`Floor 3`), specific enemies (`Frenzy Giant`, `The Blind One`, `Ravager`), weapons (`Glock 17`, `M16`, `Shotgun`), and rare loot drops (`Red Crate`, `Chopper Tank`).
+  - Added `synthesize_dynamic_fallback` checking procedural candidates against the 30-episode history with strict $\le 0.40$ similarity cutoff.
+  - Implemented 2-word key bigram overlap penalties in `calculate_title_similarity` to strictly prevent consecutive episodes from repeating core phrases.
+  - Added unit test suite `tests/test_anti_repetition_overhaul.py`.
+- **Suggested Video Thumbnail Optimization (P3 - `src/processor/cinematic_branding.py`, `src/processor/thumbnail_generator.py`)**:
+  - Calibrated cinematic color grading in `extract_enhanced_frame` (+20% contrast, +30% saturation, unsharp filtering) to isolate 1 clear dominant focal point.
+  - Added `generate_complementary_badge_text` in `ThumbnailGenerator` generating strictly 2 to 3 high-contrast words (`MAX STORAGE!`, `SOLO CLEAR!`, `INSANE LOOT!`, `DON'T DIE!`, `BOSS FIGHT!`) that complement the title without repeating it.
+  - Added `draw_complementary_hook_badge` in `src/processor/cinematic_branding.py` rendering bold, heavy typography with dark glass backing and neon yellow/gold outlines in the lower-left quadrant for maximum legibility in small sidebar Suggested Video feeds.
+  - Added unit test suite `tests/test_suggested_thumbnails.py`.
+- **Shorts Instant Frame-1 Hook (P4 - `src/processor/shorts_generator.py`)**:
+  - Implemented instantaneous 0.00s action cut using `-avoid_negative_ts make_zero` in FFmpeg, eliminating pre-roll delay, blank frames, and audio desync.
+  - Added dynamic Frame-1 visual urgency indicator banners (`⚠️ DO NOT MAKE THIS MISTAKE! ⚠️`, `🔥 1 IN A MILLION DROP?! 🔥`, `🚨 WAIT FOR IT... 🚨`) anchored at the top of the 9:16 vertical overlay.
+  - Enlarged headline typography (size 60) with deep 3D drop shadows and high-contrast neon yellow subtitles to halt viewer swipe-away in the critical first 1.5 seconds.
+  - Added unit test suite `tests/test_shorts_instant_hook.py`.
+
 ## [1.21.0] - 2026-11-26
 
 ### Added
