@@ -38,6 +38,7 @@ class TitleManager:
         title_style: str = "action_hook",
         episode_numbering: bool = True,
         max_title_length: int = 55,
+        anti_repetition_lookback: int = 30,
         sync_youtube: bool = False,
     ) -> None:
         self.tracker_file = tracker_file
@@ -46,6 +47,7 @@ class TitleManager:
         self.title_style = title_style
         self.episode_numbering = episode_numbering
         self.max_title_length = max_title_length
+        self.anti_repetition_lookback = anti_repetition_lookback
         self.sync_youtube = sync_youtube
         self._synced_with_youtube = False
         self._ensure_tracker_exists()
@@ -371,8 +373,11 @@ class TitleManager:
         else:
             primary = action_hook
 
-        # Anti-Repetition Guard: Cross-reference against recent episodes
-        recent_titles = self.get_recent_published_titles(limit=10)
+        # Anti-Repetition Guard: Cross-reference against recent episodes (lookback window)
+        recent_titles = self.get_recent_published_titles(
+            limit=self.anti_repetition_lookback,
+            before_episode=ep,
+        )
         anti_rep_applied = False
         similarity_score = 0.0
         avoided_title = ""
@@ -402,27 +407,8 @@ class TitleManager:
             if chosen_candidate:
                 primary = chosen_candidate
             else:
-                thematic_rotations = [
-                    "Bunker Alfa Infiltration",
-                    "Crooked Creek Farm Clear",
-                    "Resource Scavenge & Smelt",
-                    "Zombie Horde Base Defense",
-                    "Chopper Motorcycle Fuel Run",
-                    "Blueprint Workshop Upgrades",
-                ]
-                used_texts = " ".join(recent_titles[:5]).lower()
-                chosen_theme = None
-                for theme in thematic_rotations:
-                    if not any(k in used_texts for k in theme.lower().split()[:2]):
-                        chosen_theme = theme
-                        break
-                chosen_theme = chosen_theme or thematic_rotations[ep % len(thematic_rotations)]
-
-                if ep_tag:
-                    primary = self._fit_title_length(f"{chosen_theme}! | {self.series_prefix} {ep_tag}", ep_tag)
-                else:
-                    primary = self._fit_title_length(f"{chosen_theme}! | {self.series_name}", ep_tag)
-                logger.info(f"Anti-Repetition Guard synthesized fresh thematic hook: '{primary}'")
+                primary = self.synthesize_dynamic_fallback(events, ep, recent_titles, ep_tag)
+                logger.info(f"Anti-Repetition Guard synthesized fresh dynamic hook: '{primary}'")
 
         logger.info(
             f"Generated high-CTR title package for Episode #{ep}",
@@ -451,15 +437,133 @@ class TitleManager:
             avoided_recent_title=avoided_title,
         )
 
-    def get_recent_published_titles(self, limit: int = 10) -> List[str]:
+    def extract_granular_event_highlights(self, events: List[Any]) -> List[str]:
+        """Extracts high-specificity details (zones, floors, enemies, weapons, loot) from gameplay events."""
+        highlights = []
+        if not events:
+            return highlights
+
+        enemy_map = {
+            "blind one": "The Blind One Fight",
+            "frenzy giant": "Frenzy Giant Combat",
+            "ravager": "Ravager Boss Fight",
+            "witch": "Witch Boss Clear",
+            "turret": "Heavy Turret Destroyed",
+            "horde": "Zombie Horde Wave",
+            "bloater": "Floater Bloater Battle",
+            "abomination": "Toxic Abomination Battle",
+        }
+        zone_map = {
+            "floor 4": "Bunker Alfa Floor 4",
+            "floor 3": "Bunker Alfa Floor 3",
+            "floor 2": "Bunker Alfa Floor 2",
+            "lobby": "Bunker Alfa Lobby",
+            "police station": "Police Station Waves",
+            "blackport": "Blackport PD Waves",
+            "crooked creek": "Crooked Creek Farm",
+            "farm barn": "Farm Barn Opening",
+            "motel": "Motel Speed Clear",
+            "sewer": "Port Sewers Clear",
+            "laboratory": "Genesis Lab Clear",
+            "red pine": "Red Zone Pine Scavenge",
+            "limestone": "Limestone Ridge Farm",
+            "air drop": "Loot Air Drop Event",
+            "convoy": "Destroyed Convoy Event",
+        }
+        weapon_map = {
+            "glock": "Glock 17 Combat",
+            "shotgun": "Shotgun Blast Run",
+            "ak-47": "AK-47 Assault Run",
+            "m16": "M16 Firefight",
+            "wall trick": "Wall Trick Combat",
+            "sneak": "Sneak Attack Run",
+            "crate": "Red Crate Unboxing",
+            "circuit": "Electronic Circuit Loot",
+            "chopper": "Chopper Gas Tank Find",
+            "furnace": "Furnace Smelting Setup",
+            "storage": "Base Storage Optimization",
+            "steel": "Steel Room Build",
+        }
+
+        full_event_text = " ".join([getattr(ev, "description", "") for ev in events]).lower()
+
+        for key, val in enemy_map.items():
+            if key in full_event_text and val not in highlights:
+                highlights.append(val)
+
+        for key, val in zone_map.items():
+            if key in full_event_text and val not in highlights:
+                highlights.append(val)
+
+        for key, val in weapon_map.items():
+            if key in full_event_text and val not in highlights:
+                highlights.append(val)
+
+        return highlights
+
+    def synthesize_dynamic_fallback(
+        self,
+        events: List[Any],
+        ep: int,
+        recent_titles: List[str],
+        ep_tag: str,
+    ) -> str:
+        """Synthesizes a unique, non-repetitive title dynamically extracted from actual gameplay events."""
+        granular_highlights = self.extract_granular_event_highlights(events)
+        candidates = []
+
+        # Generate candidates from granular highlights
+        for hl in granular_highlights:
+            candidates.append(f"{hl}!")
+            candidates.append(f"Mastering {hl}")
+            candidates.append(f"Solo {hl} Run")
+
+        # Procedural fallback themes with episode-specific context if granular highlights are unavailable
+        procedural_themes = [
+            "Wasteland Survival Sprint",
+            "Base Workshop Expansion",
+            "High-Tier Resource Scavenge",
+            "Outpost Fortification",
+            "Hardcore Wasteland Clearing",
+            "Survivor Arsenal Upgrades",
+            "Deadly Sector Infiltration",
+            f"Survival Mastery Day {ep}",
+        ]
+        candidates.extend(procedural_themes)
+
+        # Check each candidate against recent titles with strict 0.40 threshold
+        for cand in candidates:
+            if ep_tag:
+                full_cand = self._fit_title_length(f"{cand} | {self.series_prefix} {ep_tag}", ep_tag)
+            else:
+                full_cand = self._fit_title_length(f"{cand} | {self.series_name}", ep_tag)
+
+            is_rep, _, _ = self.is_title_repetitive(full_cand, recent_titles, threshold=0.40)
+            if not is_rep:
+                return full_cand
+
+        # Ultimate fallback guarantee: completely unique procedural title
+        final_lead = f"Survival Frontier Day {ep}"
+        if ep_tag:
+            return self._fit_title_length(f"{final_lead} | {self.series_prefix} {ep_tag}", ep_tag)
+        return self._fit_title_length(f"{final_lead} | {self.series_name}", ep_tag)
+
+    def get_recent_published_titles(
+        self,
+        limit: Optional[int] = None,
+        before_episode: Optional[int] = None,
+    ) -> List[str]:
         """Fetches the titles of the most recent N completed episodes from tracker file."""
+        max_limit = limit if limit is not None else self.anti_repetition_lookback
         if not self.tracker_file.exists():
             return []
         try:
             data = json.loads(self.tracker_file.read_text(encoding="utf-8"))
             completed = data.get("completed_episodes", [])
+            if before_episode is not None:
+                completed = [ep for ep in completed if ep.get("episode", 0) < before_episode]
             recent = [ep.get("title", "") for ep in completed if ep.get("title")]
-            return list(reversed(recent[-limit:]))
+            return list(reversed(recent[-max_limit:]))
         except Exception as e:
             logger.warning(f"Could not read recent titles for anti-repetition check: {e}")
             return []
@@ -475,9 +579,18 @@ class TitleManager:
 
     def calculate_title_similarity(self, title_a: str, title_b: str) -> float:
         """Calculates token-overlap similarity between two titles (excluding boilerplate words)."""
-        stop_words = {"and", "the", "with", "for", "plus", "part", "to", "how", "fast", "guide", "survival", "ldoe"}
-        tokens_a = {w for w in self.clean_title_for_comparison(title_a).split() if len(w) > 2 and w not in stop_words}
-        tokens_b = {w for w in self.clean_title_for_comparison(title_b).split() if len(w) > 2 and w not in stop_words}
+        clean_a = self.clean_title_for_comparison(title_a)
+        clean_b = self.clean_title_for_comparison(title_b)
+        if not clean_a or not clean_b:
+            return 0.0
+        if clean_a == clean_b:
+            return 1.0
+
+        stop_words = {"and", "the", "with", "for", "plus", "part", "to", "how", "fast", "guide", "survival", "ldoe", "can", "we"}
+        words_a = [w for w in clean_a.split() if len(w) > 2 and w not in stop_words]
+        words_b = [w for w in clean_b.split() if len(w) > 2 and w not in stop_words]
+        tokens_a = set(words_a)
+        tokens_b = set(words_b)
 
         if not tokens_a or not tokens_b:
             return 0.0
@@ -486,7 +599,15 @@ class TitleManager:
         union = tokens_a | tokens_b
         jaccard = len(intersection) / len(union)
         containment = len(intersection) / min(len(tokens_a), len(tokens_b))
-        return max(jaccard, containment * 0.85)
+        score = max(jaccard, containment * 0.85)
+
+        # Check for matching 2-word key bigrams (e.g., "bunker alfa", "base storage", "crooked creek")
+        bigrams_a = {f"{words_a[i]} {words_a[i+1]}" for i in range(len(words_a) - 1)}
+        bigrams_b = {f"{words_b[i]} {words_b[i+1]}" for i in range(len(words_b) - 1)}
+        if bigrams_a and bigrams_b and (bigrams_a & bigrams_b):
+            score = max(score, 0.55)
+
+        return score
 
     def is_title_repetitive(
         self,
@@ -495,9 +616,11 @@ class TitleManager:
         threshold: float = 0.50,
     ) -> tuple[bool, str, float]:
         """Determines whether a candidate title is too repetitive against recently published episodes."""
-        for recent in recent_titles:
+        for idx, recent in enumerate(recent_titles):
+            # For the most recent 3 episodes, use an even stricter threshold (0.38)
+            effective_threshold = threshold if idx >= 3 else min(threshold, 0.38)
             score = self.calculate_title_similarity(candidate_title, recent)
-            if score >= threshold:
+            if score >= effective_threshold:
                 return True, recent, score
         return False, "", 0.0
 

@@ -93,6 +93,9 @@ class YouTubeSettings(BaseModel):
     max_title_length: int = Field(
         default_factory=lambda: _safe_int(os.getenv("MAX_TITLE_LENGTH"), 55)
     )
+    anti_repetition_lookback: int = Field(
+        default_factory=lambda: _safe_int(os.getenv("ANTI_REPETITION_LOOKBACK"), 30)
+    )
     episode_numbering: bool = Field(
         default_factory=lambda: os.getenv("EPISODE_NUMBERING_ENABLED", "true").lower() == "true"
     )

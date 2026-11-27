@@ -172,6 +172,7 @@ def run_pipeline(
         title_style=settings.youtube.title_style,
         episode_numbering=settings.youtube.episode_numbering,
         max_title_length=getattr(settings.youtube, "max_title_length", 55),
+        anti_repetition_lookback=getattr(settings.youtube, "anti_repetition_lookback", 30),
         sync_youtube=settings.youtube.sync_episode_with_youtube,
     )
     thumbnail_gen = ThumbnailGenerator(output_dir=settings.processing.output_dir)
