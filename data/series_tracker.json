@@ -1,6 +1,6 @@
 {
   "series_name": "Last Day on Earth: Survival",
-  "current_episode": 154,
+  "current_episode": 155,
   "completed_episodes": [
     {
       "episode": 1,
@@ -1041,6 +1041,13 @@
       "video_id": "WcNqModXavA",
       "youtube_url": "https://youtu.be/WcNqModXavA",
       "job_id": "WcNqModXavA"
+    },
+    {
+      "episode": 154,
+      "title": "Wasteland Survival Sprint | LDoE #154",
+      "video_id": "q0KYC82ziik",
+      "youtube_url": "https://youtu.be/q0KYC82ziik",
+      "job_id": "q0KYC82ziik"
     }
   ]
 }

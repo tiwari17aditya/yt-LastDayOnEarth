@@ -269,8 +269,8 @@
       "title": "RAREST LOOT DROP?! - Ep #150 | LDoE Survival #Shorts",
       "scheduled_publish_time_utc": "2026-11-27T21:30:00Z",
       "scheduled_publish_time_ist": "28 Nov 2026, 03:00 AM IST",
-      "privacy_status": "private",
-      "status": "SCHEDULED",
+      "privacy_status": "public",
+      "status": "PUBLISHED",
       "youtube_url": "https://youtu.be/9zkGll3rG1M",
       "enqueued_at_utc": "2026-11-27T01:08:49Z"
     },
@@ -295,7 +295,18 @@
       "status": "SCHEDULED",
       "youtube_url": "https://youtu.be/WcNqModXavA",
       "enqueued_at_utc": "2026-11-27T16:03:09Z"
+    },
+    {
+      "episode_number": 154,
+      "video_id": "q0KYC82ziik",
+      "title": "Wasteland Survival Sprint | LDoE #154",
+      "scheduled_publish_time_utc": "2026-11-28T14:30:00Z",
+      "scheduled_publish_time_ist": "28 Nov 2026, 08:00 PM IST",
+      "privacy_status": "private",
+      "status": "SCHEDULED",
+      "youtube_url": "https://youtu.be/q0KYC82ziik",
+      "enqueued_at_utc": "2026-11-28T00:11:59Z"
     }
   ],
-  "last_updated_utc": "2026-11-27T16:03:09Z"
+  "last_updated_utc": "2026-11-28T00:11:59Z"
 }

@@ -5215,5 +5215,40 @@
       },
       "md5_checksum": "d97c98e6392da4ac37aa3d1e78f3aa00"
     }
+  },
+  {
+    "job_id": "job_20261128_001205",
+    "timestamp": "2026-11-28T00:12:05.212712+00:00",
+    "input_filename": "ScreenRecording_11-08-2026 01-45-57_1.mp4",
+    "output_filename": "ScreenRecording_11-08-2026_01-45-57_1_Processed_28112026.mp4",
+    "status": "SUCCESS",
+    "video_id": "q0KYC82ziik",
+    "youtube_url": "https://youtu.be/q0KYC82ziik",
+    "details": {
+      "video_id": "q0KYC82ziik",
+      "youtube_url": "https://youtu.be/q0KYC82ziik",
+      "scheduled_publish_time_utc": "2026-11-28T14:30:00Z",
+      "scheduled_publish_time_ist": "28 Nov 2026, 08:00 PM IST",
+      "privacy_status": "private",
+      "video_output": "output/ScreenRecording_11-08-2026_01-45-57_1_Processed_28112026.mp4",
+      "metadata_output": "output/ScreenRecording_11-08-2026_01-45-57_1_Processed_28112026_metadata.json",
+      "thumbnail_output": "output/ScreenRecording_11-08-2026_01-45-57_1_Processed_28112026_thumbnail.jpg",
+      "title_candidates": {
+        "action_hook": "Blueprint Upgrades! | LDoE #154",
+        "curiosity": "Can We Survive Blueprint Upgrades? | LDoE #154",
+        "walkthrough": "Day 154: Blueprint Upgrades | LDoE #154",
+        "search_guide": "How to Master Blueprint Upgrades Fast | LDoE #154"
+      },
+      "duration_seconds": 27.431667,
+      "soundtrack_tracks": [
+        "Groove Grove"
+      ],
+      "subtitles_burned": true,
+      "privacy_redacted": true,
+      "ads_removed_count": 0,
+      "ads_removed": [],
+      "companion_short": null,
+      "md5_checksum": "80ee3e4fe87dd52c0add78b65d23fae3"
+    }
   }
 ]
